@@ -7,26 +7,26 @@
 <style>
   * { box-sizing: border-box; }
   body { font-family: system-ui, Arial, sans-serif; background:#F9FAFB; color:#111; margin:0; }
-  /* Always 20px from the viewport edge on both sides */
   .container { width:100%; margin:0; padding:24px 20px; }
 
-  /* Headers */
   h1 { font-size:20pt; margin:0 0 8px 0; line-height:1.2; }
   .subheader { font-size:18pt; margin:0 0 20px 0; font-weight:500; }
   h2 { font-size:14pt; margin:22px 0 10px 0; line-height:1.25; }
 
-  /* Use CSS Grid so inputs always reach the right edge of the container */
   .row {
-    display: grid;
-    grid-template-columns: 118px 1fr; /* compact label, full‑width field */
-    column-gap: 6px;                  /* small gap between label and field */
+    display: flex;
     align-items: center;
     margin: 10px 0;
   }
-  .row > label { font-size:10pt; font-weight:400; }
+  .row > label {
+    width: 120px;
+    font-size: 10pt;
+    font-weight: 400;
+  }
   .row > input,
   .row > select {
-    width: 100%;                      /* ensures right edge lines up with page border */
+    width: 260px;   /* fixed width for all fields */
+    max-width: 100%;
     padding: 8px 10px;
     font-size: 10pt;
   }
@@ -38,11 +38,6 @@
   .pill.selected { background:#1E90FF; color:#fff; }
 
   button { padding:10px 14px; border:1px solid #ccc; border-radius:10px; background:#fff; cursor:pointer; }
-
-  /* Fallback: on very narrow screens, stack label above field to avoid cramped layout */
-  @media (max-width: 340px) {
-    .row { grid-template-columns: 1fr; row-gap: 6px; }
-  }
 </style>
 <script id="embeddedQuestions" type="application/json">[
   {
