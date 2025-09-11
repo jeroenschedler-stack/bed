@@ -39,7 +39,7 @@
 
     .sar-logo-wrap{ display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
     .sar-logo{ font-size:28px; font-weight:800; letter-spacing:.35px; color:var(--text); white-space:nowrap; }
-    .sar-dotbar{ display:flex; gap:6px; align-items:center; justify-content:flex-start }
+    .sar-dotbar{ display:flex; gap:10px; align-items:center; justify-content:flex-start }
     /* Dots 20% smaller (16px -> ~13px), no borders, new red for done/current */
     .sar-dot{ width:13px; height:13px; border-radius:50%; background:#E5E7EB; box-shadow:none; border:none; }
     .sar-dot.done{ background:var(--active); }
@@ -109,7 +109,7 @@ p{color:#434343;line-height:1.6;}
     /* Intro & scale (welcome) */
     .sar-intro p,.sar-scale{font-size:14px;line-height:1.45}
     @media (max-width:360px){ .sar-intro p,.sar-scale{font-size:13px} }
-    .sar-scale-row{display:flex;align-items:center;gap:6px;margin:6px 0}
+    .sar-scale-row{display:flex;align-items:center;gap:10px;margin:6px 0}
     .sar-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--brand);color:#fff;font-size:13px;font-weight:600}
 
     /* Extra space above start */
@@ -214,8 +214,8 @@ p{color:#434343;line-height:1.6;}
 .field-label   { font-size:11pt !important; line-height:1.45; }
 </style><style>
 /* Rating scale dots on Page 2 */
-.rating-dots { display:flex; flex-direction:column; gap:6px; margin-top:8px; }
-.rating-row { display:flex; align-items:center; gap:6px; }
+.rating-dots { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+.rating-row { display:flex; align-items:center; gap:10px; }
 .rating-row .dot {
   width:28px; height:28px; border-radius:50%;
   display:inline-flex; align-items:center; justify-content:center;
@@ -239,71 +239,32 @@ p{color:#434343;line-height:1.6;}
 <section class="sar-card">
 <!-- Welcome -->
 <div class="sar-page" data-step="welcome">
-
-<div class="card" style="margin-top:16px;">
-  <style>
-    /* Page-1 only: inline labels */
-    .field-inline{display:flex;align-items:center;gap:6px;margin:6px 0 12px;}
-    .field-inline > label{min-width:110px;font-size:11pt;color:#6B7280;white-space:nowrap;}
-    .field-inline > input, .field-inline > select{
-      flex:1 1 100%;min-width:0;width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;
-    }
-  </style>
-  <h2 class="section-title">YOUR INFORMATION</h2>
-  <div class="field-inline">
-    <label class="small field-label" for="sarNick">your name</label>
-    <input id="sarNick" type="text"/>
-  </div>
-  <div class="field-inline">
-    <label class="small field-label" for="sarEmail">your email</label>
-    <input id="sarEmail" type="email"/>
-  </div>
-  <div class="field-inline">
-    <label class="small field-label" for="sarHotel">your location</label>
-    <select id="sarHotel">
-      <option value="">select hotel</option>
-      <option>BED Changkian</option>
-      <option>BED Phrasing</option>
-      <option>BED Nimman</option>
-      <option>BED Chiangmai Gate</option>
-      <option>BED Flying</option>
-      <option>BED Support</option>
-    </select>
-  </div>
+<div class="card" style="margin-top:10px;">
 </div>
-
 <div class="card" style="margin-top:16px;">
-  <h2 class="section-title">PEER INFORMATION</h2>
-  <div class="peer-subtext" style="font-size:11pt;font-weight:700;color:#666;margin-top:4px;margin-bottom:12px;">
-    your peer must work in BED for at least 12 months
-  </div>
-  <div class="field-inline">
-    <label class="small field-label" for="peerName">name peer</label>
-    <input id="peerName" type="text"/>
-  </div>
-  <div class="field-inline">
-    <label class="small field-label" for="peerEmail">email peer</label>
-    <input id="peerEmail" type="email"/>
-  </div>
-  <div class="field-inline">
-    <label class="small field-label" for="peerHotel">peer location</label>
-    <select id="peerHotel">
-      <option value="">select hotel</option>
-      <option>BED Changkian</option>
-      <option>BED Phrasing</option>
-      <option>BED Nimman</option>
-      <option>BED Chiangmai Gate</option>
-      <option>BED Flying</option>
-      <option>BED Support</option>
-    </select>
-  </div>
+<h2 class="section-title">PERSONAL INFORMATION</h2>
+<label class="small field-label">please enter your name</label>
+<input id="sarNick" placeholder="nick name" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="text"/>
+<label class="small field-label">your email address</label>
+<input id="sarEmail" placeholder="email address" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="email"/>
+<label class="small field-label">select your location</label>
+<select id="sarHotel" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 4px;">
+<option value="">select hotel</option>
+<option>BED Changkian</option>
+<option>BED Phrasing</option>
+<option>BED Nimman</option>
+<option>BED Chiangmai Gate</option>
+<option>BED Flying</option>
+<option>BED Support</option>
+</select>
 </div>
-
-<label class="small field-label">name peer</label>
+<div class="card" style="margin-top:16px;">
+<h2 class="section-title">PEER INFORMATION</h2><div class="peer-subtext" style="font-size:11pt;color:#666;margin-top:4px;margin-bottom:12px;">the person that will review you must have been in BED for at least 12 months</div>
+<label class="small field-label">name of your peer reviewer</label>
 <input id="peerName" placeholder="nick name" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="text"/>
-<label class="small field-label">email peer</label>
+<label class="small field-label">email address of your peer reviewer</label>
 <input id="peerEmail" placeholder="email address" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="email"/>
-<label class="small field-label">peer location</label>
+<label class="small field-label">select peer location</label>
 <select id="peerHotel" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 4px;">
 <option value="">select hotel</option>
 <option>BED Changkian</option>
@@ -319,14 +280,14 @@ p{color:#434343;line-height:1.6;}
 </div>
 </div><div class="sar-page" data-step="intro">
 <div class="card" style="margin-top:10px;">
-<h2 class="section-title">HOW THIS WORKS</h2>
+<h2 class="section-title">INSTRUCTIONS FOR ASSESSMENT</h2>
 <div class="field-label" style="margin-top:6px;">
     Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself.
     The goal is to know your own strengths and opportunities.
   </div>
 </div>
 <div class="card" style="margin-top:16px;">
-<h3 class="section-title" style="font-size:14pt;">HOW YOU SCORE YOURSELF</h3>
+<h3 class="section-title" style="font-size:14pt;">RATING SCALE</h3>
 <div class="rating-dots">
 <div class="rating-row"><span class="dot">1</span><span class="label">I am not good at this</span></div>
 <div class="rating-row"><span class="dot">2</span><span class="label">I need to be better at this</span></div>
@@ -379,37 +340,6 @@ p{color:#434343;line-height:1.6;}
 <div class="sar-actions">
 <button class="sar-btn" data-nav="back">Back</button>
 <button class="sar-btn primary" data-nav="next">Next</button>
-</div>
-</div>
-<div class="sar-page" data-step="peer">
-<div class="sar-gap-1"></div>
-<div class="sar-para-title">FIND YOUR PEER REVIEWER</div>
-<div class="sar-intro" style="margin-bottom:12px"><p>You completed your self-assessment. The next step is peer review. Ask anyone in your team who has been in BED for at least 24 months to assess you. When they accept complete the information. When you click Done the review form is send to your peer</p></div>
-<div class="sar-gap-1"></div>
-<div class="sar-row sar-row-fields" style="margin-bottom:12px">
-<label class="sar-field">
-<span class="sar-label">peer nick name</span>
-<input class="sar-input" id="peerName" inputmode="text" type="text"/>
-</label>
-<label class="sar-field">
-<span class="sar-label">peer email address</span>
-<input autocomplete="email" class="sar-input" id="peerEmail" inputmode="email" type="email"/>
-</label>
-</div>
-<div aria-label="Choose peer's BED Hotel" class="sar-row sar-hotels" role="group" style="margin-bottom:12px">
-<button class="sar-btn sar-hotel" data-hotel="BCK">BCK</button>
-<button class="sar-btn sar-hotel" data-hotel="BPS">BPS</button>
-<button class="sar-btn sar-hotel" data-hotel="BNM">BNM</button>
-<button class="sar-btn sar-hotel" data-hotel="BCG">BCG</button>
-<button class="sar-btn sar-hotel" data-hotel="FLY">FLY</button>
-<button class="sar-btn sar-hotel" data-hotel="BED">BED</button>
-</div>
-<div class="sar-actions"><button class="sar-btn" data-nav="back">Back</button>
-<button class="sar-btn" id="peerSend" type="button">Send</button>
-<label class="sar-check" style="display:flex;gap:8px;align-items:flex-start;line-height:1.3;margin:10px 0; font-size:14px; font-family:inherit;">
-<input id="peerConsent" style="margin-top:3px;" type="checkbox"/>
-<span>I agree to share my self-assessment with my peer</span>
-</label>
 </div>
 </div>
 <div class="sar-page" data-step="done"><div class="sar-title">Done</div></div>
@@ -544,7 +474,7 @@ p{color:#434343;line-height:1.6;}
 
     async function renderQ1(){
       const qs = await loadQuestions();
-      const slice = qs.slice(0, 18);
+      const slice = qs.slice(0, 16);
       const mount = document.getElementById('q1List');
       mount.innerHTML = slice.map(q => renderQuestionHTML(q)).join('');
       slice.forEach(q => {
@@ -558,7 +488,7 @@ p{color:#434343;line-height:1.6;}
 
     async function renderQ2(){
       const qs = await loadQuestions();
-      const slice = qs.slice(18, 35);
+      const slice = qs.slice(16, 32);
       const mount = document.getElementById('q2List');
       mount.innerHTML = slice.map(q => renderQuestionHTML(q)).join('');
       slice.forEach(q => {
@@ -847,7 +777,7 @@ function downloadSarResults(){
   .exp24__modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.25);min-width:260px;max-width:92vw;display:none;z-index:2147483647;font-family:inherit}
   .exp24__hd{padding:14px 16px;border-bottom:1px solid #eee;font-weight:600}
   .exp24__bd{padding:16px 16px 8px 16px;font-size:15px;line-height:1.35}
-  .exp24__ft{padding:12px 16px 16px 16px;display:flex;gap:6px;justify-content:flex-end}
+  .exp24__ft{padding:12px 16px 16px 16px;display:flex;gap:10px;justify-content:flex-end}
   .exp24__btn{border:none;border-radius:10px;padding:10px 14px;font-size:14px;cursor:pointer}
   .exp24__btn--ghost{background:#f2f4f7}
   .exp24__btn--primary{background:#1E90FF;color:#fff}
@@ -2096,24 +2026,3 @@ ok.onclick = function(){
   }, 300);
 })();</script></body>
 </html>
-
-
-<!-- PAGE-1 NAV ROBUSTNESS -->
-<script>
-(function(){
-  function bindNav(){
-    if (typeof ensureWelcomeBindings === 'function') {
-      try { ensureWelcomeBindings(); } catch(e){}
-    }
-  }
-  window.addEventListener('hashchange', bindNav, {passive:true});
-  document.addEventListener('click', function(e){
-    var t = e.target;
-    if (!t) return;
-    if (t.matches && (t.matches('.btn-back') || t.matches('[data-nav="back"]') || t.id === 'sarBack')) {
-      setTimeout(bindNav, 0);
-    }
-  }, {passive:true});
-})();
-</script>
-
