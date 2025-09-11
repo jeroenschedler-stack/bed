@@ -6,9 +6,9 @@
 <title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
 <style>
   :root {
-    --pad: 20px;
-    --label-w: 118px;
-    --gap: 6px;
+    --pad: 20px;           /* 20px side padding on all pages */
+    --label-w: 118px;      /* fixed label width */
+    --gap: 8px;            /* NORMAL space between label and field */
     --brand-blue: #1E90FF;
     --progress-red: #E11D48;
     --progress-gray: #f3f4f6;
@@ -23,10 +23,12 @@
   h2 { font-size:14pt; margin:22px 0 8px 0; line-height:1.25; }
   .intro { font-size:10pt; color:#333; margin:4px 0 14px 0; }
 
+  /* Header progress bar (7 dots across all pages) */
   .progress { display:flex; gap:10px; margin:6px 0 16px 0; }
   .dot { width:10px; height:10px; border-radius:50%; background:var(--progress-gray); border:1px solid #e5e7eb; }
   .dot.active { background: var(--progress-red); border-color: var(--progress-red); }
 
+  /* Grid rows so inputs/selects reach the right edge (20px page padding) */
   .row {
     display: grid;
     grid-template-columns: var(--label-w) 1fr;
@@ -45,6 +47,7 @@
     background: #fff;
     transition: box-shadow .15s, border-color .15s, background-color .15s;
   }
+  /* Blue focus background for BOTH input and select */
   .row > input:focus,
   .row > select:focus {
     outline: none;
@@ -54,21 +57,25 @@
   }
   select:invalid { color:#aaa; }
 
+  /* Buttons */
   .actions { padding-left: calc(var(--label-w) + var(--gap)); margin-top: 14px; display:flex; gap:10px; justify-content: flex-end; }
   button { padding: 12px 18px; border: none; border-radius: 12px; background: var(--brand-blue); color: #fff; font-size: 12pt; cursor: pointer; }
   .btn-secondary { background:#fff; color:#111; border:1px solid var(--gray-300); }
 
+  /* Question items */
   .q-item { padding:12px 0; border-top:1px solid #ddd; }
   .q-item > div:first-child { font-size: 11pt; margin-bottom: 6px; }
   .q-item em { font-size: 10pt; color: #444; display:block; margin-bottom:6px; }
   .pill { display:inline-block; width:32px; height:32px; line-height:32px; text-align:center; border:1px solid #ccc; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none; }
   .pill.selected { background: var(--brand-blue); color:#fff; }
 
+  /* Instruction page visuals (round blue 1–5) */
   .scale-list { list-style:none; padding:0; margin:10px 0; }
   .scale-item { display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt; }
   .badge { width:28px; height:28px; border-radius:50%; background: var(--brand-blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700; }
   .instructions-box { font-size:12pt; color:#222; line-height:1.5; margin-bottom:12px; }
 
+  /* Mobile fallback: stack label above field on very narrow screens */
   @media (max-width: 340px) {
     .row { grid-template-columns: 1fr; row-gap: 6px; }
     .actions { padding-left: 0; }
@@ -262,6 +269,7 @@
       <span class="dot"></span>
     </div>
 
+    <!-- PAGE 1: Welcome form -->
     <section id="welcome">
       <h2>Your Information</h2>
       <div class="row"><label for="nick">your name</label><input id="nick"></div>
@@ -299,17 +307,19 @@
       </div>
     </section>
 
+    <!-- PAGE 2: Instructions (patched per your text) -->
     <section id="instructions" style="display:none">
-      <h2>Before you start</h2>
+      <h2>HOW TO ASSESS YOURSELF</h2>
       <p class="instructions-box">
-        Self-assessment helps your personal growth and development. Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities.
+        Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities
       </p>
+      <h2>HOW TO SCORE YOURSELF</h2>
       <ul class="scale-list">
-        <li class="scale-item"><span class="badge">1</span> <span>I'm not good at this</span></li>
-        <li class="scale-item"><span class="badge">2</span> <span>I can do better in this</span></li>
-        <li class="scale-item"><span class="badge">3</span> <span>I'm good at this</span></li>
-        <li class="scale-item"><span class="badge">4</span> <span>I'm great at this</span></li>
-        <li class="scale-item"><span class="badge">5</span> <span>I'm excellent at this</span></li>
+        <li class="scale-item"><span class="badge">1</span> <span>I am not good at this</span></li>
+        <li class="scale-item"><span class="badge">2</span> <span>I need to be better at this</span></li>
+        <li class="scale-item"><span class="badge">3</span> <span>I am average at this</span></li>
+        <li class="scale-item"><span class="badge">4</span> <span>I am good at this</span></li>
+        <li class="scale-item"><span class="badge">5</span> <span>I am very good at this</span></li>
       </ul>
       <div class="actions">
         <button class="btn-secondary" id="backToWelcome">Back</button>
@@ -317,6 +327,7 @@
       </div>
     </section>
 
+    <!-- PAGE 3: Questions Part 1 -->
     <section id="q1" style="display:none">
       <h2>Statements Part 1</h2>
       <div id="list-q1"></div>
@@ -326,6 +337,7 @@
       </div>
     </section>
 
+    <!-- PAGE 4: Questions Part 2 -->
     <section id="q2" style="display:none">
       <h2>Statements Part 2</h2>
       <div id="list-q2"></div>
@@ -335,6 +347,7 @@
       </div>
     </section>
 
+    <!-- PAGE 5: Finish placeholder -->
     <section id="finish" style="display:none">
       <h2>Completed</h2>
       <p class="intro">Thank you. We will add the confirmation popup next.</p>
@@ -391,6 +404,7 @@
     return d;
   }
 
+  // Navigation
   el('toInstructions').onclick = () => show('instructions');
   el('backToWelcome').onclick = () => show('welcome');
   el('toQ1').onclick = () => {
