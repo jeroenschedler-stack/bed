@@ -193,7 +193,14 @@ p{color:#434343;line-height:1.6;}
 .modal-footer { text-align: right; }
 
 </style>
-</head>
+<style>
+/* Page 1 specific typography (pt units as requested) */
+#formHeaderCard { margin-top: 10px; }
+#fhTitle { font-size: 18pt; font-weight: 800; letter-spacing: 0.3px; }
+#fhSubtitle { font-size: 16pt; font-weight: 700; color: #434343; margin-top: 2px; }
+.sar-page[data-step="welcome"] h2 { font-size: 14pt; font-weight: 700; margin: 0 0 10px 0; }
+.sar-page[data-step="welcome"] label.small { font-size: 11pt; color: #666; }
+</style></head>
 <body>
 <!-- Header -->
 <header class="sar-header">
@@ -208,18 +215,9 @@ p{color:#434343;line-height:1.6;}
 <main class="sar-wrap">
 <section class="sar-card">
 <!-- Welcome -->
-<div class="sar-page" data-step="welcome">
+<div class="sar-page" data-step="welcome"><div class="card" id="formHeaderCard"><div id="fhTitle">BED HOSPITALITY 2.0</div><div id="fhSubtitle">SELF ASSESSMENT FORM</div><div id="dotbar"><div class="sar-dot done current"></div><div class="sar-dot"></div><div class="sar-dot"></div><div class="sar-dot"></div><div class="sar-dot"></div><div class="sar-dot"></div></div></div>
 <div class="card" style="margin-top:10px;">
 
-
-<div id="dotbar" style="margin-top:12px; display:flex; gap:10px;">
-<div class="sar-dot done current"></div>
-<div class="sar-dot"></div>
-<div class="sar-dot"></div>
-<div class="sar-dot"></div>
-<div class="sar-dot"></div>
-<div class="sar-dot"></div>
-</div>
 </div>
 <div class="card" style="margin-top:16px;">
 <h2>PERSONAL INFORMATION</h2>
@@ -256,9 +254,9 @@ p{color:#434343;line-height:1.6;}
 </select>
 </div>
 <div style="display:flex;justify-content:flex-end;margin:18px 0 8px;">
-<button class="primary" id="sarStart">Next</button>
+
 </div>
-</div>
+<div class="btnrow"><button class="primary" id="sarStart">Next</button></div></div>
 <!-- Part 1 — Dynamic questions -->
 <div class="sar-page" data-step="q1">
 <!-- removed page-level thin progress bar (now in header) -->
@@ -1721,7 +1719,6 @@ ok.onclick = function(){
   var page = document.querySelector('.sar-page[data-step="welcome"]') || document;
   var btn = page.querySelector('#sarStart');
   if (!btn) return;
-  // Inputs
   var name = page.querySelector('#sarNick');
   var email = page.querySelector('#sarEmail');
   var hotel = page.querySelector('#sarHotel');
@@ -1738,11 +1735,10 @@ ok.onclick = function(){
     if (email) email.addEventListener(evt, update);
     if (hotel) hotel.addEventListener(evt, update);
   });
-  // initial state
   update();
-  // Click -> go to next step if any JS router exists, else just allow form submit
   btn.addEventListener('click', function(e){
-    // If a global App router exists, move to intro
+    // prevent if disabled
+    if (btn.disabled) { e.preventDefault(); return; }
     if (window.BED && window.BED.App && typeof window.BED.App.go === 'function'){
       e.preventDefault();
       window.BED.App.go('intro');
