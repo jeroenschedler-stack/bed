@@ -1903,5 +1903,70 @@ ok.onclick = function(){
       }, 30);
     });
   }
+})();</script><script>
+// LOAD_AND_RENDER_QUESTIONS
+(function(){
+  function q(sel, root){ return (root||document).querySelector(sel); }
+  function all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  function setProgress(step){
+    var bar = document.getElementById('dotbar');
+    if (!bar) return;
+    var dots = all('.sar-dot', bar);
+    var STEPS = ["welcome","intro","q1","q2","score","peer","done","finish"];
+    var idx = Math.max(0, STEPS.indexOf(step));
+    dots.forEach(function(d){ d.classList.remove('done','current'); });
+    dots.forEach(function(d, i){ if (i <= idx) d.classList.add('done'); });
+    if (dots[idx]) dots[idx].classList.add('current');
+  }
+
+  function renderList(target, items){
+    var host = q('#'+target);
+    if (!host) return;
+    var html = items.map(function(it){
+      var id = it.id || '';
+      var stmt = it.statement || '';
+      var sub  = it.subtext || '';
+      var radios = [1,2,3,4,5].map(function(v){
+        var rid = id+"_"+v;
+        return '<input type="radio" name="rate_'+id+'" id="'+rid+'" value="'+v+'"/><label for="'+rid+'">'+v+'</label>';
+      }).join('');
+      return '<div class="q-item" data-qid="'+id+'">\
+        <div class="q-title">'+stmt+'</div>'+(sub?'<div class="q-help">'+sub+'</div>':'')+'\
+        <div class="q-scale">'+radios+'</div>\
+      </div>';
+    }).join('');
+    host.innerHTML = html;
+  }
+
+  fetch("./questions.json?v="+Date.now(), {cache:"no-store"}).then(function(r){ return r.json(); }).then(function(qs){
+    if (!Array.isArray(qs)) return;
+    var q1 = qs.slice(0, 18);
+    var q2 = qs.slice(18);
+    renderList("q1List", q1);
+    renderList("q2List", q2);
+  }).catch(function(e){ console.error("questions load failed", e); });
+
+  // Navigation: back/next buttons
+  function go(step){
+    var pages = all('.sar-page');
+    pages.forEach(function(p){ p.classList.remove('active'); });
+    var pg = q('.sar-page[data-step="'+step+'"]');
+    if (pg){ pg.classList.add('active'); setProgress(step); }
+  }
+
+  var introNext = q('.sar-page[data-step="intro"] #introStart');
+  if (introNext){
+    introNext.addEventListener('click', function(){ setTimeout(function(){ go('q1'); }, 0); });
+  }
+
+  var q1Back = q('.sar-page[data-step="q1"] #q1Back');
+  var q1Next = q('.sar-page[data-step="q1"] #q1Next');
+  if (q1Back){ q1Back.addEventListener('click', function(){ go('intro'); }); }
+  if (q1Next){ q1Next.addEventListener('click', function(){ go('q2'); }); }
+
+  var q2Back = q('.sar-page[data-step="q2"] #q2Back');
+  var q2Next = q('.sar-page[data-step="q2"] #q2Next');
+  if (q2Back){ q2Back.addEventListener('click', function(){ go('q1'); }); }
+  if (q2Next){ q2Next.addEventListener('click', function(){ go('score'); }); }
 })();</script></body>
 </html>
