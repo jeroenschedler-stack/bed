@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
 <style>
-  /* ===== baseline layout (keep) ===== */
   :root {
     --pad: 20px;
     --label-w: 118px;
@@ -18,17 +17,16 @@
   * { box-sizing: border-box; }
   body { font-family: system-ui, Arial, sans-serif; background:#F9FAFB; color:#111; margin:0; }
   .container { width:100%; margin:0; padding:24px var(--pad); }
+
   h1 { font-size:20pt; margin:0 0 8px 0; line-height:1.2; }
   .subheader { font-size:18pt; margin:0 0 12px 0; font-weight:500; }
   h2 { font-size:14pt; margin:22px 0 8px 0; line-height:1.25; }
   .intro { font-size:10pt; color:#333; margin:4px 0 14px 0; }
 
-  /* header progress bar: 7 dots across all pages */
   .progress { display:flex; gap:10px; margin:6px 0 16px 0; }
   .dot { width:10px; height:10px; border-radius:50%; background:var(--progress-gray); border:1px solid #e5e7eb; }
   .dot.active { background: var(--progress-red); border-color: var(--progress-red); }
 
-  /* grid rows so fields reach right edge (20px padding) */
   .row {
     display: grid;
     grid-template-columns: var(--label-w) 1fr;
@@ -47,7 +45,6 @@
     background: #fff;
     transition: box-shadow .15s, border-color .15s, background-color .15s;
   }
-  /* blue bg on focus for both input and select */
   .row > input:focus,
   .row > select:focus {
     outline: none;
@@ -57,33 +54,25 @@
   }
   select:invalid { color:#aaa; }
 
-  /* actions / buttons */
   .actions { padding-left: calc(var(--label-w) + var(--gap)); margin-top: 14px; display:flex; gap:10px; justify-content: flex-end; }
   button { padding: 12px 18px; border: none; border-radius: 12px; background: var(--brand-blue); color: #fff; font-size: 12pt; cursor: pointer; }
   .btn-secondary { background:#fff; color:#111; border:1px solid var(--gray-300); }
 
-  /* question block */
   .q-item { padding:12px 0; border-top:1px solid #ddd; }
   .q-item > div:first-child { font-size: 11pt; margin-bottom: 6px; }
   .q-item em { font-size: 10pt; color: #444; display:block; margin-bottom:6px; }
   .pill { display:inline-block; width:32px; height:32px; line-height:32px; text-align:center; border:1px solid #ccc; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none; }
   .pill.selected { background: var(--brand-blue); color:#fff; }
 
-  /* ===== instruction page (restore style with round blue circles) ===== */
   .scale-list { list-style:none; padding:0; margin:10px 0; }
   .scale-item { display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt; }
   .badge { width:28px; height:28px; border-radius:50%; background: var(--brand-blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700; }
   .instructions-box { font-size:12pt; color:#222; line-height:1.5; margin-bottom:12px; }
 
-  /* mobile fallback */
   @media (max-width: 340px) {
     .row { grid-template-columns: 1fr; row-gap: 6px; }
     .actions { padding-left: 0; }
   }
-
-  /* ====== DO NOT EDIT: Welcome page lock markers ====== */
-  /* Keeping selectors specific so other edits won't affect #welcome */
-  #welcome .row > input, #welcome .row > select { border-color: var(--gray-300); }
 </style>
 <script id="embeddedQuestions" type="application/json">[
   {
@@ -273,7 +262,6 @@
       <span class="dot"></span>
     </div>
 
-    <!-- ===== PAGE 1: Welcome form (locked) ===== -->
     <section id="welcome">
       <h2>Your Information</h2>
       <div class="row"><label for="nick">your name</label><input id="nick"></div>
@@ -311,7 +299,6 @@
       </div>
     </section>
 
-    <!-- ===== PAGE 2: Instructions (restored with blue circles 1–5) ===== -->
     <section id="instructions" style="display:none">
       <h2>Before you start</h2>
       <p class="instructions-box">
@@ -330,7 +317,6 @@
       </div>
     </section>
 
-    <!-- ===== PAGE 3: Questions Part 1 ===== -->
     <section id="q1" style="display:none">
       <h2>Statements Part 1</h2>
       <div id="list-q1"></div>
@@ -340,7 +326,6 @@
       </div>
     </section>
 
-    <!-- ===== PAGE 4: Questions Part 2 ===== -->
     <section id="q2" style="display:none">
       <h2>Statements Part 2</h2>
       <div id="list-q2"></div>
@@ -350,7 +335,6 @@
       </div>
     </section>
 
-    <!-- ===== PAGE 5: Finish placeholder ===== -->
     <section id="finish" style="display:none">
       <h2>Completed</h2>
       <p class="intro">Thank you. We will add the confirmation popup next.</p>
@@ -393,7 +377,7 @@
     d.dataset.qid = q.id;
     d.innerHTML = `<div>${ord}. ${q.statement}</div>`;
     if(q.subtext){ d.innerHTML += `<em>${q.subtext}</em>`; }
-    for(let v=1; v<=5; v++){ 
+    for(let v=1; v<=5; v++){
       const p = document.createElement('span');
       p.className = 'pill';
       p.textContent = v;
@@ -407,7 +391,6 @@
     return d;
   }
 
-  // navigation
   el('toInstructions').onclick = () => show('instructions');
   el('backToWelcome').onclick = () => show('welcome');
   el('toQ1').onclick = () => {
