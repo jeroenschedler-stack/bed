@@ -1904,7 +1904,7 @@ ok.onclick = function(){
     });
   }
 })();</script><script>
-// CONSOLIDATED_QUESTIONS_AND_NAV v3
+// CONSOLIDATED_QUESTIONS_AND_NAV v4 (fix Q2 numbering + label click reliability)
 (function(){
   function q(sel, root){ return (root||document).querySelector(sel); }
   function all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
@@ -1935,16 +1935,24 @@ ok.onclick = function(){
     }
     return id.replace(/[^\w\-]/g, "_");
   }
+  function displayNumbered(statement, idx, base){
+    // Always prefix computed number to ensure correct 19..35 on page 2
+    var num = base + idx + 1;
+    // Strip any existing leading number like "19. "
+    var text = String(statement||"").replace(/^\s*\d+\.\s*/,'').trim();
+    return num + ". " + text;
+  }
   function renderList(target, items, base){
     var host = q('#'+target);
     if (!host) return;
     var html = items.map(function(it, idx){
       var id = makeId(it, idx, base);
-      var stmt = it.statement || '';
+      var stmt = displayNumbered(it.statement, idx, base);
       var sub  = it.subtext || '';
       var radios = [1,2,3,4,5].map(function(v){
         var rid = id+"_"+v;
-        return '<input type="radio" name="rate_'+id+'" id="'+rid+'" value="'+v+'"/><label for="'+rid+'">'+v+'</label>';
+        return '<input type="radio" name="rate_'+id+'" id="'+rid+'" value="'+v+'" />\
+                <label for="'+rid+'" tabindex="0">'+v+'</label>';
       }).join('');
       return '<div class="q-item" data-qid="'+id+'">\
         <div class="q-title">'+stmt+'</div>'+(sub?'<div class="q-help">'+sub+'</div>':'')+'\
@@ -1965,8 +1973,40 @@ ok.onclick = function(){
     var btn = q('.sar-page[data-step="q1"] #q1Next');
     if (btn){
       var total = rows.length;
-      btn.disabled = !(total >= 18 && answered >= 18); // require all 18
+      btn.disabled = !(total >= 18 && answered >= 18); // require all 18 on first page
     }
+  }
+
+  // ------- Q2 label click reliability -------
+  function attachQ2LabelFix(){
+    var mount = q('#q2List');
+    if (!mount) return;
+    mount.addEventListener('click', function(e){
+      var lab = e.target.closest('label');
+      if (!lab) return;
+      var fid = lab.getAttribute('for');
+      if (!fid) return;
+      var inp = document.getElementById(fid);
+      if (inp && inp.type === 'radio'){
+        inp.checked = true;
+        // trigger change to allow any listeners to update
+        var ev = new Event('change', {bubbles:true});
+        inp.dispatchEvent(ev);
+      }
+    });
+    // Also support keyboard activation on label
+    mount.addEventListener('keydown', function(e){
+      if (e.target && e.target.matches('#q2List label') && (e.key === 'Enter' || e.key === ' ')){
+        e.preventDefault();
+        var fid = e.target.getAttribute('for');
+        var inp = document.getElementById(fid);
+        if (inp && inp.type === 'radio'){
+          inp.checked = true;
+          var ev = new Event('change', {bubbles:true});
+          inp.dispatchEvent(ev);
+        }
+      }
+    });
   }
 
   // ------- Load questions and init listeners -------
@@ -1979,20 +2019,22 @@ ok.onclick = function(){
       renderList("q1List", q1, 0);
       renderList("q2List", q2, 18);
 
-      // Attach change listener AFTER render to track answers
+      // Q1 enablement
       var mountQ1 = q('#q1List');
       if (mountQ1){
         mountQ1.addEventListener('change', function(e){
           if (e.target && e.target.matches('input[type="radio"]')) q1UpdateNext();
         });
-        // initialize disabled
         var btn = q('.sar-page[data-step="q1"] #q1Next');
         if (btn) btn.disabled = true;
       }
+
+      // Q2 label fix
+      attachQ2LabelFix();
     })
     .catch(function(e){ console.error("questions load failed", e); });
 
-  // ------- Nav buttons (make sure Back/Next work) -------
+  // ------- Nav buttons -------
   var introNext = q('.sar-page[data-step="intro"] #introStart');
   if (introNext){
     introNext.addEventListener('click', function(){ setTimeout(function(){ go('q1'); }, 0); });
@@ -2000,14 +2042,14 @@ ok.onclick = function(){
   var q1Back = q('.sar-page[data-step="q1"] #q1Back');
   var q1Next = q('.sar-page[data-step="q1"] #q1Next');
   if (q1Back){ q1Back.addEventListener('click', function(){ go('intro'); }); }
-  if (q1Next){ q1Next.addEventListener('click', function(){ go('q2'); }); }
+  if (q1Next){ q1Next.addEventListener('click', function(){ go('q2'); setProgress('q2'); }); }
 
   var q2Back = q('.sar-page[data-step="q2"] #q2Back');
   var q2Next = q('.sar-page[data-step="q2"] #q2Next');
   if (q2Back){ q2Back.addEventListener('click', function(){ go('q1'); }); }
   if (q2Next){ q2Next.addEventListener('click', function(){ go('score'); }); }
 
-  // also keep the dotbar in sync on any change
+  // Keep dots in sync
   setInterval(function(){
     var active = q('.sar-page.active');
     var step = active ? active.getAttribute('data-step') : null;
