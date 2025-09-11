@@ -5,14 +5,79 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
 <style>
-  body{font-family:system-ui,Arial,sans-serif;background:#F9FAFB;color:#111}
-  .row{display:flex;align-items:center;gap:10px;margin:8px 0}
-  .row>label{min-width:150px;font-weight:600}
-  .row>input,.row>select{flex:1;padding:8px}
-  .q-item{padding:10px 0;border-top:1px solid #ddd}
-  .pill{display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;
-         border:1px solid #ccc;border-radius:50%;margin-right:6px;cursor:pointer}
-  .pill.selected{background:#1E90FF;color:#fff}
+  :root {
+    --pad: 20px;
+    --label-w: 96px;
+    --gap: 6px;
+    --brand-blue: #1E90FF;
+    --progress-red: #E11D48;
+    --progress-gray: #f3f4f6;
+    --gray-300:#cfd4dc;
+  }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, Arial, sans-serif; background:#F9FAFB; color:#111; margin:0; }
+  .container { width:100%; margin:0; padding:24px var(--pad); }
+
+  h1 { font-size:20pt; margin:0 0 8px 0; line-height:1.2; }
+  .subheader { font-size:18pt; margin:0 0 12px 0; font-weight:500; }
+  h2 { font-size:14pt; margin:22px 0 8px 0; line-height:1.25; }
+  .intro { font-size:12pt; color:#333; margin:4px 0 14px 0; } /* unified intro text size */
+
+  .progress { display:flex; gap:10px; margin:6px 0 16px 0; }
+  .dot { width:10px; height:10px; border-radius:50%; background:var(--progress-gray); border:1px solid #e5e7eb; }
+  .dot.active { background: var(--progress-red); border-color: var(--progress-red); }
+
+  .row {
+    display: grid;
+    grid-template-columns: minmax(84px, var(--label-w)) 1fr;
+    column-gap: var(--gap);
+    align-items: center;
+    margin: 10px 0;
+  }
+  .row > label {
+    font-size:10pt;
+    font-weight:400;
+    white-space: normal;
+    word-break: break-word;
+  }
+  .row > input,
+  .row > select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 10pt;
+    border: 1px solid var(--gray-300);
+    border-radius: 10px;
+    background: #fff;
+    transition: box-shadow .15s, border-color .15s;
+  }
+  .row > input:focus,
+  .row > select:focus {
+    outline: none;
+    border-color: rgba(30,144,255,0.8);
+    box-shadow: 0 0 0 3px rgba(30,144,255,0.18);
+    background-color: #fff; /* stays white */
+  }
+  select:invalid { color:#aaa; }
+
+  .actions { padding-left: calc(var(--label-w) + var(--gap)); margin-top: 14px; display:flex; gap:10px; justify-content: flex-end; }
+  button { padding: 12px 18px; border: none; border-radius: 12px; background: var(--brand-blue); color: #fff; font-size: 12pt; cursor: pointer; }
+  .btn-secondary { background:#fff; color:#111; border:1px solid var(--gray-300); }
+
+  .q-item { padding:12px 0; border-top:1px solid #ddd; }
+  .q-item > div:first-child { font-size: 11pt; margin-bottom: 6px; }
+  .q-item em { font-size: 10pt; color: #444; display:block; margin-bottom:6px; }
+  .pill { display:inline-block; width:32px; height:32px; line-height:32px; text-align:center; border:1px solid #ccc; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none; }
+  .pill.selected { background: var(--brand-blue); color:#fff; }
+
+  .scale-list { list-style:none; padding:0; margin:10px 0; }
+  .scale-item { display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt; }
+  .badge { width:28px; height:28px; border-radius:50%; background: var(--brand-blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700; }
+  .instructions-box { font-size:12pt; color:#222; line-height:1.5; margin-bottom:12px; }
+
+  @media (max-width: 340px) {
+    .row { grid-template-columns: 1fr; row-gap: 6px; }
+    .actions { padding-left: 0; }
+  }
 </style>
 <script id="embeddedQuestions" type="application/json">[
   {
@@ -193,41 +258,164 @@
 ]</script>
 </head>
 <body>
-<h1>BED HOSPITALITY 2.0 — Self Assessment</h1>
-<div id="welcome">
-  <h2>Your Information</h2>
-  <div class="row"><label for="nick">your name</label><input id="nick"></div>
-  <div class="row"><label for="email">your email</label><input id="email" type="email"></div>
-  <div class="row"><label for="hotel">your location</label><select id="hotel"><option value="">select</option><option>BED Changkian</option><option>BED Phrasing</option><option>BED Nimman</option><option>BED Chiangmai Gate</option><option>BED Flying</option><option>BED Support</option></select></div>
-  <h2>Peer Information</h2>
-  <div class="row"><label for="peerName">name peer</label><input id="peerName"></div>
-  <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email"></div>
-  <div class="row"><label for="peerHotel">peer location</label><select id="peerHotel"><option value="">select</option><option>BED Changkian</option><option>BED Phrasing</option><option>BED Nimman</option><option>BED Chiangmai Gate</option><option>BED Flying</option><option>BED Support</option></select></div>
-  <button id="start">Start</button>
-</div>
-<div id="q1" style="display:none">
-  <h2>Statements Part 1</h2>
-  <div id="list-q1"></div>
-  <button id="toQ2">Next</button>
-</div>
-<div id="q2" style="display:none">
-  <h2>Statements Part 2</h2>
-  <div id="list-q2"></div>
-  <button id="finish">Finish</button>
-</div>
+  <main class="container">
+    <h1>BED HOSPITALITY 2.0</h1>
+    <p class="subheader">TEAM MEMBER FORM</p>
+    <div class="progress" id="progressHeader">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+
+    <!-- ===== DO NOT EDIT: PAGE 1 START ===== -->
+    <section id="welcome">
+      <h2>Your Information</h2>
+      <div class="row"><label for="nick">your name</label><input id="nick"></div>
+      <div class="row"><label for="email">your email</label><input id="email" type="email"></div>
+      <div class="row"><label for="hotel">your location</label>
+        <select id="hotel" required>
+          <option value="" disabled selected>select hotel</option>
+          <option>BED Changkian</option>
+          <option>BED Phrasing</option>
+          <option>BED Nimman</option>
+          <option>BED Chiangmai Gate</option>
+          <option>BED Flying</option>
+          <option>BED Support</option>
+        </select>
+      </div>
+
+      <h2>Peer Information</h2>
+      <p class="intro">after you completed your self assessment one of your peers will review you. select one of your team members who worked in BED for at least 12 months</p>
+      <div class="row"><label for="peerName">name peer</label><input id="peerName"></div>
+      <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email"></div>
+      <div class="row"><label for="peerHotel">peer location</label>
+        <select id="peerHotel" required>
+          <option value="" disabled selected>select hotel</option>
+          <option>BED Changkian</option>
+          <option>BED Phrasing</option>
+          <option>BED Nimman</option>
+          <option>BED Chiangmai Gate</option>
+          <option>BED Flying</option>
+          <option>BED Support</option>
+        </select>
+      </div>
+
+      <div class="actions">
+        <button id="toInstructions">Start</button>
+      </div>
+    </section>
+    <!-- ===== DO NOT EDIT: PAGE 1 END ===== -->
+
+    <section id="instructions" style="display:none">
+      <h2>HOW TO ASSESS YOURSELF</h2>
+      <p class="instructions-box">
+        Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities
+      </p>
+      <h2>HOW TO SCORE YOURSELF</h2>
+      <ul class="scale-list">
+        <li class="scale-item"><span class="badge">1</span> <span>I am not good at this</span></li>
+        <li class="scale-item"><span class="badge">2</span> <span>I need to be better at this</span></li>
+        <li class="scale-item"><span class="badge">3</span> <span>I am average at this</span></li>
+        <li class="scale-item"><span class="badge">4</span> <span>I am good at this</span></li>
+        <li class="scale-item"><span class="badge">5</span> <span>I am very good at this</span></li>
+      </ul>
+      <div class="actions">
+        <button class="btn-secondary" id="backToWelcome">Back</button>
+        <button id="toQ1">Start</button>
+      </div>
+    </section>
+
+    <section id="q1" style="display:none">
+      <h2>Statements Part 1</h2>
+      <div id="list-q1"></div>
+      <div class="actions">
+        <button class="btn-secondary" id="backToInstructions">Back</button>
+        <button id="toQ2">Next</button>
+      </div>
+    </section>
+
+    <section id="q2" style="display:none">
+      <h2>Statements Part 2</h2>
+      <div id="list-q2"></div>
+      <div class="actions">
+        <button class="btn-secondary" id="backToQ1">Back</button>
+        <button id="toFinish">Next</button>
+      </div>
+    </section>
+
+    <section id="finish" style="display:none">
+      <h2>Completed</h2>
+      <p class="intro">Thank you. We will add the confirmation popup next.</p>
+      <div class="actions">
+        <button class="btn-secondary" id="backToQ2">Back</button>
+        <button id="done">Done</button>
+      </div>
+    </section>
+  </main>
+
 <script>
 (function(){
-  const S={answers:{},questions:[]};
-  try{S.questions=JSON.parse(document.getElementById('embeddedQuestions').textContent)||[]}catch(e){S.questions=[]};
-  const $=id=>document.getElementById(id);
-  function makeQ(q,ord){const d=document.createElement('div');d.className='q-item';d.dataset.qid=q.id;
-    d.innerHTML=`<div>${ord}. ${q.statement}</div>`;if(q.subtext){d.innerHTML+=`<div><em>${q.subtext}</em></div>`}
-    for(let v=1;v<=5;v++){const p=document.createElement('span');p.className='pill';p.textContent=v;
-      p.dataset.val=v;p.onclick=()=>{S.answers[q.id]=v;d.querySelectorAll('.pill').forEach(x=>x.classList.toggle('selected',x===p))};d.appendChild(p);}
-    return d;}
-  $('start').onclick=()=>{const l=$('list-q1');l.innerHTML='';S.questions.slice(0,18).forEach((q,i)=>l.appendChild(makeQ(q,i+1)));$('welcome').style.display='none';$('q1').style.display='block';};
-  $('toQ2').onclick=()=>{const l=$('list-q2');l.innerHTML='';S.questions.slice(18,35).forEach((q,i)=>l.appendChild(makeQ(q,19+i)));$('q1').style.display='none';$('q2').style.display='block';};
-  $('finish').onclick=()=>{alert('Done')};
+  const S = {answers:{}, questions:[]};
+  try { S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }
+  catch(e) { S.questions = []; }
+
+  const el = id => document.getElementById(id);
+  const sections = ['welcome','instructions','q1','q2','finish'];
+
+  function show(id){
+    sections.forEach(s => el(s).style.display = (s===id ? 'block' : 'none'));
+    let n = 1;
+    if(id==='instructions') n = 2;
+    else if(id==='q1') n = 3;
+    else if(id==='q2') n = 4;
+    else if(id==='finish') n = 7;
+    setProgress(n);
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function setProgress(n){
+    const dots = document.querySelectorAll('#progressHeader .dot');
+    dots.forEach((d,i)=>d.classList.toggle('active', i < n));
+  }
+  setProgress(1);
+
+  function makeQ(q,ord){
+    const d = document.createElement('div');
+    d.className = 'q-item';
+    d.dataset.qid = q.id;
+    d.innerHTML = `<div>${ord}. ${q.statement}</div>`;
+    if(q.subtext){ d.innerHTML += `<em>${q.subtext}</em>`; }
+    for(let v=1; v<=5; v++){
+      const p = document.createElement('span');
+      p.className = 'pill';
+      p.textContent = v;
+      p.dataset.val = v;
+      p.onclick = () => {
+        S.answers[q.id] = v;
+        d.querySelectorAll('.pill').forEach(x => x.classList.toggle('selected', x===p));
+      };
+      d.appendChild(p);
+    }
+    return d;
+  }
+
+  el('toInstructions').onclick = () => show('instructions');
+  el('backToWelcome').onclick = () => show('welcome');
+  el('toQ1').onclick = () => {
+    const l = el('list-q1'); l.innerHTML = '';
+    S.questions.slice(0,18).forEach((q,i)=> l.appendChild(makeQ(q, i+1)));
+    show('q1');
+  };
+  el('backToInstructions').onclick = () => show('instructions');
+  el('toQ2').onclick = () => {
+    const l = el('list-q2'); l.innerHTML = '';
+    S.questions.slice(18,35).forEach((q,i)=> l.appendChild(makeQ(q, 19+i)));
+    show('q2');
+  };
+  el('backToQ1').onclick = () => show('q1');
+  el('toFinish').onclick = () => show('finish');
+  el('backToQ2').onclick = () => show('q2');
+  el('done').onclick = () => alert('Done');
 })();
 </script>
 </body>
