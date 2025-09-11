@@ -1,0 +1,212 @@
+[
+  {
+    "id": "q1",
+    "statement": "1. Statement",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q2",
+    "statement": "2. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q3",
+    "statement": "3. Statement",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q4",
+    "statement": "4. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q5",
+    "statement": "5. Statement",
+    "subtext": "",
+    "weight": 0.5
+  },
+  {
+    "id": "q6",
+    "statement": "6. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q7",
+    "statement": "7. Statement",
+    "subtext": "",
+    "weight": 2.0
+  },
+  {
+    "id": "q8",
+    "statement": "8. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q9",
+    "statement": "9. Statement",
+    "subtext": "",
+    "weight": 2.0
+  },
+  {
+    "id": "q10",
+    "statement": "10. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q11",
+    "statement": "11. Statement",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q12",
+    "statement": "12. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q13",
+    "statement": "13. Statement",
+    "subtext": "",
+    "weight": 0.5
+  },
+  {
+    "id": "q14",
+    "statement": "14. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q15",
+    "statement": "15. Statement",
+    "subtext": "",
+    "weight": 1.5
+  },
+  {
+    "id": "q16",
+    "statement": "16. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q17",
+    "statement": "17. Statement",
+    "subtext": "",
+    "weight": 2.0
+  },
+  {
+    "id": "q18",
+    "statement": "18. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q19",
+    "statement": "19. Statement",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q20",
+    "statement": "20. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q21",
+    "statement": "21. Statement",
+    "subtext": "",
+    "weight": 2.0
+  },
+  {
+    "id": "q22",
+    "statement": "22. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q23",
+    "statement": "23. Statement",
+    "subtext": "",
+    "weight": 0.5
+  },
+  {
+    "id": "q24",
+    "statement": "24. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q25",
+    "statement": "25. Statement",
+    "subtext": "",
+    "weight": 2.0
+  },
+  {
+    "id": "q26",
+    "statement": "26. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q27",
+    "statement": "27. Statement",
+    "subtext": "",
+    "weight": 2.0
+  },
+  {
+    "id": "q28",
+    "statement": "28. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q29",
+    "statement": "29. Statement",
+    "subtext": "",
+    "weight": 2.0
+  },
+  {
+    "id": "q30",
+    "statement": "30. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q31",
+    "statement": "31. Statement",
+    "subtext": "",
+    "weight": 0.5
+  },
+  {
+    "id": "q32",
+    "statement": "32. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q33",
+    "statement": "33. Statement",
+    "subtext": "",
+    "weight": 1.5
+  },
+  {
+    "id": "q34",
+    "statement": "34. Subtext",
+    "subtext": "",
+    "weight": 1.0
+  },
+  {
+    "id": "q35",
+    "statement": "35. Statement",
+    "subtext": "",
+    "weight": 2.0
+  }
+]
