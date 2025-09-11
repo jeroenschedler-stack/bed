@@ -5,36 +5,86 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
 <style>
-  body{font-family:system-ui,Arial,sans-serif;background:#F9FAFB;color:#111;margin:0}
-  .container{max-width:900px;margin:0 auto;padding:24px 28px;}
-  /* Header styles */
+  body {
+    font-family: system-ui, Arial, sans-serif;
+    background: #F9FAFB;
+    color: #111;
+    margin: 0;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px 32px; /* equal left/right margins on all pages */
+  }
+  /* Headers */
   h1 {
-    font-size:20pt;
-    margin:0 0 8px 0;
-    line-height:1.2;
+    font-size: 20pt; /* form header fixed size */
+    margin: 0 0 8px 0;
+    line-height: 1.2;
   }
   .subheader {
-    font-size:18pt;
-    margin:0 0 20px 0;
-    font-weight:500;
+    font-size: 18pt; /* subheader fixed size */
+    margin: 0 0 20px 0;
+    font-weight: 500;
   }
   h2 {
-    font-size:14pt;
-    margin:22px 0 10px 0;
-    line-height:1.25;
+    font-size: 14pt; /* page headers */
+    margin: 22px 0 10px 0;
+    line-height: 1.25;
   }
-  .row{display:flex;align-items:center;gap:12px;margin:12px 0}
-  .row>label{min-width:180px;font-weight:400;font-size:10pt}
-  .row>input,.row>select{flex:1;padding:10px 12px;font-size:10pt}
-  /* Placeholder color for select */
-  select:invalid{color:#aaa;font-size:10pt}
-  .q-item{padding:12px 0;border-top:1px solid #ddd}
-  .pill{display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;
-         border:1px solid #ccc;border-radius:50%;margin-right:6px;cursor:pointer}
-  .pill.selected{background:#1E90FF;color:#fff}
-  /* Buttons */
-  button{padding:10px 14px;border:1px solid #ccc;border-radius:10px;background:#fff;cursor:pointer}
-  #welcome, #q1, #q2{margin-top:8px}
+  /* Rows and fields */
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 8px;              /* bring fields closer to labels */
+    margin: 12px 0;
+  }
+  .row>label {
+    min-width: 120px;      /* narrower label for tighter layout */
+    font-weight: 400;      /* remove bold */
+    font-size: 10pt;       /* fixed label size */
+  }
+  .row>input,
+  .row>select {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 10pt;       /* field text size */
+  }
+  /* Placeholder styling for selects */
+  select:invalid {
+    color: #aaa;
+    font-size: 10pt;
+  }
+  /* Questions UI */
+  .q-item {
+    padding: 12px 0;
+    border-top: 1px solid #ddd;
+  }
+  .pill {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    text-align: center;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    margin-right: 6px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .pill.selected {
+    background: #1E90FF;
+    color: #fff;
+  }
+  button {
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+  }
+  /* Section top margin to keep space below header across pages */
+  #welcome, #q1, #q2 { margin-top: 8px; }
 </style>
 <script id="embeddedQuestions" type="application/json">[
   {
@@ -249,29 +299,49 @@
       </div>
       <button id="start">Start</button>
     </div>
+
     <div id="q1" style="display:none">
       <h2>Statements Part 1</h2>
       <div id="list-q1"></div>
       <button id="toQ2">Next</button>
     </div>
+
     <div id="q2" style="display:none">
       <h2>Statements Part 2</h2>
       <div id="list-q2"></div>
       <button id="finish">Finish</button>
     </div>
   </main>
+
 <script>
 (function(){
   const S={answers:{},questions:[]};
   try{S.questions=JSON.parse(document.getElementById('embeddedQuestions').textContent)||[]}catch(e){S.questions=[]};
   const $=id=>document.getElementById(id);
-  function makeQ(q,ord){const d=document.createElement('div');d.className='q-item';d.dataset.qid=q.id;
-    d.innerHTML=`<div>${ord}. ${q.statement}</div>`;if(q.subtext){d.innerHTML+=`<div><em>${q.subtext}</em></div>`}
-    for(let v=1;v<=5;v++){const p=document.createElement('span');p.className='pill';p.textContent=v;
-      p.dataset.val=v;p.onclick=()=>{S.answers[q.id]=v;d.querySelectorAll('.pill').forEach(x=>x.classList.toggle('selected',x===p))};d.appendChild(p);}
-    return d;}
-  $('start').onclick=()=>{const l=$('list-q1');l.innerHTML='';S.questions.slice(0,18).forEach((q,i)=>l.appendChild(makeQ(q,i+1)));$('welcome').style.display='none';$('q1').style.display='block';};
-  $('toQ2').onclick=()=>{const l=$('list-q2');l.innerHTML='';S.questions.slice(18,35).forEach((q,i)=>l.appendChild(makeQ(q,19+i)));$('q1').style.display='none';$('q2').style.display='block';};
+  function makeQ(q,ord){
+    const d=document.createElement('div');d.className='q-item';d.dataset.qid=q.id;
+    d.innerHTML=`<div>${ord}. ${q.statement}</div>`;
+    if(q.subtext){d.innerHTML+=`<div><em>${q.subtext}</em></div>`}
+    for(let v=1;v<=5;v++){
+      const p=document.createElement('span');p.className='pill';p.textContent=v;
+      p.dataset.val=v;
+      p.onclick=()=>{S.answers[q.id]=v;d.querySelectorAll('.pill').forEach(x=>x.classList.toggle('selected',x===p))};
+      d.appendChild(p);
+    }
+    return d;
+  }
+  $('start').onclick=()=>{
+    const l=$('list-q1');l.innerHTML='';
+    S.questions.slice(0,18).forEach((q,i)=>l.appendChild(makeQ(q,i+1)));
+    document.getElementById('welcome').style.display='none';
+    document.getElementById('q1').style.display='block';
+  };
+  $('toQ2').onclick=()=>{
+    const l=$('list-q2');l.innerHTML='';
+    S.questions.slice(18,35).forEach((q,i)=>l.appendChild(makeQ(q,19+i)));
+    document.getElementById('q1').style.display='none';
+    document.getElementById('q2').style.display='block';
+  };
   $('finish').onclick=()=>{alert('Done')};
 })();
 </script>
