@@ -5,78 +5,261 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
 <style>
-  body{font-family:system-ui,Arial,sans-serif;background:#F9FAFB;color:#111}
+  body{font-family:system-ui,Arial,sans-serif;background:#F9FAFB;color:#111;margin:0}
+  .container{max-width:900px;margin:0 auto;padding:24px 28px;}
   /* Header styles */
   h1 {
-    font-size:24pt;
-    margin-bottom:4px;
+    font-size:20pt;
+    margin:0 0 8px 0;
+    line-height:1.2;
   }
   .subheader {
     font-size:18pt;
-    margin-top:0;
-    margin-bottom:16px;
+    margin:0 0 20px 0;
     font-weight:500;
   }
   h2 {
     font-size:14pt;
-    margin-top:16px;
+    margin:22px 0 10px 0;
+    line-height:1.25;
   }
-  .row{display:flex;align-items:center;gap:10px;margin:8px 0}
-  .row>label{min-width:150px;font-weight:600;font-size:10pt}
-  .row>input,.row>select{flex:1;padding:8px;font-size:10pt}
+  .row{display:flex;align-items:center;gap:12px;margin:12px 0}
+  .row>label{min-width:180px;font-weight:400;font-size:10pt}
+  .row>input,.row>select{flex:1;padding:10px 12px;font-size:10pt}
   /* Placeholder color for select */
   select:invalid{color:#aaa;font-size:10pt}
-  .q-item{padding:10px 0;border-top:1px solid #ddd}
+  .q-item{padding:12px 0;border-top:1px solid #ddd}
   .pill{display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;
          border:1px solid #ccc;border-radius:50%;margin-right:6px;cursor:pointer}
   .pill.selected{background:#1E90FF;color:#fff}
+  /* Buttons */
+  button{padding:10px 14px;border:1px solid #ccc;border-radius:10px;background:#fff;cursor:pointer}
+  #welcome, #q1, #q2{margin-top:8px}
 </style>
-<script id="embeddedQuestions" type="application/json"></script>
+<script id="embeddedQuestions" type="application/json">[
+  {
+    "id": 1,
+    "statement": "1. I answer very quickly to guest messages",
+    "subtext": "I often check and reply right away"
+  },
+  {
+    "id": 2,
+    "statement": "2. I make my replies warm and personal",
+    "subtext": "I use their name and add helpful information"
+  },
+  {
+    "id": 3,
+    "statement": "3. I make a great first impression",
+    "subtext": "I know it starts with the first message"
+  },
+  {
+    "id": 4,
+    "statement": "4. I can see if a guest is stressed or relaxed",
+    "subtext": "I adjust the way I check-in to the mood"
+  },
+  {
+    "id": 5,
+    "statement": "5. I ask questions before I ask passports",
+    "subtext": "I welcome guests like friends"
+  },
+  {
+    "id": 6,
+    "statement": "6. I can check-in a guest in 60 seconds",
+    "subtext": "I timed three standard check-ins"
+  },
+  {
+    "id": 7,
+    "statement": "7. I check in groups differently than FIT",
+    "subtext": "I usually check-in groups with the leader"
+  },
+  {
+    "id": 8,
+    "statement": "8. I don't say that check-in time is 14:00",
+    "subtext": "Guests can check-in when the room is ready"
+  },
+  {
+    "id": 9,
+    "statement": "9. I dont show stress when there is a problem",
+    "subtext": "I know that makes guests really worry"
+  },
+  {
+    "id": 10,
+    "statement": "10. I show genuine interest during check-out",
+    "subtext": "I ask about their stay or next destination"
+  },
+  {
+    "id": 11,
+    "statement": "11. I make great last impressions",
+    "subtext": "I walk them out and wait until their car has left"
+  },
+  {
+    "id": 12,
+    "statement": "12. I use names to connect with guests",
+    "subtext": "When it feels right I introduce myself"
+  },
+  {
+    "id": 13,
+    "statement": "13. I scan every guest every time",
+    "subtext": "I dont look at a group but at each individual"
+  },
+  {
+    "id": 14,
+    "statement": "14. I am good at scanning",
+    "subtext": "I see what people need before they ask"
+  },
+  {
+    "id": 15,
+    "statement": "15. I create unique surprises for guests",
+    "subtext": "I do more than offering free things"
+  },
+  {
+    "id": 16,
+    "statement": "16. Music is an essential part of the vibe",
+    "subtext": "I listen to make sure we play the right music"
+  },
+  {
+    "id": 17,
+    "statement": "17. I tell guests they can use other BED facilities",
+    "subtext": "I offer downtown coffee, big pool or breakfast"
+  },
+  {
+    "id": 18,
+    "statement": "18. It's annoying when a room key doesn't work",
+    "subtext": "I go up to make sure the new key works"
+  },
+  {
+    "id": 19,
+    "statement": "19. I talk with guests because I am interested",
+    "subtext": "When I force myself it will not be real"
+  },
+  {
+    "id": 20,
+    "statement": "20. I often give my friends honest feedback",
+    "subtext": "Im happy to help them to grow"
+  },
+  {
+    "id": 21,
+    "statement": "21. My friends often give me honest feedback",
+    "subtext": "I'm happy they help me to grow"
+  },
+  {
+    "id": 22,
+    "statement": "22. I can answer most questions about BED",
+    "subtext": "I have visited the rooms in all our hotels"
+  },
+  {
+    "id": 23,
+    "statement": "23. I understand the meaning of showtime",
+    "subtext": "The magic happens from 0700-1000"
+  },
+  {
+    "id": 24,
+    "statement": "24. I have peeled my own onion",
+    "subtext": "I dont act. Usually I show my true self"
+  },
+  {
+    "id": 25,
+    "statement": "25. I use ChatGPT or Gemini",
+    "subtext": "I ask for help with e.g., guest messages"
+  },
+  {
+    "id": 26,
+    "statement": "26. I send messages that look like I wrote them",
+    "subtext": "I don't copy AI because guests will know"
+  },
+  {
+    "id": 27,
+    "statement": "27. I use ChatGPT or Gemini",
+    "subtext": "I ask help to analyze and solve problems"
+  },
+  {
+    "id": 28,
+    "statement": "28. I never gossip. I signed I Promise",
+    "subtext": "I dont talk badly when someones not here"
+  },
+  {
+    "id": 29,
+    "statement": "29. I really understand that rules can be flexible",
+    "subtext": "Without reasons many rules just disappear"
+  },
+  {
+    "id": 30,
+    "statement": "30. I am confident about my own judgment",
+    "subtext": "I make decisions without asking permission"
+  },
+  {
+    "id": 31,
+    "statement": "31. I look after the whole hotel, not only front",
+    "subtext": "I include rooms, maintenance and back areas"
+  },
+  {
+    "id": 32,
+    "statement": "32. I look around when I arrive at the hotel",
+    "subtext": "I share responsibility for the whole hotel"
+  },
+  {
+    "id": 33,
+    "statement": "33. I don't pass issues to others but act myself",
+    "subtext": "I follow up later to make sure it's fixed"
+  },
+  {
+    "id": 34,
+    "statement": "34. I am not afraid of the CEO or my coach",
+    "subtext": "I know I am allowed to make mistakes"
+  },
+  {
+    "id": 35,
+    "statement": "35. I have no manuals that show me what to do",
+    "subtext": "That means I cannot do anything wrong"
+  }
+]</script>
 </head>
 <body>
-<h1>BED HOSPITALITY 2.0 — Self Assessment</h1>
-<p class="subheader">TEAM MEMBER FORM</p>
-<div id="welcome">
-  <h2>Your Information</h2>
-  <div class="row"><label for="nick">your name</label><input id="nick"></div>
-  <div class="row"><label for="email">your email</label><input id="email" type="email"></div>
-  <div class="row"><label for="hotel">your location</label>
-    <select id="hotel" required>
-      <option value="" disabled selected>select</option>
-      <option>BED Changkian</option>
-      <option>BED Phrasing</option>
-      <option>BED Nimman</option>
-      <option>BED Chiangmai Gate</option>
-      <option>BED Flying</option>
-      <option>BED Support</option>
-    </select>
-  </div>
-  <h2>Peer Information</h2>
-  <div class="row"><label for="peerName">name peer</label><input id="peerName"></div>
-  <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email"></div>
-  <div class="row"><label for="peerHotel">peer location</label>
-    <select id="peerHotel" required>
-      <option value="" disabled selected>select</option>
-      <option>BED Changkian</option>
-      <option>BED Phrasing</option>
-      <option>BED Nimman</option>
-      <option>BED Chiangmai Gate</option>
-      <option>BED Flying</option>
-      <option>BED Support</option>
-    </select>
-  </div>
-  <button id="start">Start</button>
-</div>
-<div id="q1" style="display:none">
-  <h2>Statements Part 1</h2>
-  <div id="list-q1"></div>
-  <button id="toQ2">Next</button>
-</div>
-<div id="q2" style="display:none">
-  <h2>Statements Part 2</h2>
-  <div id="list-q2"></div>
-  <button id="finish">Finish</button>
-</div>
+  <main class="container">
+    <h1>BED HOSPITALITY 2.0</h1>
+    <p class="subheader">TEAM MEMBER FORM</p>
+    <div id="welcome">
+      <h2>Your Information</h2>
+      <div class="row"><label for="nick">your name</label><input id="nick"></div>
+      <div class="row"><label for="email">your email</label><input id="email" type="email"></div>
+      <div class="row"><label for="hotel">your location</label>
+        <select id="hotel" required>
+          <option value="" disabled selected>select</option>
+          <option>BED Changkian</option>
+          <option>BED Phrasing</option>
+          <option>BED Nimman</option>
+          <option>BED Chiangmai Gate</option>
+          <option>BED Flying</option>
+          <option>BED Support</option>
+        </select>
+      </div>
+      <h2>Peer Information</h2>
+      <div class="row"><label for="peerName">name peer</label><input id="peerName"></div>
+      <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email"></div>
+      <div class="row"><label for="peerHotel">peer location</label>
+        <select id="peerHotel" required>
+          <option value="" disabled selected>select</option>
+          <option>BED Changkian</option>
+          <option>BED Phrasing</option>
+          <option>BED Nimman</option>
+          <option>BED Chiangmai Gate</option>
+          <option>BED Flying</option>
+          <option>BED Support</option>
+        </select>
+      </div>
+      <button id="start">Start</button>
+    </div>
+    <div id="q1" style="display:none">
+      <h2>Statements Part 1</h2>
+      <div id="list-q1"></div>
+      <button id="toQ2">Next</button>
+    </div>
+    <div id="q2" style="display:none">
+      <h2>Statements Part 2</h2>
+      <div id="list-q2"></div>
+      <button id="finish">Finish</button>
+    </div>
+  </main>
 <script>
 (function(){
   const S={answers:{},questions:[]};
