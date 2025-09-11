@@ -4,42 +4,46 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>BED HOSPITALITY 2.0 — SAR Baseline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-  :root{{--brand:#111827;--muted:#6b7280;--blue:#1d4ed8;--ring:#d1d5db;}}
-  *{{box-sizing:border-box}}
-  body{{font-family:Inter,system-ui,Arial,sans-serif;background:#f7f7f8;color:#111827;margin:0}}
-  header{{padding:16px 20px;border-bottom:1px solid #eee;background:#fff;position:sticky;top:0;z-index:10}}
-  .title{{font-weight:800;letter-spacing:0.5px}}
-  .subtitle{{color:var(--muted);font-weight:700}}
-  .wrap{{max-width:840px;margin:18px auto;padding:0 16px}}
+  :root{--brand:#111827;--muted:#6b7280;--blue:#1d4ed8;--ring:#d1d5db;}
+  *{box-sizing:border-box}
+  body{font-family:Inter,system-ui,Arial,sans-serif;background:#f7f7f8;color:#111827;margin:0}
+  header{padding:16px 20px;border-bottom:1px solid #eee;background:#fff;position:sticky;top:0;z-index:10}
+  .title{font-weight:800;letter-spacing:0.5px}
+  .subtitle{color:var(--muted);font-weight:700}
+  .wrap{max-width:900px;margin:18px auto;padding:0 16px}
 
-  .dots{{display:flex;gap:10px;margin:8px 0 18px}}
-  .dot{{width:12px;height:12px;border-radius:50%;background:#e5e7eb}}
-  .dot.active{{background:#ef4444}}
+  .dots{display:flex;gap:10px;margin:8px 0 18px}
+  .dot{width:12px;height:12px;border-radius:50%;background:#e5e7eb}
+  .dot.active{background:#ef4444}
 
-  .card{{background:#fff;border:1px solid #ececec;border-radius:12px;padding:16px;margin-top:16px}}
-  .section-title{{margin:0 0 10px 0;font-size:22px;font-weight:800;letter-spacing:0.3px}}
-  .muted{{color:var(--muted)}}
+  .card{background:#fff;border:1px solid #ececec;border-radius:12px;padding:16px;margin-top:16px;box-shadow:0 2px 6px rgba(0,0,0,.03)}
+  .section-title{margin:0 0 10px 0;font-size:22px;font-weight:800;letter-spacing:0.3px}
+  .muted{color:var(--muted)}
 
-  .p1-row{{display:flex;align-items:center;gap:12px;margin:8px 0 14px;flex-wrap:nowrap}}
-  .p1-row>label{{min-width:200px;white-space:nowrap;font-size:14px;font-weight:600;color:#374151}}
-  .p1-row>input,.p1-row>select{{flex:1 1 auto;min-width:0;width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px;font-size:16px}}
-  @media (max-width:480px){{.p1-row>label{{min-width:150px}}}}
+  /* PAGE 1: inline labels always on one line */
+  .p1-row{display:grid;grid-template-columns:180px 1fr;align-items:center;gap:12px;margin:8px 0 14px}
+  .p1-row>label{font-size:14px;font-weight:600;color:#374151;white-space:nowrap}
+  .p1-row>input,.p1-row>select{width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px;font-size:16px;background:#fff}
+  @media (max-width:420px){ .p1-row{grid-template-columns:140px 1fr} .p1-row>label{font-size:13px} }
 
-  .q-item{{padding:14px 0;border-bottom:1px solid #f0f0f0}}
-  .q-title{{font-weight:800}}
-  .q-sub{{color:var(--muted)}}
-  .choices{{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap}}
-  .choice{{width:44px;height:44px;border-radius:50%;border:2px solid var(--ring);display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;user-select:none}}
-  .choice.selected{{background:var(--blue);color:#fff;border-color:var(--blue)}}
+  .q-item{padding:14px 0;border-bottom:1px solid #f0f0f0}
+  .q-title{font-weight:800}
+  .q-sub{color:var(--muted)}
+  .choices{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap}
+  .choice{width:44px;height:44px;border-radius:50%;border:2px solid var(--ring);display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;user-select:none}
+  .choice.selected{background:var(--blue);color:#fff;border-color:var(--blue)}
 
-  .nav{{display:flex;justify-content:space-between;gap:12px;margin-top:18px}}
-  .btn{{padding:12px 18px;border-radius:12px;border:none;font-weight:700;cursor:pointer}}
-  .btn.primary{{background:#2563eb;color:#fff}}
-  .btn.ghost{{background:#fff;border:1px solid #e5e7eb}}
-  .btn[disabled]{{opacity:.5;cursor:not-allowed}}
+  .nav{display:flex;justify-content:space-between;gap:12px;margin-top:18px}
+  .btn{padding:12px 18px;border-radius:12px;border:none;font-weight:700;cursor:pointer}
+  .btn.primary{background:#2563eb;color:#fff}
+  .btn.ghost{background:#fff;border:1px solid #e5e7eb}
+  .btn[disabled]{opacity:.5;cursor:not-allowed}
 
-  .ver{{position:fixed;bottom:10px;right:10px;background:#111827;color:#fff;padding:6px 10px;border-radius:999px;font-size:12px;opacity:.8}}
+  .ver{position:fixed;bottom:10px;right:10px;background:#111827;color:#fff;padding:6px 10px;border-radius:999px;font-size:12px;opacity:.8}
 </style>
 <script id="embeddedQuestions" type="application/json">[{"id": "q1", "statement": "1. I answer very quickly to guest messages", "subtext": "I often check and reply right away", "weight": 1.0}, {"id": "q2", "statement": "2. I make my replies warm and personal", "subtext": "I use their name and add helpful information", "weight": 1.0}, {"id": "q3", "statement": "3. I make a great first impression", "subtext": "I know it starts with the first message", "weight": 0.5}, {"id": "q4", "statement": "4. I can see if a guest is stressed or relaxed", "subtext": "I adjust the way I check-in to the mood", "weight": 2.0}, {"id": "q5", "statement": "5. I ask questions before I ask passports", "subtext": "I welcome guests like friends", "weight": 2.0}, {"id": "q6", "statement": "6. I can check-in a guest in 60 seconds", "subtext": "I timed three standard check-ins", "weight": 1.0}, {"id": "q7", "statement": "7. I check in groups differently than FIT", "subtext": "I usually check-in groups with the leader", "weight": 0.5}, {"id": "q8", "statement": "8. I don't say that check-in time is 14:00", "subtext": "Guests can check-in when the room is ready", "weight": 1.5}, {"id": "q9", "statement": "9. I dont show stress when there is a problem", "subtext": "I know that makes guests really worry", "weight": 2.0}, {"id": "q10", "statement": "10. I show genuine interest during check-out", "subtext": "I ask about their stay or next destination", "weight": 1.0}, {"id": "q11", "statement": "11. I make great last impressions", "subtext": "I walk them out and wait until their car has left", "weight": 2.0}, {"id": "q12", "statement": "12. I use names to connect with guests", "subtext": "When it feels right I introduce myself", "weight": 0.5}, {"id": "q13", "statement": "13. I scan every guest every time", "subtext": "I dont look at a group but at each individual", "weight": 2.0}, {"id": "q14", "statement": "14. I am good at scanning", "subtext": "I see what people need before they ask", "weight": 2.0}, {"id": "q15", "statement": "15. I create unique surprises for guests", "subtext": "I do more than offering free things", "weight": 2.0}, {"id": "q16", "statement": "16. Music is an essential part of the vibe", "subtext": "I listen to make sure we play the right music", "weight": 0.5}, {"id": "q17", "statement": "17. I tell guests they can use other BED facilities", "subtext": "I offer downtown coffee, big pool or breakfast", "weight": 1.5}, {"id": "q18", "statement": "18. It's annoying when a room key doesn't work", "subtext": "I go up to make sure the new key works", "weight": 2.0}, {"id": "q19", "statement": "19. I talk with guests because I am interested", "subtext": "When I force myself it will not be real", "weight": 1.0}, {"id": "q20", "statement": "20. I often give my friends honest feedback", "subtext": "Im happy to help them to grow", "weight": 1.5}, {"id": "q21", "statement": "21. My friends often give me honest feedback", "subtext": "I'm happy they help me to grow", "weight": 1.0}, {"id": "q22", "statement": "22. I can answer most questions about BED", "subtext": "I have visited the rooms in all our hotels", "weight": 0.5}, {"id": "q23", "statement": "23. I understand the meaning of showtime", "subtext": "The magic happens from 0700-1000", "weight": 0.5}, {"id": "q24", "statement": "24. I have peeled my own onion", "subtext": "I dont act. Usually I show my true self", "weight": 1.5}, {"id": "q25", "statement": "25. I use ChatGPT or Gemini", "subtext": "I ask for help with e.g., guest messages", "weight": 0.5}, {"id": "q26", "statement": "26. I send messages that look like I wrote them", "subtext": "I don't copy AI because guests will know", "weight": 1.5}, {"id": "q27", "statement": "27. I use ChatGPT or Gemini", "subtext": "I ask help to analyze and solve problems", "weight": 1.5}, {"id": "q28", "statement": "28. I never gossip. I signed I Promise", "subtext": "I dont talk badly when someones not here", "weight": 2.0}, {"id": "q29", "statement": "29. I really understand that rules can be flexible", "subtext": "Without reasons many rules just disappear", "weight": 1.0}, {"id": "q30", "statement": "30. I am confident about my own judgment", "subtext": "I make decisions without asking permission", "weight": 1.0}, {"id": "q31", "statement": "31. I look after the whole hotel, not only front", "subtext": "I include rooms, maintenance and back areas", "weight": 2.0}, {"id": "q32", "statement": "32. I look around when I arrive at the hotel", "subtext": "I share responsibility for the whole hotel", "weight": 0.5}, {"id": "q33", "statement": "33. I don't pass issues to others but act myself", "subtext": "I follow up later to make sure it's fixed", "weight": 1.0}, {"id": "q34", "statement": "34. I am not afraid of the CEO or my coach", "subtext": "I know I am allowed to make mistakes", "weight": 1.0}, {"id": "q35", "statement": "35. I have no manuals that show me what to do", "subtext": "That means I cannot do anything wrong", "weight": 0.5}]</script>
 </head>
@@ -145,35 +149,33 @@
   </section>
 </main>
 
-<div class="ver" id="ver">SAR baseline v8.5 — build 35Q</div>
+<div class="ver" id="ver">SAR baseline v8.6 — build 35Q</div>
 
 <script>
 (function(){
-  const SAR = window.SAR = { ver:'v8.5', state:{ user:{}, peer:{}, answers:{}, questions:[] } };
+  const SAR = window.SAR = { ver:'v8.6', state:{ user:{}, peer:{}, answers:{}, questions:[] } };
 
-  function $(id){ return document.getElementById(id); }
-  function show(stepId){ 
+  const $ = (id)=>document.getElementById(id);
+  const show = (stepId)=>{
     document.querySelectorAll('.sar-page').forEach(p => p.style.display='none');
     $(stepId).style.display = 'block';
     updateDots(stepId);
     if(stepId==='page-q1') ensureQ1();
     if(stepId==='page-q2') ensureQ2();
     if(stepId==='page-welcome') validateWelcome();
-  }
-  function updateDots(stepId){ 
+  };
+  const updateDots = (stepId)=>{
     const order = ['page-welcome','page-q1','page-q2'];
     const idx = Math.max(0, order.indexOf(stepId));
-    document.querySelectorAll('#dots .dot').forEach((d,i)=>{
-      d.classList.toggle('active', i<=idx);
-    });
-  }
+    document.querySelectorAll('#dots .dot').forEach((d,i)=> d.classList.toggle('active', i<=idx));
+  };
 
-  try{ 
+  try{
     const raw = document.getElementById('embeddedQuestions').textContent;
     SAR.state.questions = JSON.parse(raw);
   }catch(e){ SAR.state.questions = []; }
 
-  function validateWelcome(){ 
+  function validateWelcome(){
     const nick  = $('sarNick').value.trim();
     const email = $('sarEmail').value.trim();
     const hotel = $('sarHotel').value.trim();
@@ -199,13 +201,13 @@
   $('startNext').addEventListener('click', ()=> show('page-q1'));
   $('startBack').addEventListener('click', ()=> {});
 
-  function escapeHtml(s){ return String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
-
-  function makeQItem(q){ 
+  function makeQItem(q){
     const div = document.createElement('div');
     div.className = 'q-item';
-    div.innerHTML = '<div class="q-title"></div>';
-    div.querySelector('.q-title').textContent = q.id + '. ' + (q.title||'');
+    const title = document.createElement('div');
+    title.className = 'q-title';
+    title.textContent = q.id + '. ' + (q.title||'');
+    div.appendChild(title);
     if (q.subtitle){
       const sub = document.createElement('div');
       sub.className = 'q-sub';
@@ -215,7 +217,7 @@
     const ch = document.createElement('div');
     ch.className = 'choices';
     div.appendChild(ch);
-    for(let v=1; v<=5; v++){ 
+    for(let v=1; v<=5; v++){
       const b = document.createElement('div');
       b.className = 'choice';
       b.textContent = String(v);
@@ -226,7 +228,7 @@
     }
     return div;
   }
-  function onChoice(e){ 
+  function onChoice(e){
     const qid = String(e.currentTarget.dataset.qid);
     const val = Number(e.currentTarget.dataset.val);
     SAR.state.answers[qid] = val;
@@ -234,12 +236,12 @@
     parent.querySelectorAll('.choice').forEach(c=>c.classList.toggle('selected', Number(c.dataset.val)===val));
     validateQButtons();
   }
-  function renderRange(containerId, startIdx, endIdxExclusive){ 
+  function renderRange(containerId, startIdx, endIdxExclusive){
     const list = $(containerId);
     list.innerHTML = '';
     const qs = SAR.state.questions.slice(startIdx, endIdxExclusive);
     qs.forEach(q=> list.appendChild(makeQItem(q)));
-    list.querySelectorAll('.choice').forEach(c=>{ 
+    list.querySelectorAll('.choice').forEach(c=>{
       const qid = String(c.dataset.qid);
       const val = SAR.state.answers[qid];
       if (val && Number(c.dataset.val)===Number(val)) c.classList.add('selected');
@@ -247,13 +249,13 @@
   }
   function ensureQ1(){ renderRange('q1List', 0, 18); validateQButtons(); }
   function ensureQ2(){ renderRange('q2List', 18, 35); validateQButtons(); }
-  function validateQButtons(){ 
+  function validateQButtons(){
     const ok1 = countAnswered(1,18) === 18;
     $('q1Next').disabled = !ok1;
     const ok2 = countAnswered(19,35) === (35-19+1);
     $('q2Next').disabled = !ok2;
   }
-  function countAnswered(from, to){ 
+  function countAnswered(from, to){
     let n=0;
     for(let id=from; id<=to; id++){ if (SAR.state.answers[String(id)]) n++; }
     return n;
