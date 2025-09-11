@@ -3,187 +3,93 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>BED HOSPITALITY — Self Assessment</title>
+<title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
 <style>
-  :root { --brand:#1E90FF; --text:#111827; --muted:#6B7280; --border:#E5E7EB; }
-  * { box-sizing:border-box; margin:0; padding:0; }
-  body { font-family:system-ui,-apple-system,Arial,sans-serif; background:#F9FAFB; color:var(--text); }
-  header { position:sticky; top:0; background:#fff; border-bottom:1px solid var(--border); padding:14px 16px; z-index:10; }
-  .brand { font-weight:800; font-size:18px; }
-  .dots { display:flex; gap:6px; margin-top:6px; }
-  .dot { width:12px; height:12px; border-radius:50%; background:#E5E7EB; }
-  .dot.active { background:#EF4444; }
-  main { max-width:820px; margin:16px auto; padding:0 16px 28px; }
-  .card { background:#fff; border:1px solid var(--border); border-radius:12px; padding:16px; margin-top:12px; }
-  h2 { margin:0 0 10px 0; font-size:18px; font-weight:800; }
-  .muted { color:var(--muted); }
-  .row { display:flex; align-items:center; gap:10px; margin:8px 0 12px; }
-  .row>label { min-width:160px; white-space:nowrap; font-weight:600; font-size:14px; color:#374151; }
-  .row>input, .row>select { flex:1; padding:11px; border:1px solid #D1D5DB; border-radius:8px; font-size:15px; background:#fff; }
-  @media(max-width:480px) { .row>label { min-width:120px; } }
-  .q-item { padding:12px 0; border-top:1px solid var(--border); }
-  .q-item:first-child { border-top:none; }
-  .q-title { font-weight:700; }
-  .q-sub { color:var(--muted); margin-top:2px; }
-  .scale { display:flex; gap:8px; margin-top:8px; }
-  .pill { width:38px; height:38px; border-radius:50%; border:1px solid #D1D5DB; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:700; }
-  .pill.selected { background:var(--brand); color:#fff; border-color:var(--brand); }
-  .actions { display:flex; justify-content:space-between; gap:10px; margin-top:16px; }
-  .btn { padding:10px 16px; border-radius:8px; border:1px solid #D1D5DB; background:#fff; font-weight:700; cursor:pointer; }
-  .btn.primary { background:var(--brand); border-color:var(--brand); color:#fff; }
-  .btn[disabled] { opacity:.5; cursor:not-allowed; }
-  .ver { position:fixed; right:10px; bottom:10px; background:#111827; color:#fff; padding:5px 10px; border-radius:999px; font-size:12px; opacity:.8; }
+  body{font-family:system-ui,Arial,sans-serif;background:#F9FAFB;color:#111}
+  /* Header styles */
+  h1 {
+    font-size:24pt;
+    margin-bottom:4px;
+  }
+  .subheader {
+    font-size:18pt;
+    margin-top:0;
+    margin-bottom:16px;
+    font-weight:500;
+  }
+  h2 {
+    font-size:14pt;
+    margin-top:16px;
+  }
+  .row{display:flex;align-items:center;gap:10px;margin:8px 0}
+  .row>label{min-width:150px;font-weight:600;font-size:10pt}
+  .row>input,.row>select{flex:1;padding:8px;font-size:10pt}
+  /* Placeholder color for select */
+  select:invalid{color:#aaa;font-size:10pt}
+  .q-item{padding:10px 0;border-top:1px solid #ddd}
+  .pill{display:inline-block;width:32px;height:32px;line-height:32px;text-align:center;
+         border:1px solid #ccc;border-radius:50%;margin-right:6px;cursor:pointer}
+  .pill.selected{background:#1E90FF;color:#fff}
 </style>
-<script id="embeddedQuestions" type="application/json">[{"id": 1, "statement": "1. I answer very quickly to guest messages", "subtext": "I often check and reply right away"}, {"id": 2, "statement": "2. I make my replies warm and personal", "subtext": "I use their name and add helpful information"}, {"id": 3, "statement": "3. I make a great first impression", "subtext": "I know it starts with the first message"}, {"id": 4, "statement": "4. I can see if a guest is stressed or relaxed", "subtext": "I adjust the way I check-in to the mood"}, {"id": 5, "statement": "5. I ask questions before I ask passports", "subtext": "I welcome guests like friends"}, {"id": 6, "statement": "6. I can check-in a guest in 60 seconds", "subtext": "I timed three standard check-ins"}, {"id": 7, "statement": "7. I check in groups differently than FIT", "subtext": "I usually check-in groups with the leader"}, {"id": 8, "statement": "8. I don't say that check-in time is 14:00", "subtext": "Guests can check-in when the room is ready"}, {"id": 9, "statement": "9. I dont show stress when there is a problem", "subtext": "I know that makes guests really worry"}, {"id": 10, "statement": "10. I show genuine interest during check-out", "subtext": "I ask about their stay or next destination"}, {"id": 11, "statement": "11. I make great last impressions", "subtext": "I walk them out and wait until their car has left"}, {"id": 12, "statement": "12. I use names to connect with guests", "subtext": "When it feels right I introduce myself"}, {"id": 13, "statement": "13. I scan every guest every time", "subtext": "I dont look at a group but at each individual"}, {"id": 14, "statement": "14. I am good at scanning", "subtext": "I see what people need before they ask"}, {"id": 15, "statement": "15. I create unique surprises for guests", "subtext": "I do more than offering free things"}, {"id": 16, "statement": "16. Music is an essential part of the vibe", "subtext": "I listen to make sure we play the right music"}, {"id": 17, "statement": "17. I tell guests they can use other BED facilities", "subtext": "I offer downtown coffee, big pool or breakfast"}, {"id": 18, "statement": "18. It's annoying when a room key doesn't work", "subtext": "I go up to make sure the new key works"}, {"id": 19, "statement": "19. I talk with guests because I am interested", "subtext": "When I force myself it will not be real"}, {"id": 20, "statement": "20. I often give my friends honest feedback", "subtext": "Im happy to help them to grow"}, {"id": 21, "statement": "21. My friends often give me honest feedback", "subtext": "I'm happy they help me to grow"}, {"id": 22, "statement": "22. I can answer most questions about BED", "subtext": "I have visited the rooms in all our hotels"}, {"id": 23, "statement": "23. I understand the meaning of showtime", "subtext": "The magic happens from 0700-1000"}, {"id": 24, "statement": "24. I have peeled my own onion", "subtext": "I dont act. Usually I show my true self"}, {"id": 25, "statement": "25. I use ChatGPT or Gemini", "subtext": "I ask for help with e.g., guest messages"}, {"id": 26, "statement": "26. I send messages that look like I wrote them", "subtext": "I don't copy AI because guests will know"}, {"id": 27, "statement": "27. I use ChatGPT or Gemini", "subtext": "I ask help to analyze and solve problems"}, {"id": 28, "statement": "28. I never gossip. I signed I Promise", "subtext": "I dont talk badly when someones not here"}, {"id": 29, "statement": "29. I really understand that rules can be flexible", "subtext": "Without reasons many rules just disappear"}, {"id": 30, "statement": "30. I am confident about my own judgment", "subtext": "I make decisions without asking permission"}, {"id": 31, "statement": "31. I look after the whole hotel, not only front", "subtext": "I include rooms, maintenance and back areas"}, {"id": 32, "statement": "32. I look around when I arrive at the hotel", "subtext": "I share responsibility for the whole hotel"}, {"id": 33, "statement": "33. I don't pass issues to others but act myself", "subtext": "I follow up later to make sure it's fixed"}, {"id": 34, "statement": "34. I am not afraid of the CEO or my coach", "subtext": "I know I am allowed to make mistakes"}, {"id": 35, "statement": "35. I have no manuals that show me what to do", "subtext": "That means I cannot do anything wrong"}]</script>
+<script id="embeddedQuestions" type="application/json"></script>
 </head>
 <body>
-<header>
-  <div class="brand">BED HOSPITALITY 2.0</div>
-  <div class="dots" id="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-</header>
-
-<main>
-  <!-- Page 1: Personal + Peer -->
-  <section id="p-welcome">
-    <div class="card">
-      <h2>YOUR INFORMATION</h2>
-      <div class="row"><label for="nick">your name</label><input id="nick" type="text"/></div>
-      <div class="row"><label for="email">your email</label><input id="email" type="email"/></div>
-      <div class="row"><label for="hotel">your location</label>
-        <select id="hotel">
-          <option value="">select hotel</option>
-          <option>BED Changkian</option><option>BED Phrasing</option><option>BED Nimman</option>
-          <option>BED Chiangmai Gate</option><option>BED Flying</option><option>BED Support</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>PEER INFORMATION</h2>
-      <div class="muted" style="font-weight:700;margin:4px 0 10px;">peer must be in BED ≥ 12 months</div>
-      <div class="row"><label for="peerName">name peer</label><input id="peerName" type="text"/></div>
-      <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email"/></div>
-      <div class="row"><label for="peerHotel">peer location</label>
-        <select id="peerHotel">
-          <option value="">select hotel</option>
-          <option>BED Changkian</option><option>BED Phrasing</option><option>BED Nimman</option>
-          <option>BED Chiangmai Gate</option><option>BED Flying</option><option>BED Support</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="actions">
-      <button class="btn" id="wBack" disabled>Back</button>
-      <button class="btn primary" id="wNext" disabled>Next</button>
-    </div>
-  </section>
-
-  <!-- Page 2: Q1 -->
-  <section id="p-q1" style="display:none">
-    <div class="card">
-      <h2>STATEMENTS PART 1</h2>
-      <div id="list-q1"></div>
-      <div class="actions">
-        <button class="btn" id="q1Back">Back</button>
-        <button class="btn primary" id="q1Next" disabled>Next</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Page 3: Q2 -->
-  <section id="p-q2" style="display:none">
-    <div class="card">
-      <h2>STATEMENTS PART 2</h2>
-      <div id="list-q2"></div>
-      <div class="actions">
-        <button class="btn" id="q2Back">Back</button>
-        <button class="btn primary" id="q2Next" disabled>Next</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Page 4: Finish -->
-  <section id="p-finish" style="display:none">
-    <div class="card">
-      <h2>All Done</h2>
-      <p class="muted">Thanks! Your entries are complete.</p>
-      <div class="actions">
-        <button class="btn" id="fBack">Back</button>
-        <button class="btn primary" id="fDone">Done</button>
-      </div>
-    </div>
-  </section>
-</main>
-
-<div class="ver">Clean baseline v9 — 35Q</div>
-
+<h1>BED HOSPITALITY 2.0 — Self Assessment</h1>
+<p class="subheader">TEAM MEMBER FORM</p>
+<div id="welcome">
+  <h2>Your Information</h2>
+  <div class="row"><label for="nick">your name</label><input id="nick"></div>
+  <div class="row"><label for="email">your email</label><input id="email" type="email"></div>
+  <div class="row"><label for="hotel">your location</label>
+    <select id="hotel" required>
+      <option value="" disabled selected>select</option>
+      <option>BED Changkian</option>
+      <option>BED Phrasing</option>
+      <option>BED Nimman</option>
+      <option>BED Chiangmai Gate</option>
+      <option>BED Flying</option>
+      <option>BED Support</option>
+    </select>
+  </div>
+  <h2>Peer Information</h2>
+  <div class="row"><label for="peerName">name peer</label><input id="peerName"></div>
+  <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email"></div>
+  <div class="row"><label for="peerHotel">peer location</label>
+    <select id="peerHotel" required>
+      <option value="" disabled selected>select</option>
+      <option>BED Changkian</option>
+      <option>BED Phrasing</option>
+      <option>BED Nimman</option>
+      <option>BED Chiangmai Gate</option>
+      <option>BED Flying</option>
+      <option>BED Support</option>
+    </select>
+  </div>
+  <button id="start">Start</button>
+</div>
+<div id="q1" style="display:none">
+  <h2>Statements Part 1</h2>
+  <div id="list-q1"></div>
+  <button id="toQ2">Next</button>
+</div>
+<div id="q2" style="display:none">
+  <h2>Statements Part 2</h2>
+  <div id="list-q2"></div>
+  <button id="finish">Finish</button>
+</div>
 <script>
 (function(){
-  const S = window.SAR = { user: {}, peer: {}, answers: {}, questions: [] };
-
-  try { S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }
-  catch(e) { S.questions = []; }
-
-  const $ = id => document.getElementById(id);
-  const pages = ['p-welcome','p-q1','p-q2','p-finish'];
-
-  function show(id) { pages.forEach(p => $(p).style.display = (p === id ? 'block' : 'none')); updateDots(id); }
-  function updateDots(id) {
-    const idx = id==='p-welcome'?0:id==='p-q1'?1:2;
-    document.querySelectorAll('#dots .dot').forEach((d,i)=>d.classList.toggle('active', i<=idx));
-  }
-
-  function emailOK(v) { return /^\S+@\S+\.\S+$/.test((v||'').trim()); }
-  function validateWelcome() {
-    S.user.nickname=$('nick').value.trim();
-    S.user.email=$('email').value.trim();
-    S.user.hotel=$('hotel').value.trim();
-    S.peer.name=$('peerName').value.trim();
-    S.peer.email=$('peerEmail').value.trim();
-    S.peer.hotel=$('peerHotel').value.trim();
-    const ok = !!S.user.nickname && emailOK(S.user.email) && !!S.user.hotel &&
-               !!S.peer.name && emailOK(S.peer.email) && !!S.peer.hotel;
-    $('wNext').disabled=!ok;
-  }
-  ['nick','email','hotel','peerName','peerEmail','peerHotel'].forEach(id=>{
-    document.addEventListener('input',e=>{if(e.target.id===id)validateWelcome();});
-    document.addEventListener('change',e=>{if(e.target.id===id)validateWelcome();});
-  });
-
-  function makeQ(q,ordinal) {
-    const wrap=document.createElement('div');
-    wrap.className='q-item'; wrap.dataset.qid=q.id;
-    const title=document.createElement('div'); title.className='q-title'; title.textContent=ordinal+'. '+(q.statement||''); wrap.appendChild(title);
-    if(q.subtext){const sub=document.createElement('div');sub.className='q-sub';sub.textContent=q.subtext;wrap.appendChild(sub);}
-    const scale=document.createElement('div');scale.className='scale';wrap.appendChild(scale);
-    for(let v=1;v<=5;v++){const pill=document.createElement('div');pill.className='pill';pill.textContent=v;pill.dataset.val=v;
-      pill.addEventListener('click',onPick);scale.appendChild(pill);if(S.answers[q.id]==v)pill.classList.add('selected');}
-    return wrap;
-  }
-  function onPick(e) {
-    const pill=e.currentTarget,val=Number(pill.dataset.val),qid=pill.closest('.q-item').dataset.qid;
-    S.answers[qid]=val;
-    pill.closest('.q-item').querySelectorAll('.pill').forEach(p=>p.classList.toggle('selected',Number(p.dataset.val)===val));
-    validateQ();
-  }
-  function renderQ1() { const m=$('list-q1');m.innerHTML='';S.questions.slice(0,18).forEach((q,i)=>m.appendChild(makeQ(q,i+1))); }
-  function renderQ2() { const m=$('list-q2');m.innerHTML='';S.questions.slice(18,35).forEach((q,i)=>m.appendChild(makeQ(q,19+i))); }
-  function validateQ() {
-    const answered=(f,t)=>{let n=0;for(let i=f;i<=t;i++)if(S.answers[String(i)])n++;return n;};
-    $('q1Next').disabled=answered(1,18)!==18;
-    $('q2Next').disabled=answered(19,35)!==(35-19+1);
-  }
-
-  $('wNext').addEventListener('click',()=>{renderQ1();show('p-q1');validateQ();});
-  $('q1Back').addEventListener('click',()=>show('p-welcome'));
-  $('q1Next').addEventListener('click',()=>{renderQ2();show('p-q2');validateQ();});
-  $('q2Back').addEventListener('click',()=>show('p-q1'));
-  $('q2Next').addEventListener('click',()=>show('p-finish'));
-  $('fBack').addEventListener('click',()=>show('p-q2'));
-  $('fDone').addEventListener('click',()=>alert('Done'));
-
-  validateWelcome();
-  show('p-welcome');
+  const S={answers:{},questions:[]};
+  try{S.questions=JSON.parse(document.getElementById('embeddedQuestions').textContent)||[]}catch(e){S.questions=[]};
+  const $=id=>document.getElementById(id);
+  function makeQ(q,ord){const d=document.createElement('div');d.className='q-item';d.dataset.qid=q.id;
+    d.innerHTML=`<div>${ord}. ${q.statement}</div>`;if(q.subtext){d.innerHTML+=`<div><em>${q.subtext}</em></div>`}
+    for(let v=1;v<=5;v++){const p=document.createElement('span');p.className='pill';p.textContent=v;
+      p.dataset.val=v;p.onclick=()=>{S.answers[q.id]=v;d.querySelectorAll('.pill').forEach(x=>x.classList.toggle('selected',x===p))};d.appendChild(p);}
+    return d;}
+  $('start').onclick=()=>{const l=$('list-q1');l.innerHTML='';S.questions.slice(0,18).forEach((q,i)=>l.appendChild(makeQ(q,i+1)));$('welcome').style.display='none';$('q1').style.display='block';};
+  $('toQ2').onclick=()=>{const l=$('list-q2');l.innerHTML='';S.questions.slice(18,35).forEach((q,i)=>l.appendChild(makeQ(q,19+i)));$('q1').style.display='none';$('q2').style.display='block';};
+  $('finish').onclick=()=>{alert('Done')};
 })();
 </script>
 </body>
