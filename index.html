@@ -267,6 +267,27 @@ p{color:#434343;line-height:1.6;}
 <div style="display:flex;justify-content:flex-end;margin:18px 0 8px;">
 <div class="btnrow" style="display:flex;justify-content:flex-end;margin:18px 0 8px;"><button class="btn-next primary" id="sarStart" type="button">Next</button></div>
 </div>
+</div><div class="sar-page" data-step="intro">
+<div class="card" style="margin-top:10px;">
+<h2 class="section-title">INSTRUCTIONS FOR ASSESSMENT</h2>
+<div class="field-label" style="margin-top:6px;">
+    Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself.
+    The goal is to know your own strengths and opportunities.
+  </div>
+</div>
+<div class="card" style="margin-top:16px;">
+<h3 class="section-title" style="font-size:14pt;">RATING SCALE</h3>
+<div class="field-label" style="white-space:pre-line; margin-top:8px;">
+1   I am not good at this
+2   I need to be better at this
+3   I am average at this
+4   I am good at this
+5   I am very good at this
+  </div>
+</div>
+<div class="btnrow" style="display:flex;justify-content:flex-end;margin:24px 0 8px;">
+<button class="btn-next" id="introStart" type="button">Start</button>
+</div>
 </div>
 <!-- Part 1 — Dynamic questions -->
 <div class="sar-page" data-step="q1">
@@ -1807,5 +1828,24 @@ ok.onclick = function(){
   } else {
     attach();
   }
+})();</script><script>
+(function(){
+  var page = document.querySelector('.sar-page[data-step="intro"]');
+  if (!page) return;
+  var btn = page.querySelector('#introStart');
+  if (!btn) return;
+  btn.addEventListener('click', function(e){
+    if (window.BED && window.BED.App && typeof window.BED.App.go === 'function'){
+      e.preventDefault();
+      window.BED.App.go('q1');
+    } else {
+      // Fallback: switch pages manually without altering anything else
+      e.preventDefault();
+      var all = document.querySelectorAll('.sar-page');
+      all.forEach(function(p){ p.classList.remove('active'); });
+      var q1 = document.querySelector('.sar-page[data-step="q1"]');
+      if (q1) q1.classList.add('active');
+    }
+  });
 })();</script></body>
 </html>
