@@ -11,22 +11,22 @@
     --gap: 6px;
     --brand-blue: #1E90FF;
     --progress-red: #E11D48;
+    --progress-gray: #f3f4f6;
   }
   * { box-sizing: border-box; }
   body { font-family: system-ui, Arial, sans-serif; background:#F9FAFB; color:#111; margin:0; }
   .container { width:100%; margin:0; padding:24px var(--pad); }
 
-  /* Headers */
   h1 { font-size:20pt; margin:0 0 8px 0; line-height:1.2; }
   .subheader { font-size:18pt; margin:0 0 12px 0; font-weight:500; }
   h2 { font-size:14pt; margin:22px 0 8px 0; line-height:1.25; }
 
-  /* Progress dots (now on every page) */
+  /* Header progress bar (7 dots across all pages) */
   .progress { display:flex; gap:10px; margin:6px 0 16px 0; }
-  .dot { width:10px; height:10px; border-radius:50%; background:#f3f4f6; border:1px solid #e5e7eb; }
+  .dot { width:10px; height:10px; border-radius:50%; background:var(--progress-gray); border:1px solid #e5e7eb; }
   .dot.active { background: var(--progress-red); border-color: var(--progress-red); }
 
-  /* Form rows use Grid so fields reach right edge (20px page padding) */
+  /* Grid rows so inputs reach right border (20px padding) */
   .row {
     display: grid;
     grid-template-columns: var(--label-w) 1fr;
@@ -40,23 +40,25 @@
     width: 100%;
     padding: 10px 12px;
     font-size: 10pt;
-    border: 1px solid #cfd4dc;   /* neutral border */
+    border: 1px solid #cfd4dc;
     border-radius: 10px;
     background: #fff;
     transition: box-shadow .15s, border-color .15s, background-color .15s;
   }
-  /* Remove blue border/glow on focus per request */
+  /* Blue background on focus for BOTH input and select */
   .row > input:focus,
   .row > select:focus {
     outline: none;
-    border-color: #cfd4dc;
-    box-shadow: none;
-    background-color: #fff;
+    border-color: rgba(30,144,255,0.8);
+    box-shadow: 0 0 0 3px rgba(30,144,255,0.18);
+    background-color: rgba(30,144,255,0.04);
   }
   select:invalid { color:#aaa; }
 
+  .intro { font-size:10pt; color:#333; margin:4px 0 14px 0; }
+
   /* Buttons */
-  .actions { padding-left: calc(var(--label-w) + var(--gap)); margin-top: 14px; text-align: right; }
+  .actions { padding-left: calc(var(--label-w) + var(--gap)); margin-top: 14px; display:flex; gap:10px; justify-content: flex-end; }
   button {
     padding: 12px 18px;
     border: none;
@@ -66,14 +68,18 @@
     font-size: 12pt;
     cursor: pointer;
   }
+  .btn-secondary { background:#fff; color:#111; border:1px solid #cfd4dc; }
 
+  /* Question block formatting (restored) */
   .q-item { padding:12px 0; border-top:1px solid #ddd; }
+  .q-item > div:first-child { font-size: 11pt; margin-bottom: 6px; }
+  .q-item em { font-size: 10pt; color: #444; display:block; margin-bottom:6px; }
   .pill { display:inline-block; width:32px; height:32px; line-height:32px;
-          text-align:center; border:1px solid #ccc; border-radius:50%;
-          margin-right:6px; cursor:pointer; user-select:none; }
+          text-align:center; border:1px solid #ccc; border-radius:50%; margin-right:6px;
+          cursor:pointer; user-select:none; }
   .pill.selected { background: var(--brand-blue); color:#fff; }
 
-  /* Mobile fallback: stack label above field below 340px */
+  /* Mobile fallback */
   @media (max-width: 340px) {
     .row { grid-template-columns: 1fr; row-gap: 6px; }
     .actions { padding-left: 0; }
@@ -261,13 +267,15 @@
   <main class="container">
     <h1>BED HOSPITALITY 2.0</h1>
     <p class="subheader">TEAM MEMBER FORM</p>
-    <div class="progress" id="progressP1">
-      <span class="dot active"></span><span class="dot active"></span><span class="dot active"></span><span class="dot active"></span>
+    <div class="progress" id="progressHeader">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      <span class="dot"></span>
     </div>
 
-    <div id="welcome">
+    <!-- PAGE 1: Welcome form -->
+    <section id="welcome">
       <h2>Your Information</h2>
-      <!-- Removed intro text under Your Information -->
       <div class="row"><label for="nick">your name</label><input id="nick"></div>
       <div class="row"><label for="email">your email</label><input id="email" type="email"></div>
       <div class="row"><label for="hotel">your location</label>
@@ -283,7 +291,7 @@
       </div>
 
       <h2>Peer Information</h2>
-      <p class="intro" style="font-size:10pt;">after you completed your self assessment one of your peers will review you. select one of your team members who worked in BED for at least 12 months</p>
+      <p class="intro">after you completed your self assessment one of your peers will review you. select one of your team members who worked in BED for at least 12 months</p>
       <div class="row"><label for="peerName">name peer</label><input id="peerName"></div>
       <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email"></div>
       <div class="row"><label for="peerHotel">peer location</label>
@@ -299,31 +307,56 @@
       </div>
 
       <div class="actions">
-        <button id="start">Start</button>
+        <button id="toInstructions">Start</button>
       </div>
-    </div>
+    </section>
 
-    <div id="q1" style="display:none">
-      <h2>Statements Part 1</h2>
-      <div class="progress" id="progressQ1">
-        <span class="dot active"></span><span class="dot active"></span><span class="dot active"></span><span class="dot active"></span>
+    <!-- PAGE 2: Instructions with 1–5 scoring explanations (restored) -->
+    <section id="instructions" style="display:none">
+      <h2>How scoring works</h2>
+      <p class="intro">Please read before you answer the statements.</p>
+      <div style="font-size:10pt; line-height:1.4; border:1px solid #e5e7eb; border-radius:10px; padding:12px;">
+        <p><strong>1 — Strongly Disagree</strong>: This is not true for me in most situations.</p>
+        <p><strong>2 — Disagree</strong>: This is usually not true for me.</p>
+        <p><strong>3 — Neutral</strong>: Sometimes true, sometimes not sure.</p>
+        <p><strong>4 — Agree</strong>: This is mostly true for me.</p>
+        <p><strong>5 — Strongly Agree</strong>: This is true for me almost all the time.</p>
       </div>
+      <div class="actions">
+        <button class="btn-secondary" id="backToWelcome">Back</button>
+        <button id="toQ1">Start Questions</button>
+      </div>
+    </section>
+
+    <!-- PAGE 3: Question page 1 (restored) -->
+    <section id="q1" style="display:none">
+      <h2>Statements Part 1</h2>
       <div id="list-q1"></div>
       <div class="actions">
+        <button class="btn-secondary" id="backToInstructions">Back</button>
         <button id="toQ2">Next</button>
       </div>
-    </div>
+    </section>
 
-    <div id="q2" style="display:none">
+    <!-- PAGE 4: Question page 2 (restored) -->
+    <section id="q2" style="display:none">
       <h2>Statements Part 2</h2>
-      <div class="progress" id="progressQ2">
-        <span class="dot active"></span><span class="dot active"></span><span class="dot active"></span><span class="dot active"></span>
-      </div>
       <div id="list-q2"></div>
       <div class="actions">
-        <button id="finish">Finish</button>
+        <button class="btn-secondary" id="backToQ1">Back</button>
+        <button id="toFinish">Next</button>
       </div>
-    </div>
+    </section>
+
+    <!-- PAGE 5: Finish placeholder (no popup yet) -->
+    <section id="finish" style="display:none">
+      <h2>Completed</h2>
+      <p class="intro">Thank you. We will add the confirmation popup next.</p>
+      <div class="actions">
+        <button class="btn-secondary" id="backToQ2">Back</button>
+        <button id="done">Done</button>
+      </div>
+    </section>
   </main>
 
 <script>
@@ -331,15 +364,34 @@
   const S = {answers:{}, questions:[]};
   try { S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }
   catch(e) { S.questions = []; }
-  const $ = id => document.getElementById(id);
+
+  const el = id => document.getElementById(id);
+  const sections = ['welcome','instructions','q1','q2','finish'];
+
+  function show(id){
+    sections.forEach(s => el(s).style.display = (s===id ? 'block' : 'none'));
+    let n = 1;
+    if(id==='instructions') n = 2;
+    else if(id==='q1') n = 3;
+    else if(id==='q2') n = 4;
+    else if(id==='finish') n = 7;
+    setProgress(n);
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function setProgress(n){
+    const dots = document.querySelectorAll('#progressHeader .dot');
+    dots.forEach((d,i)=>d.classList.toggle('active', i < n));
+  }
+  setProgress(1); // initial
 
   function makeQ(q,ord){
     const d = document.createElement('div');
     d.className = 'q-item';
     d.dataset.qid = q.id;
     d.innerHTML = `<div>${ord}. ${q.statement}</div>`;
-    if(q.subtext){ d.innerHTML += `<div><em>${q.subtext}</em></div>`; }
-    for(let v=1; v<=5; v++){
+    if(q.subtext){ d.innerHTML += `<em>${q.subtext}</em>`; }
+    for(let v=1; v<=5; v++){ 
       const p = document.createElement('span');
       p.className = 'pill';
       p.textContent = v;
@@ -353,23 +405,24 @@
     return d;
   }
 
-  $('start').onclick = () => {
-    const l = $('list-q1'); l.innerHTML = '';
-    S.questions.slice(0,18).forEach((q,i) => l.appendChild(makeQ(q, i+1)));
-    document.getElementById('welcome').style.display = 'none';
-    document.getElementById('q1').style.display = 'block';
-    window.scrollTo({top:0, behavior:'smooth'});
+  // Wire buttons
+  el('toInstructions').onclick = () => show('instructions');
+  el('backToWelcome').onclick = () => show('welcome');
+  el('toQ1').onclick = () => {
+    const l = el('list-q1'); l.innerHTML = '';
+    S.questions.slice(0,18).forEach((q,i)=> l.appendChild(makeQ(q, i+1)));
+    show('q1');
   };
-
-  $('toQ2').onclick = () => {
-    const l = $('list-q2'); l.innerHTML = '';
-    S.questions.slice(18,35).forEach((q,i) => l.appendChild(makeQ(q, 19+i)));
-    document.getElementById('q1').style.display = 'none';
-    document.getElementById('q2').style.display = 'block';
-    window.scrollTo({top:0, behavior:'smooth'});
+  el('backToInstructions').onclick = () => show('instructions');
+  el('toQ2').onclick = () => {
+    const l = el('list-q2'); l.innerHTML = '';
+    S.questions.slice(18,35).forEach((q,i)=> l.appendChild(makeQ(q, 19+i)));
+    show('q2');
   };
-
-  $('finish').onclick = () => { alert('Done'); };
+  el('backToQ1').onclick = () => show('q1');
+  el('toFinish').onclick = () => show('finish');
+  el('backToQ2').onclick = () => show('q2');
+  el('done').onclick = () => alert('Done');
 })();
 </script>
 </body>
