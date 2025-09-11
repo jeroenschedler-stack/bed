@@ -5,85 +5,63 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
 <style>
+  /* Global */
+  * { box-sizing: border-box; }
   body {
     font-family: system-ui, Arial, sans-serif;
     background: #F9FAFB;
     color: #111;
     margin: 0;
   }
+  /* Container: 20px left/right on ALL pages */
   .container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 24px 32px; /* equal left/right margins on all pages */
+    width: 100%;
+    margin: 0;
+    padding: 24px 20px; /* 20px from viewport border on both sides */
   }
+
   /* Headers */
-  h1 {
-    font-size: 20pt; /* form header fixed size */
-    margin: 0 0 8px 0;
-    line-height: 1.2;
-  }
-  .subheader {
-    font-size: 18pt; /* subheader fixed size */
-    margin: 0 0 20px 0;
-    font-weight: 500;
-  }
-  h2 {
-    font-size: 14pt; /* page headers */
-    margin: 22px 0 10px 0;
-    line-height: 1.25;
-  }
-  /* Rows and fields */
+  h1 { font-size: 20pt; margin: 0 0 8px 0; line-height: 1.2; }
+  .subheader { font-size: 18pt; margin: 0 0 20px 0; font-weight: 500; }
+  h2 { font-size: 14pt; margin: 22px 0 10px 0; line-height: 1.25; }
+
+  /* Form rows */
   .row {
     display: flex;
     align-items: center;
-    gap: 8px;              /* bring fields closer to labels */
-    margin: 12px 0;
+    gap: 6px;            /* bring field closer to label */
+    margin: 10px 0;
   }
-  .row>label {
-    min-width: 120px;      /* narrower label for tighter layout */
-    font-weight: 400;      /* remove bold */
-    font-size: 10pt;       /* fixed label size */
+  .row > label {
+    width: 140px;        /* fixed label width → equal field sizes */
+    font-weight: 400;    /* not bold */
+    font-size: 10pt;
+    flex: 0 0 140px;
   }
-  .row>input,
-  .row>select {
-    flex: 1;
+  .row > input,
+  .row > select {
+    flex: 1 1 auto;      /* fields extend to the right edge */
     padding: 8px 10px;
-    font-size: 10pt;       /* field text size */
-  }
-  /* Placeholder styling for selects */
-  select:invalid {
-    color: #aaa;
     font-size: 10pt;
   }
+  /* Placeholder styling for selects */
+  select:invalid { color: #aaa; font-size: 10pt; }
+
   /* Questions UI */
-  .q-item {
-    padding: 12px 0;
-    border-top: 1px solid #ddd;
-  }
+  .q-item { padding: 12px 0; border-top: 1px solid #ddd; }
   .pill {
-    display: inline-block;
-    width: 32px;
-    height: 32px;
-    line-height: 32px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 50%;
-    margin-right: 6px;
-    cursor: pointer;
-    user-select: none;
+    display: inline-block; width: 32px; height: 32px; line-height: 32px;
+    text-align: center; border: 1px solid #ccc; border-radius: 50%;
+    margin-right: 6px; cursor: pointer; user-select: none;
   }
-  .pill.selected {
-    background: #1E90FF;
-    color: #fff;
-  }
+  .pill.selected { background: #1E90FF; color: #fff; }
+
   button {
-    padding: 10px 14px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background: #fff;
-    cursor: pointer;
+    padding: 10px 14px; border: 1px solid #ccc; border-radius: 10px;
+    background: #fff; cursor: pointer;
   }
-  /* Section top margin to keep space below header across pages */
+
+  /* Section spacing across pages */
   #welcome, #q1, #q2 { margin-top: 8px; }
 </style>
 <script id="embeddedQuestions" type="application/json">[
@@ -268,6 +246,7 @@
   <main class="container">
     <h1>BED HOSPITALITY 2.0</h1>
     <p class="subheader">TEAM MEMBER FORM</p>
+
     <div id="welcome">
       <h2>Your Information</h2>
       <div class="row"><label for="nick">your name</label><input id="nick"></div>
@@ -283,6 +262,7 @@
           <option>BED Support</option>
         </select>
       </div>
+
       <h2>Peer Information</h2>
       <div class="row"><label for="peerName">name peer</label><input id="peerName"></div>
       <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email"></div>
@@ -297,6 +277,7 @@
           <option>BED Support</option>
         </select>
       </div>
+
       <button id="start">Start</button>
     </div>
 
@@ -315,34 +296,46 @@
 
 <script>
 (function(){
-  const S={answers:{},questions:[]};
-  try{S.questions=JSON.parse(document.getElementById('embeddedQuestions').textContent)||[]}catch(e){S.questions=[]};
-  const $=id=>document.getElementById(id);
+  const S = {answers:{}, questions:[]};
+  try { S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }
+  catch(e) { S.questions = []; }
+  const $ = id => document.getElementById(id);
+
   function makeQ(q,ord){
-    const d=document.createElement('div');d.className='q-item';d.dataset.qid=q.id;
-    d.innerHTML=`<div>${ord}. ${q.statement}</div>`;
-    if(q.subtext){d.innerHTML+=`<div><em>${q.subtext}</em></div>`}
-    for(let v=1;v<=5;v++){
-      const p=document.createElement('span');p.className='pill';p.textContent=v;
-      p.dataset.val=v;
-      p.onclick=()=>{S.answers[q.id]=v;d.querySelectorAll('.pill').forEach(x=>x.classList.toggle('selected',x===p))};
+    const d = document.createElement('div');
+    d.className = 'q-item';
+    d.dataset.qid = q.id;
+    d.innerHTML = `<div>${ord}. ${q.statement}</div>`;
+    if(q.subtext){ d.innerHTML += `<div><em>${q.subtext}</em></div>`; }
+    for(let v=1; v<=5; v++){
+      const p = document.createElement('span');
+      p.className = 'pill';
+      p.textContent = v;
+      p.dataset.val = v;
+      p.onclick = () => {
+        S.answers[q.id] = v;
+        d.querySelectorAll('.pill').forEach(x => x.classList.toggle('selected', x===p));
+      };
       d.appendChild(p);
     }
     return d;
   }
-  $('start').onclick=()=>{
-    const l=$('list-q1');l.innerHTML='';
-    S.questions.slice(0,18).forEach((q,i)=>l.appendChild(makeQ(q,i+1)));
-    document.getElementById('welcome').style.display='none';
-    document.getElementById('q1').style.display='block';
+
+  $('start').onclick = () => {
+    const l = $('list-q1'); l.innerHTML = '';
+    S.questions.slice(0,18).forEach((q,i) => l.appendChild(makeQ(q, i+1)));
+    document.getElementById('welcome').style.display = 'none';
+    document.getElementById('q1').style.display = 'block';
   };
-  $('toQ2').onclick=()=>{
-    const l=$('list-q2');l.innerHTML='';
-    S.questions.slice(18,35).forEach((q,i)=>l.appendChild(makeQ(q,19+i)));
-    document.getElementById('q1').style.display='none';
-    document.getElementById('q2').style.display='block';
+
+  $('toQ2').onclick = () => {
+    const l = $('list-q2'); l.innerHTML = '';
+    S.questions.slice(18,35).forEach((q,i) => l.appendChild(makeQ(q, 19+i)));
+    document.getElementById('q1').style.display = 'none';
+    document.getElementById('q2').style.display = 'block';
   };
-  $('finish').onclick=()=>{alert('Done')};
+
+  $('finish').onclick = () => { alert('Done'); };
 })();
 </script>
 </body>
