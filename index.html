@@ -1904,7 +1904,7 @@ ok.onclick = function(){
     });
   }
 })();</script><script>
-// LOAD_AND_RENDER_QUESTIONS v2 (safe IDs + stronger progress update)
+// CONSOLIDATED_QUESTIONS_AND_NAV v3
 (function(){
   function q(sel, root){ return (root||document).querySelector(sel); }
   function all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
@@ -1918,7 +1918,13 @@ ok.onclick = function(){
     dots.forEach(function(d,i){ if (i <= idx) d.classList.add('done'); });
     if (dots[idx]) dots[idx].classList.add('current');
   }
+  function go(step){
+    all('.sar-page').forEach(function(p){ p.classList.remove('active'); });
+    var pg = q('.sar-page[data-step="'+step+'"]');
+    if (pg){ pg.classList.add('active'); setProgress(step); }
+  }
 
+  // ------- Render questions safely -------
   function makeId(it, idx, base){
     var id = (it && it.id ? String(it.id) : "").trim();
     if (!id){
@@ -1929,7 +1935,6 @@ ok.onclick = function(){
     }
     return id.replace(/[^\w\-]/g, "_");
   }
-
   function renderList(target, items, base){
     var host = q('#'+target);
     if (!host) return;
@@ -1949,6 +1954,22 @@ ok.onclick = function(){
     host.innerHTML = html;
   }
 
+  // ------- Q1 activation logic -------
+  function q1UpdateNext(){
+    var rows = all('#q1List .q-item');
+    var answered = rows.filter(function(row){
+      var qid = row.getAttribute('data-qid');
+      var checked = q('input[name="rate_'+qid+'"]:checked', row);
+      return !!checked;
+    }).length;
+    var btn = q('.sar-page[data-step="q1"] #q1Next');
+    if (btn){
+      var total = rows.length;
+      btn.disabled = !(total >= 18 && answered >= 18); // require all 18
+    }
+  }
+
+  // ------- Load questions and init listeners -------
   fetch("./questions.json?v="+Date.now(), {cache:"no-store"})
     .then(function(r){ return r.json(); })
     .then(function(qs){
@@ -1957,15 +1978,21 @@ ok.onclick = function(){
       var q2 = qs.slice(18);
       renderList("q1List", q1, 0);
       renderList("q2List", q2, 18);
+
+      // Attach change listener AFTER render to track answers
+      var mountQ1 = q('#q1List');
+      if (mountQ1){
+        mountQ1.addEventListener('change', function(e){
+          if (e.target && e.target.matches('input[type="radio"]')) q1UpdateNext();
+        });
+        // initialize disabled
+        var btn = q('.sar-page[data-step="q1"] #q1Next');
+        if (btn) btn.disabled = true;
+      }
     })
     .catch(function(e){ console.error("questions load failed", e); });
 
-  function go(step){
-    all('.sar-page').forEach(function(p){ p.classList.remove('active'); });
-    var pg = q('.sar-page[data-step="'+step+'"]');
-    if (pg){ pg.classList.add('active'); setProgress(step); }
-  }
-
+  // ------- Nav buttons (make sure Back/Next work) -------
   var introNext = q('.sar-page[data-step="intro"] #introStart');
   if (introNext){
     introNext.addEventListener('click', function(){ setTimeout(function(){ go('q1'); }, 0); });
@@ -1973,22 +2000,18 @@ ok.onclick = function(){
   var q1Back = q('.sar-page[data-step="q1"] #q1Back');
   var q1Next = q('.sar-page[data-step="q1"] #q1Next');
   if (q1Back){ q1Back.addEventListener('click', function(){ go('intro'); }); }
-  if (q1Next){ q1Next.addEventListener('click', function(){ go('q2'); setProgress('q2'); }); }
+  if (q1Next){ q1Next.addEventListener('click', function(){ go('q2'); }); }
 
   var q2Back = q('.sar-page[data-step="q2"] #q2Back');
   var q2Next = q('.sar-page[data-step="q2"] #q2Next');
   if (q2Back){ q2Back.addEventListener('click', function(){ go('q1'); }); }
   if (q2Next){ q2Next.addEventListener('click', function(){ go('score'); }); }
 
-  // Observer to force dotbar to reflect the active page (covers any route changes)
-  var lastStep = null;
+  // also keep the dotbar in sync on any change
   setInterval(function(){
     var active = q('.sar-page.active');
     var step = active ? active.getAttribute('data-step') : null;
-    if (step && step !== lastStep){
-      setProgress(step);
-      lastStep = step;
-    }
-  }, 200);
+    if (step) setProgress(step);
+  }, 300);
 })();</script></body>
 </html>
