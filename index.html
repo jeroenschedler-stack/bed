@@ -2223,3 +2223,151 @@ document.addEventListener('hydrationRequest', function(){
   } catch(e){ /* no-op */ }
 });
 </script>
+
+
+<!-- SUPER HYDRATION & NAV VALIDATION PATCH -->
+<script>
+(function(){
+  // Use a single source of truth persisted across navigation & refresh
+  try {
+    if (!window.sarState) {
+      const saved = localStorage.getItem('sarState.v1');
+      window.sarState = saved ? JSON.parse(saved) : { user:{}, peer:{}, answers:{}, questions: window.sarQuestions || [] };
+    }
+  } catch(_) {
+    window.sarState = window.sarState || { user:{}, peer:{}, answers:{}, questions: window.sarQuestions || [] };
+  }
+
+  function persistSoon(){
+    try {
+      localStorage.setItem('sarState.v1', JSON.stringify(window.sarState));
+    } catch(_) {}
+  }
+
+  // Generic helpers
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+
+  // --- Welcome page validation/enabling ---
+  function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim()); }
+  function getWelcomeElems(){
+    const card  = document.querySelector('.sar-page[data-step="welcome"]') || document.getElementById('welcome') || document.body;
+    return {
+      card,
+      nick:  card.querySelector('#sarNick')  || $('#sarNick'),
+      email: card.querySelector('#sarEmail') || $('#sarEmail'),
+      hotel: card.querySelector('#sarHotel') || $('#sarHotel'),
+      start: card.querySelector('#sarStart') || $('#sarStart') || card.querySelector('button.next, .btn.next, [data-next="instructions"]')
+    };
+  }
+  function validWelcome(){
+    const {nick,email,hotel} = getWelcomeElems();
+    return !!(nick && nick.value.trim()) && !!(email && isValidEmail(email.value)) && !!(hotel && hotel.value.trim());
+  }
+  function enableWelcomeIfValid(){
+    const els = getWelcomeElems();
+    if (!els.start) return;
+    const ok = validWelcome();
+    els.start.disabled = !ok;
+    if (ok) els.start.classList.add('primary'); else els.start.classList.remove('primary');
+  }
+  function hydrateWelcome(){
+    const els = getWelcomeElems();
+    if (els.nick){ els.nick.value = (window.sarState.user.nickname || ''); els.nick.dispatchEvent(new Event('input',{bubbles:true})); }
+    if (els.email){ els.email.value = (window.sarState.user.email || ''); els.email.dispatchEvent(new Event('input',{bubbles:true})); }
+    if (els.hotel){ els.hotel.value = (window.sarState.user.hotel || ''); els.hotel.dispatchEvent(new Event('change',{bubbles:true})); }
+    enableWelcomeIfValid();
+  }
+  function bindWelcomeSavers(){
+    const els = getWelcomeElems();
+    if (!els.card || els.card.dataset.superBound==='1') return;
+    els.card.dataset.superBound='1';
+    els.nick  && els.nick .addEventListener('input',  function(){ window.sarState.user.nickname = els.nick.value.trim();  persistSoon(); enableWelcomeIfValid(); });
+    els.email && els.email.addEventListener('input',  function(){ window.sarState.user.email    = els.email.value.trim(); persistSoon(); enableWelcomeIfValid(); });
+    els.hotel && els.hotel.addEventListener('change', function(){ window.sarState.user.hotel    = els.hotel.value.trim(); persistSoon(); enableWelcomeIfValid(); });
+  }
+
+  // --- Peer page hydration ---
+  function getPeerElems(){
+    const card = document.querySelector('.sar-page[data-step="peer"]') || document.getElementById('peer') || document.body;
+    return {
+      card,
+      name:   card.querySelector('#peerName'),
+      email:  card.querySelector('#peerEmail'),
+      hotel:  card.querySelector('#peerHotel'),
+      consent:card.querySelector('#peerConsent'),
+      done:   card.querySelector('#peerSend') || card.querySelector('#peerNext')
+    };
+  }
+  function hydratePeer(){
+    const els = getPeerElems();
+    if (els.name){ els.name.value = (window.sarState.peer.name || ''); els.name.dispatchEvent(new Event('input',{bubbles:true})); }
+    if (els.email){ els.email.value = (window.sarState.peer.email || ''); els.email.dispatchEvent(new Event('input',{bubbles:true})); }
+    if (els.hotel){ els.hotel.value = (window.sarState.peer.hotel || ''); els.hotel.dispatchEvent(new Event('change',{bubbles:true})); }
+    if (els.consent){ els.consent.checked = !!window.sarState.peer.consent; els.consent.dispatchEvent(new Event('change',{bubbles:true})); }
+  }
+  function bindPeerSavers(){
+    const els = getPeerElems();
+    if (!els.card || els.card.dataset.superBound==='1') return;
+    els.card.dataset.superBound='1';
+    els.name   && els.name  .addEventListener('input',  function(){ window.sarState.peer.name    = els.name.value.trim();   persistSoon(); });
+    els.email  && els.email .addEventListener('input',  function(){ window.sarState.peer.email   = els.email.value.trim();  persistSoon(); });
+    els.hotel  && els.hotel .addEventListener('change', function(){ window.sarState.peer.hotel   = els.hotel.value.trim();  persistSoon(); });
+    els.consent&& els.consent.addEventListener('change',function(){ window.sarState.peer.consent = !!els.consent.checked;    persistSoon(); });
+  }
+
+  // --- Questions hydration (both pages) ---
+  function bindQuestionList(root){
+    $all('[data-qid]', root).forEach(function(item){
+      var qid = item.getAttribute('data-qid');
+      var radios = item.querySelectorAll('input[type="radio"][name="q'+qid+'"]');
+      if (!radios.length){
+        // try a looser selector
+        radios = item.querySelectorAll('input[type="radio"]');
+      }
+      // hydrate
+      radios.forEach(function(r){
+        r.checked = (String(window.sarState.answers[qid]||'') === String(r.value));
+      });
+      // save
+      radios.forEach(function(r){
+        if (r.dataset.superBound==='1') return;
+        r.dataset.superBound='1';
+        r.addEventListener('change', function(){
+          if (r.checked){ window.sarState.answers[qid] = r.value; persistSoon(); }
+        });
+      });
+    });
+  }
+  function hydrateQuestions(){
+    // Support multiple containers/id variations
+    ['#q1List','#q2List','.q-list','.q-page-1','.q-page-2'].forEach(function(sel){
+      $all(sel).forEach(bindQuestionList);
+    });
+  }
+
+  // Route-aware refresh
+  function superHydrate(){
+    hydrateWelcome();
+    hydratePeer();
+    hydrateQuestions();
+    enableWelcomeIfValid();
+  }
+
+  // Initial & subsequent hooks
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      bindWelcomeSavers(); bindPeerSavers(); superHydrate();
+    });
+  } else {
+    bindWelcomeSavers(); bindPeerSavers(); superHydrate();
+  }
+  window.addEventListener('hashchange', function(){ setTimeout(function(){ bindWelcomeSavers(); bindPeerSavers(); superHydrate(); }, 0); }, {passive:true});
+  document.addEventListener('click', function(){ setTimeout(function(){ bindWelcomeSavers(); bindPeerSavers(); superHydrate(); }, 0); }, {passive:true});
+
+  // External signal
+  document.addEventListener('hydrationRequest', function(){ superHydrate(); });
+
+})();
+</script>
+<!-- END SUPER HYDRATION & NAV VALIDATION PATCH -->
