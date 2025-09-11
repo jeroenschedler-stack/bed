@@ -208,6 +208,10 @@ p{color:#434343;line-height:1.6;}
 .btn-next:disabled{
   background: #cfd8e3; color:#6b7280; box-shadow: none; cursor:not-allowed;
 }
+</style><style>
+/* LOCKED SIZES — do not change in future updates */
+.section-title { font-size:14pt !important; line-height:1.4; }
+.field-label   { font-size:11pt !important; line-height:1.45; }
 </style></head>
 <body>
 <!-- Header -->
@@ -227,12 +231,12 @@ p{color:#434343;line-height:1.6;}
 <div class="card" style="margin-top:10px;">
 </div>
 <div class="card" style="margin-top:16px;">
-<h2>PERSONAL INFORMATION</h2>
-<label class="small">please enter your name</label>
+<h2 class="section-title">PERSONAL INFORMATION</h2>
+<label class="small field-label">please enter your name</label>
 <input id="sarNick" placeholder="nick name" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="text"/>
-<label class="small">your email address</label>
+<label class="small field-label">your email address</label>
 <input id="sarEmail" placeholder="email address" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="email"/>
-<label class="small">select your location</label>
+<label class="small field-label">select your location</label>
 <select id="sarHotel" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 4px;">
 <option value="">select hotel</option>
 <option>BED Changkian</option>
@@ -244,12 +248,12 @@ p{color:#434343;line-height:1.6;}
 </select>
 </div>
 <div class="card" style="margin-top:16px;">
-<h2>PEER INFORMATION</h2>
-<label class="small">name of your peer reviewer</label>
+<h2 class="section-title">PEER INFORMATION</h2>
+<label class="small field-label">name of your peer reviewer</label>
 <input id="peerName" placeholder="nick name" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="text"/>
-<label class="small">email address of your peer reviewer</label>
+<label class="small field-label">email address of your peer reviewer</label>
 <input id="peerEmail" placeholder="email address" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="email"/>
-<label class="small">select peer location</label>
+<label class="small field-label">select peer location</label>
 <select id="peerHotel" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 4px;">
 <option value="">select hotel</option>
 <option>BED Changkian</option>
