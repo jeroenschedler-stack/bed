@@ -2,45 +2,6 @@
 
 <html lang="en">
 <head>
-
-<!-- BEGIN FRESH-SESSION RESET -->
-<script>
-(() => {
-  try {
-    // wipe any previous SAR storage so the form starts empty
-    const wipe = (store) => {
-      try {
-        for (let i = store.length - 1; i >= 0; i--) {
-          const k = store.key(i);
-          if (/^(sar|bed[-_]?sar|assessment|peer|answers|questions)/i.test(k)) {
-            store.removeItem(k);
-          }
-        }
-      } catch (e) {}
-    };
-    wipe(window.localStorage);
-    wipe(window.sessionStorage);
-  } catch (e) {}
-
-  // reset in-memory state
-  try { window.sarState = { user:{}, peer:{}, answers:{}, questions:[] }; } catch (e) {}
-
-  // when the welcome page renders, ensure fields are blank
-  document.addEventListener('DOMContentLoaded', function(){
-    const nick  = document.getElementById('sarNick');
-    const email = document.getElementById('sarEmail');
-    const hotel = document.getElementById('sarHotel');
-    if (nick)  nick.value  = '';
-    if (email) email.value = '';
-    if (hotel) hotel.selectedIndex = 0;
-    if (typeof validateWelcome === 'function') {
-      try { validateWelcome(); } catch(e){}
-    }
-  }, { once: true });
-})();
-</script>
-<!-- END FRESH-SESSION RESET -->
-
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>BED Hospitality — Self-Assessment (SAR)</title>
@@ -544,7 +505,7 @@ p{color:#434343;line-height:1.6;}
 
     async function renderQ1(){
       const qs = await loadQuestions();
-      const slice = qs.slice(0, 16);
+      const slice = qs.slice(0, 18);
       const mount = document.getElementById('q1List');
       mount.innerHTML = slice.map(q => renderQuestionHTML(q)).join('');
       slice.forEach(q => {
@@ -558,7 +519,7 @@ p{color:#434343;line-height:1.6;}
 
     async function renderQ2(){
       const qs = await loadQuestions();
-      const slice = qs.slice(16, 32);
+      const slice = qs.slice(18, 35);
       const mount = document.getElementById('q2List');
       mount.innerHTML = slice.map(q => renderQuestionHTML(q)).join('');
       slice.forEach(q => {
