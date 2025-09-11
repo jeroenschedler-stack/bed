@@ -3,81 +3,52 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
+<title>BED HOSPITALITY — Self Assessment</title>
 <style>
-  :root {
-    --pad: 20px;
-    --label-w: 96px;
-    --gap: 6px;
-    --brand-blue: #1E90FF;
-    --progress-red: #E11D48;
-    --progress-gray: #f3f4f6;
+  :root{
+    --pad:20px; --label-w:96px; --gap:6px;
+    --brand-blue:#1E90FF; --progress-red:#E11D48; --progress-gray:#f3f4f6;
     --gray-300:#cfd4dc;
+    --good:#22c55e; --mid:#f59e0b; --bad:#ef4444;
   }
-  * { box-sizing: border-box; }
-  body { font-family: system-ui, Arial, sans-serif; background:#F9FAFB; color:#111; margin:0; }
-  .container { width:100%; margin:0; padding:24px var(--pad); }
+  *{box-sizing:border-box}
+  body{font-family:system-ui,Arial,sans-serif;background:#F9FAFB;color:#111;margin:0}
+  .container{width:100%;margin:0;padding:24px var(--pad)}
+  h1{font-size:20pt;margin:0 0 8px 0;line-height:1.2}
+  .subheader{font-size:18pt;margin:0 0 12px 0;font-weight:500}
+  h2{font-size:14pt;margin:22px 0 8px 0;line-height:1.25}
+  .intro{font-size:12pt;line-height:1.5;color:#333;margin:4px 0 14px 0}
 
-  h1 { font-size:20pt; margin:0 0 8px 0; line-height:1.2; }
-  .subheader { font-size:18pt; margin:0 0 12px 0; font-weight:500; }
-  h2 { font-size:14pt; margin:22px 0 8px 0; line-height:1.25; }
-  .intro { font-size:12pt; color:#333; margin:4px 0 14px 0; } /* unified intro text size */
+  .progress{display:flex;gap:10px;margin:6px 0 16px 0}
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--progress-gray);border:1px solid #e5e7eb}
+  .dot.active{background:var(--progress-red);border-color:var(--progress-red)}
 
-  .progress { display:flex; gap:10px; margin:6px 0 16px 0; }
-  .dot { width:10px; height:10px; border-radius:50%; background:var(--progress-gray); border:1px solid #e5e7eb; }
-  .dot.active { background: var(--progress-red); border-color: var(--progress-red); }
+  .row{display:grid;grid-template-columns:minmax(84px,var(--label-w)) 1fr;column-gap:var(--gap);align-items:center;margin:10px 0}
+  .row>label{font-size:10pt;font-weight:400;white-space:normal;word-break:break-word}
+  .row>input,.row>select{width:100%;padding:10px 12px;font-size:10pt;border:1px solid var(--gray-300);border-radius:10px;background:#fff;transition:box-shadow .15s,border-color .15s}
+  .row>input:focus,.row>select:focus{outline:none;border-color:rgba(30,144,255,.8);box-shadow:0 0 0 3px rgba(30,144,255,.18);background:#fff}
+  select:invalid{color:#aaa}
 
-  .row {
-    display: grid;
-    grid-template-columns: minmax(84px, var(--label-w)) 1fr;
-    column-gap: var(--gap);
-    align-items: center;
-    margin: 10px 0;
-  }
-  .row > label {
-    font-size:10pt;
-    font-weight:400;
-    white-space: normal;
-    word-break: break-word;
-  }
-  .row > input,
-  .row > select {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 10pt;
-    border: 1px solid var(--gray-300);
-    border-radius: 10px;
-    background: #fff;
-    transition: box-shadow .15s, border-color .15s;
-  }
-  .row > input:focus,
-  .row > select:focus {
-    outline: none;
-    border-color: rgba(30,144,255,0.8);
-    box-shadow: 0 0 0 3px rgba(30,144,255,0.18);
-    background-color: #fff; /* stays white */
-  }
-  select:invalid { color:#aaa; }
+  .actions{padding-left:calc(var(--label-w) + var(--gap));margin-top:14px;display:flex;gap:10px;justify-content:flex-end}
+  button{padding:12px 18px;border:none;border-radius:12px;background:var(--brand-blue);color:#fff;font-size:12pt;cursor:pointer}
+  .btn-secondary{background:#fff;color:#111;border:1px solid var(--gray-300)}
 
-  .actions { padding-left: calc(var(--label-w) + var(--gap)); margin-top: 14px; display:flex; gap:10px; justify-content: flex-end; }
-  button { padding: 12px 18px; border: none; border-radius: 12px; background: var(--brand-blue); color: #fff; font-size: 12pt; cursor: pointer; }
-  .btn-secondary { background:#fff; color:#111; border:1px solid var(--gray-300); }
+  /* Question list styling - bold title, normal subtext */
+  .q-item{padding:14px 0;border-top:1px solid #e5e7eb}
+  .q-title{font-size:14pt;font-weight:700;margin:0 0 6px 0}
+  .q-sub{font-size:12pt;line-height:1.5;color:#444;margin:0 0 8px 0;font-style:normal}
+  .pill{display:inline-block;width:40px;height:40px;line-height:40px;text-align:center;border:1px solid #cfcfcf;border-radius:50%;margin-right:8px;cursor:pointer;user-select:none}
+  .pill.selected{background:var(--brand-blue);color:#fff}
 
-  .q-item { padding:12px 0; border-top:1px solid #ddd; }
-  .q-item > div:first-child { font-size: 11pt; margin-bottom: 6px; }
-  .q-item em { font-size: 10pt; color: #444; display:block; margin-bottom:6px; }
-  .pill { display:inline-block; width:32px; height:32px; line-height:32px; text-align:center; border:1px solid #ccc; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none; }
-  .pill.selected { background: var(--brand-blue); color:#fff; }
+  /* Result bar */
+  .score-wrap{margin:12px 0;padding:12px;border:1px solid #e5e7eb;border-radius:12px;background:#fff}
+  .meter{height:12px;border-radius:999px;background:#eee;overflow:hidden}
+  .meter>span{display:block;height:100%;width:0%}
+  .meter.red>span{background:var(--bad)}
+  .meter.amber>span{background:var(--mid)}
+  .meter.green>span{background:var(--good)}
 
-  .scale-list { list-style:none; padding:0; margin:10px 0; }
-  .scale-item { display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt; }
-  .badge { width:28px; height:28px; border-radius:50%; background: var(--brand-blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700; }
-  .instructions-box { font-size:12pt; color:#222; line-height:1.5; margin-bottom:12px; }
-
-  @media (max-width: 340px) {
-    .row { grid-template-columns: 1fr; row-gap: 6px; }
-    .actions { padding-left: 0; }
-  }
+  @media (max-width:340px){.row{grid-template-columns:1fr;row-gap:6px}.actions{padding-left:0}}
 </style>
 <script id="embeddedQuestions" type="application/json">[
   {
@@ -306,18 +277,19 @@
     </section>
     <!-- ===== DO NOT EDIT: PAGE 1 END ===== -->
 
+    <!-- Instructions -->
     <section id="instructions" style="display:none">
       <h2>HOW TO ASSESS YOURSELF</h2>
-      <p class="instructions-box">
+      <p class="intro">
         Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities
       </p>
       <h2>HOW TO SCORE YOURSELF</h2>
-      <ul class="scale-list">
-        <li class="scale-item"><span class="badge">1</span> <span>I am not good at this</span></li>
-        <li class="scale-item"><span class="badge">2</span> <span>I need to be better at this</span></li>
-        <li class="scale-item"><span class="badge">3</span> <span>I am average at this</span></li>
-        <li class="scale-item"><span class="badge">4</span> <span>I am good at this</span></li>
-        <li class="scale-item"><span class="badge">5</span> <span>I am very good at this</span></li>
+      <ul class="scale-list" style="list-style:none;padding:0;margin:10px 0">
+        <li class="scale-item" style="display:flex;align-items:center;gap:10px;margin:8px 0;font-size:12pt"><span class="badge" style="width:28px;height:28px;border-radius:50%;background:var(--brand-blue);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700">1</span> <span>I am not good at this</span></li>
+        <li class="scale-item" style="display:flex;align-items:center;gap:10px;margin:8px 0;font-size:12pt"><span class="badge" style="width:28px;height:28px;border-radius:50%;background:var(--brand-blue);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700">2</span> <span>I need to be better at this</span></li>
+        <li class="scale-item" style="display:flex;align-items:center;gap:10px;margin:8px 0;font-size:12pt"><span class="badge" style="width:28px;height:28px;border-radius:50%;background:var(--brand-blue);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700">3</span> <span>I am average at this</span></li>
+        <li class="scale-item" style="display:flex;align-items:center;gap:10px;margin:8px 0;font-size:12pt"><span class="badge" style="width:28px;height:28px;border-radius:50%;background:var(--brand-blue);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700">4</span> <span>I am good at this</span></li>
+        <li class="scale-item" style="display:flex;align-items:center;gap:10px;margin:8px 0;font-size:12pt"><span class="badge" style="width:28px;height:28px;border-radius:50%;background:var(--brand-blue);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700">5</span> <span>I am very good at this</span></li>
       </ul>
       <div class="actions">
         <button class="btn-secondary" id="backToWelcome">Back</button>
@@ -325,6 +297,7 @@
       </div>
     </section>
 
+    <!-- Questions Part 1 -->
     <section id="q1" style="display:none">
       <h2>Statements Part 1</h2>
       <div id="list-q1"></div>
@@ -334,18 +307,24 @@
       </div>
     </section>
 
+    <!-- Questions Part 2 -->
     <section id="q2" style="display:none">
       <h2>Statements Part 2</h2>
       <div id="list-q2"></div>
       <div class="actions">
         <button class="btn-secondary" id="backToQ1">Back</button>
-        <button id="toFinish">Next</button>
+        <button id="submitAll">Submit</button>
       </div>
     </section>
 
+    <!-- Results -->
     <section id="finish" style="display:none">
-      <h2>Completed</h2>
-      <p class="intro">Thank you. We will add the confirmation popup next.</p>
+      <h2>Your Score</h2>
+      <div class="score-wrap">
+        <div id="scoreText" style="font-size:14pt;font-weight:700;margin-bottom:8px">—</div>
+        <div id="scoreDetail" style="font-size:12pt;margin-bottom:8px;color:#444">—</div>
+        <div id="meter" class="meter"><span></span></div>
+      </div>
       <div class="actions">
         <button class="btn-secondary" id="backToQ2">Back</button>
         <button id="done">Done</button>
@@ -379,12 +358,28 @@
   }
   setProgress(1);
 
+  // Strip any leading numbering like "12. " from incoming statement text
+  function stripLeadingNumber(t){
+    return String(t).replace(/^\s*\d+\.\s*/, '');
+  }
+
   function makeQ(q,ord){
     const d = document.createElement('div');
     d.className = 'q-item';
     d.dataset.qid = q.id;
-    d.innerHTML = `<div>${ord}. ${q.statement}</div>`;
-    if(q.subtext){ d.innerHTML += `<em>${q.subtext}</em>`; }
+
+    const title = document.createElement('div');
+    title.className = 'q-title';
+    title.textContent = ord + '. ' + stripLeadingNumber(q.statement || '');
+    d.appendChild(title);
+
+    if(q.subtext){
+      const sub = document.createElement('div');
+      sub.className = 'q-sub';
+      sub.textContent = q.subtext;
+      d.appendChild(sub);
+    }
+
     for(let v=1; v<=5; v++){
       const p = document.createElement('span');
       p.className = 'pill';
@@ -399,23 +394,43 @@
     return d;
   }
 
+  // Navigation
   el('toInstructions').onclick = () => show('instructions');
   el('backToWelcome').onclick = () => show('welcome');
   el('toQ1').onclick = () => {
     const l = el('list-q1'); l.innerHTML = '';
-    S.questions.slice(0,18).forEach((q,i)=> l.appendChild(makeQ(q, i+1)));
+    (S.questions || []).slice(0,18).forEach((q,i)=> l.appendChild(makeQ(q, i+1)));
     show('q1');
   };
   el('backToInstructions').onclick = () => show('instructions');
   el('toQ2').onclick = () => {
     const l = el('list-q2'); l.innerHTML = '';
-    S.questions.slice(18,35).forEach((q,i)=> l.appendChild(makeQ(q, 19+i)));
+    (S.questions || []).slice(18,35).forEach((q,i)=> l.appendChild(makeQ(q, 19+i)));
     show('q2');
   };
   el('backToQ1').onclick = () => show('q1');
-  el('toFinish').onclick = () => show('finish');
+
+  // Submit + score
+  el('submitAll').onclick = () => {
+    const ids = (S.questions || []).map(q => q.id);
+    const answered = ids.filter(id => S.answers[id] != null);
+    const total = answered.reduce((sum,id) => sum + Number(S.answers[id]||0), 0);
+    const avg = answered.length ? total / answered.length : 0;
+    const pct = answered.length ? (avg - 1) / 4 * 100 : 0; // 1..5 -> 0..100
+    const meter = document.getElementById('meter');
+    const span = meter.querySelector('span');
+    span.style.width = pct + '%';
+    meter.classList.remove('red','amber','green');
+    if(avg < 2.5) meter.classList.add('red');
+    else if(avg < 3.5) meter.classList.add('amber');
+    else meter.classList.add('green');
+    document.getElementById('scoreText').textContent = 'Average: ' + (avg ? avg.toFixed(2) : '—') + ' / 5';
+    document.getElementById('scoreDetail').textContent = answered.length + ' of ' + ids.length + ' statements answered (' + Math.round((answered.length/ids.length)*100) + '%)';
+    show('finish');
+  };
+
   el('backToQ2').onclick = () => show('q2');
-  el('done').onclick = () => alert('Done');
+  el('done').onclick = () => alert('Saved. Thank you!');
 })();
 </script>
 </body>
