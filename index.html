@@ -242,12 +242,12 @@ p{color:#434343;line-height:1.6;}
 <div class="card" style="margin-top:10px;">
 </div>
 <div class="card" style="margin-top:16px;">
-<h2 class="section-title">PERSONAL INFORMATION</h2>
-<label class="small field-label">please enter your name</label>
+<h2 class="section-title">YOUR INFORMATION</h2>
+<label class="small field-label">your name</label>
 <input id="sarNick" placeholder="nick name" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="text"/>
-<label class="small field-label">your email address</label>
+<label class="small field-label">your email </label>
 <input id="sarEmail" placeholder="email address" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="email"/>
-<label class="small field-label">select your location</label>
+<label class="small field-label">your location</label>
 <select id="sarHotel" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 4px;">
 <option value="">select hotel</option>
 <option>BED Changkian</option>
@@ -259,12 +259,12 @@ p{color:#434343;line-height:1.6;}
 </select>
 </div>
 <div class="card" style="margin-top:16px;">
-<h2 class="section-title">PEER INFORMATION</h2><div class="peer-subtext" style="font-size:11pt;color:#666;margin-top:4px;margin-bottom:12px;">the person that will review you must have been in BED for at least 12 months</div>
-<label class="small field-label">name of your peer reviewer</label>
+<h2 class="section-title">PEER INFORMATION</h2><div class="peer-subtext" style="font-size:11pt;color:#666;margin-top:4px;margin-bottom:12px;">your peer must work in BED for at least 12 months</div>
+<label class="small field-label">name peer</label>
 <input id="peerName" placeholder="nick name" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="text"/>
-<label class="small field-label">email address of your peer reviewer</label>
+<label class="small field-label">email peer</label>
 <input id="peerEmail" placeholder="email address" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="email"/>
-<label class="small field-label">select peer location</label>
+<label class="small field-label">peer location</label>
 <select id="peerHotel" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 4px;">
 <option value="">select hotel</option>
 <option>BED Changkian</option>
@@ -280,14 +280,14 @@ p{color:#434343;line-height:1.6;}
 </div>
 </div><div class="sar-page" data-step="intro">
 <div class="card" style="margin-top:10px;">
-<h2 class="section-title">INSTRUCTIONS FOR ASSESSMENT</h2>
+<h2 class="section-title">HOW THIS WORKS</h2>
 <div class="field-label" style="margin-top:6px;">
     Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself.
     The goal is to know your own strengths and opportunities.
   </div>
 </div>
 <div class="card" style="margin-top:16px;">
-<h3 class="section-title" style="font-size:14pt;">RATING SCALE</h3>
+<h3 class="section-title" style="font-size:14pt;">HOW YOU SCORE YOURSELF</h3>
 <div class="rating-dots">
 <div class="rating-row"><span class="dot">1</span><span class="label">I am not good at this</span></div>
 <div class="rating-row"><span class="dot">2</span><span class="label">I need to be better at this</span></div>
@@ -340,6 +340,37 @@ p{color:#434343;line-height:1.6;}
 <div class="sar-actions">
 <button class="sar-btn" data-nav="back">Back</button>
 <button class="sar-btn primary" data-nav="next">Next</button>
+</div>
+</div>
+<div class="sar-page" data-step="peer">
+<div class="sar-gap-1"></div>
+<div class="sar-para-title">FIND YOUR PEER REVIEWER</div>
+<div class="sar-intro" style="margin-bottom:12px"><p>You completed your self-assessment. The next step is peer review. Ask anyone in your team who has been in BED for at least 24 months to assess you. When they accept complete the information. When you click Done the review form is send to your peer</p></div>
+<div class="sar-gap-1"></div>
+<div class="sar-row sar-row-fields" style="margin-bottom:12px">
+<label class="sar-field">
+<span class="sar-label">peer nick name</span>
+<input class="sar-input" id="peerName" inputmode="text" type="text"/>
+</label>
+<label class="sar-field">
+<span class="sar-label">peer email address</span>
+<input autocomplete="email" class="sar-input" id="peerEmail" inputmode="email" type="email"/>
+</label>
+</div>
+<div aria-label="Choose peer's BED Hotel" class="sar-row sar-hotels" role="group" style="margin-bottom:12px">
+<button class="sar-btn sar-hotel" data-hotel="BCK">BCK</button>
+<button class="sar-btn sar-hotel" data-hotel="BPS">BPS</button>
+<button class="sar-btn sar-hotel" data-hotel="BNM">BNM</button>
+<button class="sar-btn sar-hotel" data-hotel="BCG">BCG</button>
+<button class="sar-btn sar-hotel" data-hotel="FLY">FLY</button>
+<button class="sar-btn sar-hotel" data-hotel="BED">BED</button>
+</div>
+<div class="sar-actions"><button class="sar-btn" data-nav="back">Back</button>
+<button class="sar-btn" id="peerSend" type="button">Send</button>
+<label class="sar-check" style="display:flex;gap:8px;align-items:flex-start;line-height:1.3;margin:10px 0; font-size:14px; font-family:inherit;">
+<input id="peerConsent" style="margin-top:3px;" type="checkbox"/>
+<span>I agree to share my self-assessment with my peer</span>
+</label>
 </div>
 </div>
 <div class="sar-page" data-step="done"><div class="sar-title">Done</div></div>
@@ -474,7 +505,7 @@ p{color:#434343;line-height:1.6;}
 
     async function renderQ1(){
       const qs = await loadQuestions();
-      const slice = qs.slice(0, 16);
+      const slice = qs.slice(0, 18);
       const mount = document.getElementById('q1List');
       mount.innerHTML = slice.map(q => renderQuestionHTML(q)).join('');
       slice.forEach(q => {
@@ -488,7 +519,7 @@ p{color:#434343;line-height:1.6;}
 
     async function renderQ2(){
       const qs = await loadQuestions();
-      const slice = qs.slice(16, 32);
+      const slice = qs.slice(18, 35);
       const mount = document.getElementById('q2List');
       mount.innerHTML = slice.map(q => renderQuestionHTML(q)).join('');
       slice.forEach(q => {
