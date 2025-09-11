@@ -212,6 +212,17 @@ p{color:#434343;line-height:1.6;}
 /* LOCKED SIZES — do not change in future updates */
 .section-title { font-size:14pt !important; line-height:1.4; }
 .field-label   { font-size:11pt !important; line-height:1.45; }
+</style><style>
+/* Rating scale dots on Page 2 */
+.rating-dots { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+.rating-row { display:flex; align-items:center; gap:10px; }
+.rating-row .dot {
+  width:28px; height:28px; border-radius:50%;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:#1E90FF; color:#fff; font-weight:700; font-size:14px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 6px rgba(30,144,255,0.25);
+}
+.rating-row .label { font-size:11pt; }
 </style></head>
 <body>
 <!-- Header -->
@@ -277,13 +288,13 @@ p{color:#434343;line-height:1.6;}
 </div>
 <div class="card" style="margin-top:16px;">
 <h3 class="section-title" style="font-size:14pt;">RATING SCALE</h3>
-<div class="field-label" style="white-space:pre-line; margin-top:8px;">
-1   I am not good at this
-2   I need to be better at this
-3   I am average at this
-4   I am good at this
-5   I am very good at this
-  </div>
+<div class="rating-dots">
+<div class="rating-row"><span class="dot">1</span><span class="label">I am not good at this</span></div>
+<div class="rating-row"><span class="dot">2</span><span class="label">I need to be better at this</span></div>
+<div class="rating-row"><span class="dot">3</span><span class="label">I am average at this</span></div>
+<div class="rating-row"><span class="dot">4</span><span class="label">I am good at this</span></div>
+<div class="rating-row"><span class="dot">5</span><span class="label">I am very good at this</span></div>
+</div>
 </div>
 <div class="btnrow" style="display:flex;justify-content:flex-end;margin:24px 0 8px;">
 <button class="btn-next" id="introStart" type="button">Start</button>
@@ -1847,5 +1858,30 @@ ok.onclick = function(){
       if (q1) q1.classList.add('active');
     }
   });
+})();</script><script>
+(function(){
+  function updateDotbarForIntro(){
+    var bar = document.getElementById('dotbar');
+    if (!bar) return;
+    var dots = bar.querySelectorAll('.sar-dot');
+    if (!dots.length) return;
+    // Reset
+    dots.forEach(function(d){ d.classList.remove('done','current'); });
+    // Set first two as done; second is current (page 2)
+    if (dots[0]) dots[0].classList.add('done');
+    if (dots[1]) { dots[1].classList.add('done','current'); }
+  }
+  // If router exists and we navigate, router should repaint; still do a safety update when intro becomes active
+  function maybeUpdate(){
+    var intro = document.querySelector('.sar-page[data-step="intro"]');
+    if (intro && intro.classList.contains('active')){
+      updateDotbarForIntro();
+    }
+  }
+  if (document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", maybeUpdate);
+  } else {
+    maybeUpdate();
+  }
 })();</script></body>
 </html>
