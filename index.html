@@ -452,7 +452,7 @@ p{color:#434343;line-height:1.6;}
 
     async function renderQ1(){
       const qs = await loadQuestions();
-      const slice = qs.slice(0, 16);
+      const slice = qs.slice(0, 18);
       const mount = document.getElementById('q1List');
       mount.innerHTML = slice.map(q => renderQuestionHTML(q)).join('');
       slice.forEach(q => {
@@ -466,7 +466,7 @@ p{color:#434343;line-height:1.6;}
 
     async function renderQ2(){
       const qs = await loadQuestions();
-      const slice = qs.slice(16, 32);
+      const slice = qs.slice(18, qs.length);
       const mount = document.getElementById('q2List');
       mount.innerHTML = slice.map(q => renderQuestionHTML(q)).join('');
       slice.forEach(q => {
@@ -558,9 +558,35 @@ function renderScore(){
   const page = document.querySelector('.sar-page[data-step="score"]');
   if(!page) return;
   const qs = sarState.questions || [];
-  const total = qs.length * 5;
-  let sum = 0;
-  qs.forEach(q => { sum += (sarState.answers[q.id] || 0); });
+  let weightedScore = 0, weightedMax = 0;
+  qs.forEach(q => {
+    const w = (typeof q.weight === 'number' && isFinite(q.weight)) ? q.weight : 1.0;
+    const v = (sarState.answers[q.id] || 0);
+    weightedScore += v * w;
+    weightedMax   += 5 * w;
+  });
+  const pct = weightedMax ? Math.round((weightedScore / weightedMax) * 100) : 0;
+  const rawEl = page.querySelector('#scoreNumber');
+  const bandEl = page.querySelector('#scoreBandText');
+  if(rawEl) rawEl.textContent = "YOUR SCORE IS " + pct + "%";
+  if(bandEl) bandEl.innerHTML = scoreBand(pct);
+  const marker = page.querySelector('#scoreMarker');
+  if(marker){
+    const clamped = Math.max(0, Math.min(100, pct));
+    marker.style.left = `calc(${clamped}% - 4px)`;
+  }
+});
+  const pct = weightedMax ? Math.round((weightedScore / weightedMax) * 100) : 0;
+  const rawEl = page.querySelector('#scoreNumber');
+  const bandEl = page.querySelector('#scoreBandText');
+  if(rawEl) rawEl.textContent = "YOUR SCORE IS " + pct + "%";
+  if(bandEl) bandEl.innerHTML = scoreBand(pct);
+  const marker = page.querySelector('#scoreMarker');
+  if(marker){
+    const clamped = Math.max(0, Math.min(100, pct));
+    marker.style.left = `calc(${clamped}% - 4px)`;
+  }
+});
   const pct = total ? Math.round((sum / total) * 100) : 0;
   const rawEl = page.querySelector('#scoreNumber');
   const bandEl = page.querySelector('#scoreBandText');
@@ -1296,163 +1322,213 @@ ok.onclick = function(){
   <script id="embeddedQuestions" type="application/json">[
   {
     "id": "q1",
-    "statement": "1. I reply to guests very quickly",
-    "subtext": "I often check for messages and answer right away"
+    "statement": "1. Statement",
+    "subtext": "",
+    "weight": 1.0
   },
   {
     "id": "q2",
-    "statement": "2. I make my replies warm and personal",
-    "subtext": "I use their name and add helpful information"
+    "statement": "2. Subtext",
+    "subtext": "",
+    "weight": NaN
   },
   {
     "id": "q3",
-    "statement": "3. I make a great first impression",
-    "subtext": "I know that starts from the very first message"
+    "statement": "2. Statement",
+    "subtext": "",
+    "weight": 1.0
   },
   {
     "id": "q4",
-    "statement": "4. I can see if a guest is stressed or relaxed",
-    "subtext": "I adjust the way I check-in to the mood"
+    "statement": "3. Statement",
+    "subtext": "",
+    "weight": 0.5
   },
   {
     "id": "q5",
-    "statement": "5. I ask questions before I ask passports",
-    "subtext": "I welcome guests like friends"
+    "statement": "4. Subtext",
+    "subtext": "",
+    "weight": NaN
   },
   {
     "id": "q6",
-    "statement": "6. I can check-in a guest in 60 seconds",
-    "subtext": "I timed this three times with standard check-ins"
+    "statement": "4. Statement",
+    "subtext": "",
+    "weight": 2.0
   },
   {
     "id": "q7",
-    "statement": "7. I check in groups differently than FIT",
-    "subtext": "I usually check-in groups with the leader"
+    "statement": "5. Statement",
+    "subtext": "",
+    "weight": 2.0
   },
   {
     "id": "q8",
-    "statement": "8. I don't tell guests that check-in time is 14:00",
-    "subtext": "They can check-in as soon as the room is ready"
+    "statement": "6. Subtext",
+    "subtext": "",
+    "weight": NaN
   },
   {
     "id": "q9",
-    "statement": "9. I don't show stress when there is a problem",
-    "subtext": "I know that makes guests really worry"
+    "statement": "6. Statement",
+    "subtext": "",
+    "weight": 1.0
   },
   {
     "id": "q10",
-    "statement": "10. I show genuine interest during check-out",
-    "subtext": "I ask about their stay or next destination"
+    "statement": "7. Statement",
+    "subtext": "",
+    "weight": 0.5
   },
   {
     "id": "q11",
-    "statement": "11. I make great last impressions",
-    "subtext": "I walk them out and wait until their car has left"
+    "statement": "8. Subtext",
+    "subtext": "",
+    "weight": NaN
   },
   {
     "id": "q12",
-    "statement": "12. I use names to connect with guests",
-    "subtext": "When it feels right I tell my name and use theirs"
+    "statement": "8. Statement",
+    "subtext": "",
+    "weight": 1.5
   },
   {
     "id": "q13",
-    "statement": "13. I scan every guest every time",
-    "subtext": "I don't look at a group but at each individual"
+    "statement": "9. Statement",
+    "subtext": "",
+    "weight": 2.0
   },
   {
     "id": "q14",
-    "statement": "14. I am good at scanning",
-    "subtext": "I see what people need before they ask"
+    "statement": "10. Subtext",
+    "subtext": "",
+    "weight": NaN
   },
   {
     "id": "q15",
-    "statement": "15. I create unique surprises for guests",
-    "subtext": "I do more than offering free things"
+    "statement": "10. Statement",
+    "subtext": "",
+    "weight": 1.0
   },
   {
     "id": "q16",
-    "statement": "16. Music is an essential part of the vibe",
-    "subtext": "I listen to make sure we play the right music"
+    "statement": "11. Statement",
+    "subtext": "",
+    "weight": 2.0
   },
   {
     "id": "q17",
-    "statement": "17. I invite guests to share other BED facilities",
-    "subtext": "I offer downtown coffee, bigger pool or breakfast"
+    "statement": "12. Subtext",
+    "subtext": "",
+    "weight": NaN
   },
   {
     "id": "q18",
-    "statement": "18. its annoying when a room key doesn't work",
-    "subtext": "I go up to make sure the new key works"
+    "statement": "12. Statement",
+    "subtext": "",
+    "weight": 0.5
   },
   {
     "id": "q19",
-    "statement": "19. I talk with guests because I am interested",
-    "subtext": "When I force myself it will not be real"
+    "statement": "13. Statement",
+    "subtext": "",
+    "weight": 2.0
   },
   {
     "id": "q20",
-    "statement": "20. I often give my friends honest feedback",
-    "subtext": "I’m happy to help them to grow"
+    "statement": "14. Subtext",
+    "subtext": "",
+    "weight": NaN
   },
   {
     "id": "q21",
-    "statement": "21. My friends often give me honest feedback",
-    "subtext": "I’m happy they help me to grow"
+    "statement": "14. Statement",
+    "subtext": "",
+    "weight": 2.0
   },
   {
     "id": "q22",
-    "statement": "22. I can answer most questions about BED",
-    "subtext": "I have visited the rooms in all our hotels"
+    "statement": "15. Statement",
+    "subtext": "",
+    "weight": 2.0
   },
   {
     "id": "q23",
-    "statement": "23. I understand the meaning of \"showtime\"",
-    "subtext": "The magic happens from 07:00-10:00"
+    "statement": "16. Subtext",
+    "subtext": "",
+    "weight": NaN
   },
   {
     "id": "q24",
-    "statement": "24. I know the story of \"peeling the onion\"",
-    "subtext": "I don't act. Usually I show my true self"
+    "statement": "16. Statement",
+    "subtext": "",
+    "weight": 0.5
   },
   {
     "id": "q25",
-    "statement": "25. I never gossip. I signed “I Promise”",
-    "subtext": "I don't talk bad when someone's not here"
+    "statement": "17. Statement",
+    "subtext": "",
+    "weight": 1.5
   },
   {
     "id": "q26",
-    "statement": "26. I really understand that rules can be flexible",
-    "subtext": "Without reasons many rules just disappear"
+    "statement": "18. Subtext",
+    "subtext": "",
+    "weight": NaN
   },
   {
     "id": "q27",
-    "statement": "27. I am confident about my own judgment",
-    "subtext": "I make decisions without asking permission"
+    "statement": "18. Statement",
+    "subtext": "",
+    "weight": 2.0
   },
   {
     "id": "q28",
-    "statement": "28. I look after the rooms and public areas",
-    "subtext": "I share responsibility for the whole hotel"
+    "statement": "19. Statement",
+    "subtext": "",
+    "weight": 1.0
   },
   {
     "id": "q29",
-    "statement": "29. I look around when I arrive at the hotel",
-    "subtext": "I share responsibility for the whole hotel"
+    "statement": "20. Subtext",
+    "subtext": "",
+    "weight": NaN
   },
   {
     "id": "q30",
-    "statement": "30. I don't pass problems to others but act myself",
-    "subtext": "I follow up later to make sure it's fixed"
+    "statement": "20. Statement",
+    "subtext": "",
+    "weight": 1.5
   },
   {
     "id": "q31",
-    "statement": "31. I am not afraid of the CEO or my coach",
-    "subtext": "I know I am allowed to make mistakes"
+    "statement": "21. Statement",
+    "subtext": "",
+    "weight": 1.0
   },
   {
     "id": "q32",
-    "statement": "32. I have no manuals that show me what to do",
-    "subtext": "That means I cannot do anything wrong"
+    "statement": "22. Subtext",
+    "subtext": "",
+    "weight": NaN
+  },
+  {
+    "id": "q33",
+    "statement": "22. Statement",
+    "subtext": "",
+    "weight": 0.5
+  },
+  {
+    "id": "q34",
+    "statement": "23. Statement",
+    "subtext": "",
+    "weight": 0.5
+  },
+  {
+    "id": "q35",
+    "statement": "24. Subtext",
+    "subtext": "",
+    "weight": NaN
   }
 ]</script>
 
