@@ -2193,6 +2193,100 @@ ok.onclick = function(){
 })();
 </script>
 
+
+<!-- START BUTTON NAVIGATION SAFETY PATCH -->
+<script>
+(function(){
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim()); }
+
+  function getWelcomeEls(){
+    var card  = document.querySelector('.sar-page[data-step="welcome"]') || document.getElementById('welcome') || document.body;
+    return {
+      card,
+      nick:  card.querySelector('#sarNick'),
+      email: card.querySelector('#sarEmail'),
+      hotel: card.querySelector('#sarHotel'),
+      start: card.querySelector('#sarStart') ||
+             card.querySelector('button.next, .btn.next, [data-next], [data-role="start"], [data-action="start"]')
+    };
+  }
+
+  function getTargetStep(btn){
+    if (!btn) return 'instructions';
+    // data-next="peer" or "instructions" etc.
+    var dnext = btn.getAttribute('data-next');
+    if (dnext) return dnext.replace(/^#/, '');
+    // fallback
+    return 'instructions';
+  }
+
+  function validWelcome(els){
+    if (!els) els = getWelcomeEls();
+    var hasNick  = !!(els.nick && (els.nick.value||'').trim());
+    var hasEmail = !!(els.email && isValidEmail(els.email.value||''));
+    var hotelVal = '';
+    if (els.hotel) hotelVal = (els.hotel.value||'').trim();
+    else {
+      // try buttons
+      var root = els.card.querySelector('.hotel-choices, .sar-hotels, .hotel-buttons');
+      if (root){
+        var active = root.querySelector('.active,[aria-pressed="true"],[data-selected="true"]');
+        hotelVal = active ? (active.getAttribute('data-hotel') || active.textContent || '').trim() : '';
+      }
+    }
+    return hasNick && hasEmail && !!hotelVal;
+  }
+
+  function ensureStartWorks(){
+    var els = getWelcomeEls();
+    if (!els.start) return;
+    if (els.start.dataset._navPatched==='1') return;
+    els.start.dataset._navPatched='1';
+
+    // Always re-evaluate disabled state
+    function sync(){
+      var ok = validWelcome(els);
+      els.start.disabled = !ok;
+      if (ok){ els.start.classList && els.start.classList.add('primary'); }
+      else { els.start.classList && els.start.classList.remove('primary'); }
+    }
+    sync();
+
+    // Final safety click: if valid, force navigation ourselves
+    els.start.addEventListener('click', function(e){
+      var ok = validWelcome(els);
+      if (!ok){
+        // block when invalid
+        e.preventDefault(); e.stopImmediatePropagation();
+        return;
+      }
+      // allow default, but also guarantee navigation after a tick
+      var target = getTargetStep(els.start);
+      setTimeout(function(){
+        try{
+          if (typeof window.navigateTo === 'function') window.navigateTo(target);
+          else location.hash = '#' + target;
+        }catch(_){
+          location.hash = '#' + target;
+        }
+      }, 0);
+    }, true);
+  }
+
+  // Run on load and route changes
+  function tick(){ ensureStartWorks(); }
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', tick, {once:true});
+  } else {
+    tick();
+  }
+  window.addEventListener('hashchange', function(){ setTimeout(tick,0); }, {passive:true});
+  window.addEventListener('pageshow', function(){ setTimeout(tick,0); }, {passive:true});
+})();
+</script>
+<!-- END START BUTTON NAVIGATION SAFETY PATCH -->
+
 </body>
 </html>
 
