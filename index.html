@@ -2058,76 +2058,140 @@ ok.onclick = function(){
 })();</script>
 <div id="groupBreakdown" style="margin-top:12px;"></div>
 
-<!-- NEXT/START ENABLE FIX AFTER BACK NAV -->
+<!-- FINAL FIX: Remove Back on Instructions + Enable Next after Back -->
 <script>
 (function(){
+  // Utility helpers
+  function $(sel, root){ return (root||document).querySelector(sel); }
+  function $all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
   function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim()); }
-  function getWelcomeEls(){
-    const card  = document.querySelector('.sar-page[data-step="welcome"]') || document.getElementById('welcome') || document.body;
-    return {
-      card,
-      nick:  card.querySelector('#sarNick'),
-      email: card.querySelector('#sarEmail'),
-      hotel: card.querySelector('#sarHotel'),
-      start: card.querySelector('#sarStart') || card.querySelector('button.next, .btn.next, [data-next="instructions"]')
-    };
+
+  // --- 1) Remove any Back button on the Instructions page ---
+  function findInstructionsPage(){
+    var p = document.querySelector('.sar-page[data-step="instructions"]');
+    if (p) return p;
+    var pages = document.querySelectorAll('.sar-page');
+    for (var i=0; i<pages.length; i++){
+      var t = (pages[i].textContent||'').toLowerCase();
+      if (t.includes('instructions') && (t.includes('assessment') || t.includes('scoring'))) return pages[i];
+    }
+    return document.getElementById('instructions') || document.getElementById('assessmentInstructions') || null;
   }
-  function enableIfValid(){
-    const els = getWelcomeEls();
-    if (!els.start) return;
-    const ok = !!(els.nick && els.nick.value.trim())
-            && !!(els.email && isValidEmail(els.email.value))
-            && !!(els.hotel && els.hotel.value.trim());
-    els.start.disabled = !ok;
-    if (ok) els.start.classList && els.start.classList.add('primary');
+  function removeBackFromInstructions(){
+    var pg = findInstructionsPage();
+    if (!pg) return;
+    // Remove known IDs
+    ['backFromInstructions','backToWelcome'].forEach(function(id){
+      var el = pg.querySelector('#'+id);
+      if (el && el.parentNode) el.parentNode.removeChild(el);
+    });
+    // Remove generic back buttons/links
+    $all('button, a, [role="button"]', pg).forEach(function(el){
+      var txt = (el.textContent||'').trim().toLowerCase();
+      if (txt === 'back' || txt === 'go back'){
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }
+    });
   }
 
-  // Bind once to keep start button functional even if other handlers intercept
-  function bindStartSafety(){
-    const els = getWelcomeEls();
-    if (!els.start || els.start.dataset.enableFixBound==='1') return;
-    els.start.dataset.enableFixBound='1';
-    els.start.addEventListener('click', function(e){
-      // if still disabled, block; otherwise allow through
-      const ok = !els.start.disabled;
-      if (!ok){ e.preventDefault(); e.stopImmediatePropagation(); }
-    }, true);
+  // --- 2) Re-enable Next/Start after using Back ---
+  function getWelcomeEls(){
+    var card = document.querySelector('.sar-page[data-step="welcome"]') || document.getElementById('welcome') || document.body;
+    var hotelSel = card.querySelector('#sarHotel');
+    var hotelButtonsRoot = card.querySelector('.hotel-choices, .sar-hotels, .hotel-buttons');
+    return {
+      card,
+      nick: card.querySelector('#sarNick'),
+      email: card.querySelector('#sarEmail'),
+      hotelSel,
+      hotelButtonsRoot,
+      start: card.querySelector('#sarStart') ||
+             card.querySelector('button.next, .btn.next, [data-next="instructions"], [data-role="start"], [data-action="start"]')
+    };
+  }
+  function getHotelValue(els){
+    if (els.hotelSel) return (els.hotelSel.value||'').trim();
+    if (els.hotelButtonsRoot){
+      var active = els.hotelButtonsRoot.querySelector('.active,[aria-pressed="true"],[data-selected="true"]');
+      if (active){
+        return (active.getAttribute('data-hotel') || active.textContent || '').trim();
+      }
+    }
+    return '';
+  }
+  function enableStartIfValid(){
+    var els = getWelcomeEls();
+    if (!els.start) return;
+    var hasNick = !!(els.nick && (els.nick.value||'').trim());
+    var hasEmail = !!(els.email && isValidEmail(els.email.value||''));
+    var hotelVal = getHotelValue(els);
+    var ok = hasNick && hasEmail && !!hotelVal;
+
+    if (ok){
+      els.start.disabled = false;
+      els.start.classList && els.start.classList.remove('disabled');
+      els.start.classList && els.start.classList.add('primary');
+      // Replace stale listeners to ensure clicks work
+      if (!els.start.dataset._cleanCloned){
+        var clone = els.start.cloneNode(true);
+        els.start.parentNode.replaceChild(clone, els.start);
+        clone.dataset._cleanCloned = '1';
+      }
+    } else {
+      els.start.disabled = true;
+      els.start.classList && els.start.classList.add('disabled');
+      els.start.classList && els.start.classList.remove('primary');
+    }
+  }
+
+  function hydrateWelcomeFromState(){
+    try{
+      var s = window.sarState || {};
+      var els = getWelcomeEls();
+      if (els.nick && s.user && s.user.nickname){ els.nick.value = s.user.nickname; }
+      if (els.email && s.user && s.user.email){ els.email.value = s.user.email; }
+      if (els.hotelSel && s.user && s.user.hotel){
+        els.hotelSel.value = s.user.hotel;
+        els.hotelSel.dispatchEvent(new Event('change',{bubbles:true}));
+      }
+      if (els.hotelButtonsRoot && s.user && s.user.hotel){
+        var btns = els.hotelButtonsRoot.querySelectorAll('[data-hotel], button, .btn');
+        for (var i=0; i<btns.length; i++){
+          var val = (btns[i].getAttribute('data-hotel') || btns[i].textContent || '').trim();
+          if (val === s.user.hotel){
+            btns[i].classList && btns[i].classList.add('active');
+            btns[i].setAttribute && btns[i].setAttribute('aria-pressed','true');
+          } else {
+            btns[i].classList && btns[i].classList.remove('active');
+            btns[i].setAttribute && btns[i].setAttribute('aria-pressed','false');
+          }
+        }
+      }
+    }catch(e){}
   }
 
   function tick(){
-    enableIfValid();
-    bindStartSafety();
+    removeBackFromInstructions();
+    hydrateWelcomeFromState();
+    enableStartIfValid();
   }
 
-  // Initial
-  if (document.readyState === 'loading') {
+  // Run at key times
+  if (document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', tick, {once:true});
   } else {
     tick();
   }
-  // On SPA route changes
   window.addEventListener('hashchange', function(){ setTimeout(tick, 0); }, {passive:true});
-  // On user input (covers going back and editing fields)
+  window.addEventListener('popstate', function(){ setTimeout(tick, 0); }, {passive:true});
+  window.addEventListener('pageshow', function(){ setTimeout(tick, 0); }, {passive:true});
+  new MutationObserver(function(){ tick(); }).observe(document.documentElement, {childList:true, subtree:true});
   document.addEventListener('input', function(e){
-    const t = e.target;
-    if (!t) return;
-    if (t.id === 'sarNick' || t.id === 'sarEmail' || t.id === 'sarHotel'){ enableIfValid(); }
+    var id = e && e.target && e.target.id;
+    if (id === 'sarNick' || id === 'sarEmail' || id === 'sarHotel'){ enableStartIfValid(); }
   }, {passive:true});
-
-  // Observe DOM changes that rebuild the welcome page
-  const mo = new MutationObserver(function(){ tick(); });
-  mo.observe(document.documentElement, {childList:true, subtree:true});
-
-  // Hard-remove any leftover back button in instructions page at runtime
-  function nukeInstrBack(){
-    const btn = document.getElementById('backFromInstructions');
-    if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
-  }
-  nukeInstrBack();
-  window.addEventListener('hashchange', function(){ setTimeout(nukeInstrBack, 0); }, {passive:true});
 })();
 </script>
-<!-- END NEXT/START ENABLE FIX AFTER BACK NAV -->
 
 </body>
 </html>
@@ -2223,6 +2287,70 @@ ok.onclick = function(){
 })();
 </script>
 <!-- END PERSISTENCE/HYDRATION PATCH -->
+
+
+<!-- INSTRUCTIONS BACK BUTTON PATCH -->
+<script>
+(function(){
+  function injectBackButton(){
+    // Find the 'Scoring Instructions' page heuristically
+    var pages = document.querySelectorAll('.sar-page');
+    var target = null;
+    pages.forEach(function(pg){
+      if (pg.getAttribute('data-step') === 'instructions') target = pg;
+    });
+    if (!target){
+      // Fallback: pick a page that contains key phrases
+      pages.forEach(function(pg){
+        var t = (pg.textContent||'').toLowerCase();
+        if (!target && t.includes('scoring') && t.includes('instructions')) target = pg;
+      });
+    }
+    if (!target || target.dataset.backInjected === '1') return;
+
+    // Create container row if needed
+    var header = target.querySelector('.section-title, h2, h3') || target.firstElementChild || target;
+    var btn = document.createElement('button');
+    btn.id = 'backFromInstructions';
+    btn.type = 'button';
+    btn.className = 'btn btn-light';
+    btn.textContent = 'Back';
+    btn.style.margin = '8px 0 12px 0';
+
+    // Insert button before header
+    target.insertBefore(btn, header);
+
+    // Click handler: navigate back to Welcome without resetting state
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      // Prefer SPA navigation if present
+      if (typeof window.navigateTo === 'function') {
+        window.navigateTo('welcome');
+      } else {
+        // Hash-based fallback
+        location.hash = '#welcome';
+      }
+      // Re-apply hydration shortly after navigation
+      setTimeout(function(){
+        document.dispatchEvent(new Event('hydrationRequest'));
+      }, 50);
+    });
+
+    target.dataset.backInjected = '1';
+  }
+
+  // Initial attempt
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectBackButton, {once:true});
+  } else {
+    injectBackButton();
+  }
+  // Try again on SPA route changes
+  window.addEventListener('hashchange', function(){ setTimeout(injectBackButton, 0); }, {passive:true});
+  document.addEventListener('click', function(){ setTimeout(injectBackButton, 0); }, {passive:true});
+})();
+</script>
+<!-- END INSTRUCTIONS BACK BUTTON PATCH -->
 
 
 <script>
