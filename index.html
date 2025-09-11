@@ -194,9 +194,20 @@ p{color:#434343;line-height:1.6;}
 
 </style>
 <style>
-/* Lock consistent typography for Page 1 (as requested) */
-.sar-page[data-step="welcome"] h2 { font-size: 14pt; font-weight: 700; margin: 0 0 10px 0; }
-.sar-page[data-step="welcome"] label.small { font-size: 11pt; color: #666; }
+/* NEXT button — final look */
+.btn-next{
+  appearance:none; border:0; cursor:pointer;
+  padding:12px 22px; border-radius:14px;
+  font-weight:700; font-size:16px; line-height:1;
+  color:#fff; background:linear-gradient(180deg,#2A7DEB 0%, #1E90FF 100%);
+  box-shadow: 0 6px 14px rgba(30,144,255,0.28), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: transform .05s ease, filter .15s ease, box-shadow .15s ease;
+}
+.btn-next:hover{ filter: brightness(1.04); }
+.btn-next:active{ transform: translateY(1px); }
+.btn-next:disabled{
+  background: #cfd8e3; color:#6b7280; box-shadow: none; cursor:not-allowed;
+}
 </style></head>
 <body>
 <!-- Header -->
@@ -250,7 +261,7 @@ p{color:#434343;line-height:1.6;}
 </select>
 </div>
 <div style="display:flex;justify-content:flex-end;margin:18px 0 8px;">
-<div class="btnrow" style="display:flex;justify-content:flex-end;margin:18px 0 8px;"><button class="primary" id="sarStart">Next</button></div>
+<div class="btnrow" style="display:flex;justify-content:flex-end;margin:18px 0 8px;"><button class="btn-next primary" id="sarStart" type="button">Next</button></div>
 </div>
 </div>
 <!-- Part 1 — Dynamic questions -->
