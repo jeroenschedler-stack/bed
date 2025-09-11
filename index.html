@@ -1,2059 +1,274 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>BED Hospitality — Self-Assessment (SAR)</title>
-<meta content="#1E90FF" name="theme-color"/>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href='data:image/svg+xml,&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"&gt;&lt;rect width="64" height="64" rx="12" fill="%231E90FF"/&gt;&lt;text x="50%" y="56%" font-size="28" font-family="Arial,Helvetica,sans-serif" font-weight="700" text-anchor="middle" fill="white"&gt;BED&lt;/text&gt;&lt;/svg&gt;' rel="icon"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>BED HOSPITALITY 2.0 — SAR Baseline</title>
 <style>
-    :root{
-      --brand:#1E90FF;
-      --border:#E5E7EB;
-      --text:#111827;
-      --sub:#374151;
-      --active:#ff0000; /* new red for completed/current dots */
-      --header-h:64px;
-    }
-    *{box-sizing:border-box}
-    html,body{width:100%;height:auto;margin:0;padding:0}
-    body{
-      font-family:Inter,system-ui,-apple-system,Arial,sans-serif;
-      background:#F9FAFB;color:var(--text);
-      padding-top: var(--header-h);
-    }
+  :root{{--brand:#111827;--muted:#6b7280;--blue:#1d4ed8;--ring:#d1d5db;}}
+  *{{box-sizing:border-box}}
+  body{{font-family:Inter,system-ui,Arial,sans-serif;background:#f7f7f8;color:#111827;margin:0}}
+  header{{padding:16px 20px;border-bottom:1px solid #eee;background:#fff;position:sticky;top:0;z-index:10}}
+  .title{{font-weight:800;letter-spacing:0.5px}}
+  .subtitle{{color:var(--muted);font-weight:700}}
+  .wrap{{max-width:840px;margin:18px auto;padding:0 16px}}
 
-    /* Header */
-    .sar-header{
-      position:fixed; top:0; left:0; right:0; z-index:1000;
-      height:var(--header-h);
-      display:flex; align-items:center; justify-content:flex-start;
-      padding:0 12px; background:#fff; border-bottom:1px solid var(--border);
-      gap:12px;
-    }
-    @media (min-width:768px){ .sar-header{padding:0 16px} }
+  .dots{{display:flex;gap:10px;margin:8px 0 18px}}
+  .dot{{width:12px;height:12px;border-radius:50%;background:#e5e7eb}}
+  .dot.active{{background:#ef4444}}
 
-    .sar-logo-wrap{ display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
-    .sar-logo{ font-size:28px; font-weight:800; letter-spacing:.35px; color:var(--text); white-space:nowrap; }
-    .sar-dotbar{ display:flex; gap:10px; align-items:center; justify-content:flex-start }
-    /* Dots 20% smaller (16px -> ~13px), no borders, new red for done/current */
-    .sar-dot{ width:13px; height:13px; border-radius:50%; background:#E5E7EB; box-shadow:none; border:none; }
-    .sar-dot.done{ background:var(--active); }
-    .sar-dot.current{ background:var(--active); } /* current is also red */
+  .card{{background:#fff;border:1px solid #ececec;border-radius:12px;padding:16px;margin-top:16px}}
+  .section-title{{margin:0 0 10px 0;font-size:22px;font-weight:800;letter-spacing:0.3px}}
+  .muted{{color:var(--muted)}}
 
-    /* Global progress bar placed INSIDE header, shown only on q1/q2 */
-    .global-progress{ width:100%; height:6px; /* 50% thicker than 4px */ 
-      background:#E5E7EB; border-radius:3px; overflow:hidden; display:none; }
-    .global-progress.show{ display:block; }
-    .global-progress > span{ display:block; height:100%; width:0; background:var(--brand); transition:width .25s ease; }
+  .p1-row{{display:flex;align-items:center;gap:12px;margin:8px 0 14px;flex-wrap:nowrap}}
+  .p1-row>label{{min-width:200px;white-space:nowrap;font-size:14px;font-weight:600;color:#374151}}
+  .p1-row>input,.p1-row>select{{flex:1 1 auto;min-width:0;width:100%;padding:12px;border:1px solid #d1d5db;border-radius:10px;font-size:16px}}
+  @media (max-width:480px){{.p1-row>label{{min-width:150px}}}}
 
-    /* Layout */
-    .sar-wrap{max-width:100%;width:100%;margin:0;padding:8px 12px 24px}
-    @media (min-width:768px){ .sar-wrap{max-width:560px;margin:16px auto;padding:0 16px 24px} }
+  .q-item{{padding:14px 0;border-bottom:1px solid #f0f0f0}}
+  .q-title{{font-weight:800}}
+  .q-sub{{color:var(--muted)}}
+  .choices{{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap}}
+  .choice{{width:44px;height:44px;border-radius:50%;border:2px solid var(--ring);display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer;user-select:none}}
+  .choice.selected{{background:var(--blue);color:#fff;border-color:var(--blue)}}
 
-    /* Card */
-    .sar-card{ background:#fff;border:1px solid var(--border);border-radius:12px;
-      padding:20px 16px;box-shadow:0 1px 2px rgba(0,0,0,.04);min-height:auto }
-    @media (max-width:430px){
-      .sar-wrap{padding:0}
-      .sar-card{border:none;box-shadow:none;border-radius:0;padding:16px}
-      body{padding-bottom:env(safe-area-inset-bottom,16px)}
-    }
+  .nav{{display:flex;justify-content:space-between;gap:12px;margin-top:18px}}
+  .btn{{padding:12px 18px;border-radius:12px;border:none;font-weight:700;cursor:pointer}}
+  .btn.primary{{background:#2563eb;color:#fff}}
+  .btn.ghost{{background:#fff;border:1px solid #e5e7eb}}
+  .btn[disabled]{{opacity:.5;cursor:not-allowed}}
 
-    /* Titles */
-    .sar-title{ font-size:22px; font-weight:800; }
-.sar-para-title{font-size:14px;font-weight:800;text-transform:uppercase;color:#434343;margin-bottom:8px}
-    .sar-sub{color:var(--sub);margin-bottom:16px}
-.sar-intro p{ text-align: justify; }
-p{color:#434343;line-height:1.6;}
-
-    /* Rows & buttons */
-    .sar-row{display:flex;gap:8px;flex-wrap:wrap}
-    .sar-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
-.sar-page[data-step="peer"] .sar-actions{justify-content:flex-start}
-.sar-page[data-step="peer"] .sar-actions .sar-btn{flex:0 0 calc((100% - 16px)/3);min-width:0}
-    .sar-btn{
-      display:inline-flex;align-items:center;justify-content:center;
-      min-height:44px;min-width:140px;
-      padding:10px 18px;border-radius:8px;border:1px solid #D1D5DB;
-      background:#fff;color:var(--text);cursor:pointer;text-decoration:none;user-select:none;
-      font-size:16px;font-weight:600;
-    }
-    .sar-btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
-    .sar-btn:disabled{opacity:.6;cursor:not-allowed}
-
-    /* Pages */
-    .sar-page{display:none}
-    .sar-page.active{display:block}
-
-    /* Inputs */
-    .sar-row-fields{gap:12px}
-    .sar-field{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
-    .sar-label{font-size:12px;color:#6B7280}
-    .sar-input{
-      height:44px;padding:8px 10px;border:1px solid #D1D5DB;border-radius:8px;
-      background:#fff;color:var(--text);outline:none;font-size:16px
-    }
-    .sar-input:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(30,144,255,.15)}
-    @media (max-width:420px){ .sar-row-fields{flex-direction:column} }
-
-    /* Hotels one row */
-    .sar-hotels{display:flex;gap:6px;flex-wrap:nowrap;justify-content:space-between}
-    .sar-hotels .sar-hotel{flex:1 1 18%;min-width:0;text-transform:uppercase;font-weight:600;padding:10px 0;font-size:14px}
-    .sar-hotel.selected{background:var(--brand);color:#fff;border-color:var(--brand)}
-
-    /* Intro & scale (welcome) */
-    .sar-intro p,.sar-scale{font-size:14px;line-height:1.45}
-    @media (max-width:360px){ .sar-intro p,.sar-scale{font-size:13px} }
-    .sar-scale-row{display:flex;align-items:center;gap:10px;margin:6px 0}
-    .sar-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--brand);color:#fff;font-size:13px;font-weight:600}
-
-    /* Extra space above start */
-    .sar-page[data-step="welcome"] .sar-scale{margin-bottom:56px}
-
-    /* Questions */
-    .q-list{display:flex;flex-direction:column;gap:14px}
-    .q-item{padding:12px 0;border-top:1px solid var(--border)}
-    .q-item:first-child{border-top:none}
-    .q-title{font-size:15px;font-weight:600;line-height:1.35;margin-bottom:2px}
-    .q-sub{font-size:15px;line-height:1.35;color:var(--sub);margin-bottom:8px}
-    .q-scale{display:flex;gap:8px}
-    .q-scale input[type="radio"]{position:absolute;opacity:0;pointer-events:none}
-    .q-scale label{
-      width:36px;height:36px;border-radius:50%;
-      border:1px solid #D1D5DB;background:#fff;color:#111827;
-      display:inline-flex;align-items:center;justify-content:center;
-      font-size:14px;font-weight:600;cursor:pointer;user-select:none;
-    }
-    .q-scale input[type="radio"]:checked + label{
-      background:var(--brand);border-color:var(--brand);color:#fff;
-    }
-  
-
-/* Header stacked: brand → page title → dots */
-:root{ --header-h: 100px; --header-gap: 8px; } 
-.sar-logo-wrap{ display:flex; flex-direction:column; gap:var(--header-gap); }
-.sar-page-title{ font-size:18px; font-weight:700; color:#434343; }
-.sar-page .sar-title{ font-size:22px; font-weight:800; }
-.sar-para-title{font-size:14px;font-weight:800;text-transform:uppercase;color:#434343;margin-bottom:8px}
-
-
-/* SCORE page */
-.score-wrap{display:flex;flex-direction:column;gap:16px;align-items:stretch;justify-content:flex-start}
-.score-values{display:flex;flex-direction:column;align-items:flex-start;gap:6px;width:100%}
-.score-label{font-size:14px;color:#434343;}
-.score-label + .score-raw{margin-top:6px;}
-.score-label + .score-band{margin-top:6px;}
-.score-label + .score-band{margin-top:6px;}
-.score-raw{ font-size: 28px; font-weight:800; color:#434343; }
-.scorebar-wrap{ width:100%; margin:1.2em 0; }
-.scorebar{ position:relative; width:100%; height:48px; 
-  background: linear-gradient(90deg,#ef4444 0%, #f97316 20%, #facc15 40%, #a3e635 65%, #22c55e 100%);
-  border-radius:8px; overflow:visible; border:1px solid #E5E7EB;
-}
-.score-marker{ position:absolute; top:50%; transform:translateY(-50%); 
-  width:8px; height:68px; left:0; background:#434343; border-radius:8px;
-}
-.score-band{ font-size:22px; font-weight:700; color:#434343; text-align:left }
-
-.global-progress{display:none!important}
-    /* Finish page icon */
-.finish-hero{ display:flex; justify-content:center; align-items:center; margin-top:8px; }
-.finish-hero i{ font-size:72px; line-height:1; color:var(--brand); }
-
-/* Spacers used in multiple pages */
-.sar-gap-1{ height:1.2em; }
-.sar-gap-3{ height:3.6em; }
-
-
-/* Lock welcome page bottom spacing: remove one gap between scale and actions (50% reduction) */
-.sar-page[data-step="welcome"] .sar-scale + .sar-gap-3 { display:none !important; }
-
+  .ver{{position:fixed;bottom:10px;right:10px;background:#111827;color:#fff;padding:6px 10px;border-radius:999px;font-size:12px;opacity:.8}}
 </style>
-<!-- EmailJS SDK (Option 2: automatic email sending) -->
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-<script>
-  // === CONFIGURE THESE THREE VALUES IN GITHUB ===
-  window.EMAILJS_PUBLIC_KEY  = 'REPLACE_WITH_YOUR_PUBLIC_KEY';
-  window.EMAILJS_SERVICE_ID  = 'REPLACE_WITH_YOUR_SERVICE_ID';
-  window.EMAILJS_TEMPLATE_ID = 'REPLACE_WITH_YOUR_TEMPLATE_ID';
-  // Initialize EmailJS (requires Public Key)
-  if (window.emailjs && window.EMAILJS_PUBLIC_KEY) {
-    emailjs.init(window.EMAILJS_PUBLIC_KEY);
-  }
-</script>
-<script defer="True" src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script><style>
-/* Success modal styling (high z-index) */
-.modal-mask { position: fixed !important; inset: 0 !important; background: rgba(0,0,0,0.45) !important; z-index: 2147483646 !important; display:none; }
-.modal { position: fixed !important; left: 50% !important; top: 30% !important; transform: translateX(-50%) !important; background: #fff !important; max-width: 520px !important; width: 88% !important; border-radius: 12px !important; box-shadow: 0 10px 30px rgba(0,0,0,0.25) !important; z-index: 2147483647 !important; padding: 16px 18px !important; display:none; }
-.modal-footer { text-align: right; }
-
-</style>
-<style>
-/* NEXT button — final look */
-.btn-next{
-  appearance:none; border:0; cursor:pointer;
-  padding:12px 22px; border-radius:14px;
-  font-weight:700; font-size:16px; line-height:1;
-  color:#fff; background:linear-gradient(180deg,#2A7DEB 0%, #1E90FF 100%);
-  box-shadow: 0 6px 14px rgba(30,144,255,0.28), inset 0 1px 0 rgba(255,255,255,0.15);
-  transition: transform .05s ease, filter .15s ease, box-shadow .15s ease;
-}
-.btn-next:hover{ filter: brightness(1.04); }
-.btn-next:active{ transform: translateY(1px); }
-.btn-next:disabled{
-  background: #cfd8e3; color:#6b7280; box-shadow: none; cursor:not-allowed;
-}
-</style><style>
-/* LOCKED SIZES — do not change in future updates */
-.section-title { font-size:14pt !important; line-height:1.4; }
-.field-label   { font-size:11pt !important; line-height:1.45; }
-</style><style>
-/* Rating scale dots on Page 2 */
-.rating-dots { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
-.rating-row { display:flex; align-items:center; gap:10px; }
-.rating-row .dot {
-  width:28px; height:28px; border-radius:50%;
-  display:inline-flex; align-items:center; justify-content:center;
-  background:#1E90FF; color:#fff; font-weight:700; font-size:14px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 6px rgba(30,144,255,0.25);
-}
-.rating-row .label { font-size:11pt; }
-</style></head>
+<script id="embeddedQuestions" type="application/json">[{"id": "q1", "statement": "1. I answer very quickly to guest messages", "subtext": "I often check and reply right away", "weight": 1.0}, {"id": "q2", "statement": "2. I make my replies warm and personal", "subtext": "I use their name and add helpful information", "weight": 1.0}, {"id": "q3", "statement": "3. I make a great first impression", "subtext": "I know it starts with the first message", "weight": 0.5}, {"id": "q4", "statement": "4. I can see if a guest is stressed or relaxed", "subtext": "I adjust the way I check-in to the mood", "weight": 2.0}, {"id": "q5", "statement": "5. I ask questions before I ask passports", "subtext": "I welcome guests like friends", "weight": 2.0}, {"id": "q6", "statement": "6. I can check-in a guest in 60 seconds", "subtext": "I timed three standard check-ins", "weight": 1.0}, {"id": "q7", "statement": "7. I check in groups differently than FIT", "subtext": "I usually check-in groups with the leader", "weight": 0.5}, {"id": "q8", "statement": "8. I don't say that check-in time is 14:00", "subtext": "Guests can check-in when the room is ready", "weight": 1.5}, {"id": "q9", "statement": "9. I dont show stress when there is a problem", "subtext": "I know that makes guests really worry", "weight": 2.0}, {"id": "q10", "statement": "10. I show genuine interest during check-out", "subtext": "I ask about their stay or next destination", "weight": 1.0}, {"id": "q11", "statement": "11. I make great last impressions", "subtext": "I walk them out and wait until their car has left", "weight": 2.0}, {"id": "q12", "statement": "12. I use names to connect with guests", "subtext": "When it feels right I introduce myself", "weight": 0.5}, {"id": "q13", "statement": "13. I scan every guest every time", "subtext": "I dont look at a group but at each individual", "weight": 2.0}, {"id": "q14", "statement": "14. I am good at scanning", "subtext": "I see what people need before they ask", "weight": 2.0}, {"id": "q15", "statement": "15. I create unique surprises for guests", "subtext": "I do more than offering free things", "weight": 2.0}, {"id": "q16", "statement": "16. Music is an essential part of the vibe", "subtext": "I listen to make sure we play the right music", "weight": 0.5}, {"id": "q17", "statement": "17. I tell guests they can use other BED facilities", "subtext": "I offer downtown coffee, big pool or breakfast", "weight": 1.5}, {"id": "q18", "statement": "18. It's annoying when a room key doesn't work", "subtext": "I go up to make sure the new key works", "weight": 2.0}, {"id": "q19", "statement": "19. I talk with guests because I am interested", "subtext": "When I force myself it will not be real", "weight": 1.0}, {"id": "q20", "statement": "20. I often give my friends honest feedback", "subtext": "Im happy to help them to grow", "weight": 1.5}, {"id": "q21", "statement": "21. My friends often give me honest feedback", "subtext": "I'm happy they help me to grow", "weight": 1.0}, {"id": "q22", "statement": "22. I can answer most questions about BED", "subtext": "I have visited the rooms in all our hotels", "weight": 0.5}, {"id": "q23", "statement": "23. I understand the meaning of showtime", "subtext": "The magic happens from 0700-1000", "weight": 0.5}, {"id": "q24", "statement": "24. I have peeled my own onion", "subtext": "I dont act. Usually I show my true self", "weight": 1.5}, {"id": "q25", "statement": "25. I use ChatGPT or Gemini", "subtext": "I ask for help with e.g., guest messages", "weight": 0.5}, {"id": "q26", "statement": "26. I send messages that look like I wrote them", "subtext": "I don't copy AI because guests will know", "weight": 1.5}, {"id": "q27", "statement": "27. I use ChatGPT or Gemini", "subtext": "I ask help to analyze and solve problems", "weight": 1.5}, {"id": "q28", "statement": "28. I never gossip. I signed I Promise", "subtext": "I dont talk badly when someones not here", "weight": 2.0}, {"id": "q29", "statement": "29. I really understand that rules can be flexible", "subtext": "Without reasons many rules just disappear", "weight": 1.0}, {"id": "q30", "statement": "30. I am confident about my own judgment", "subtext": "I make decisions without asking permission", "weight": 1.0}, {"id": "q31", "statement": "31. I look after the whole hotel, not only front", "subtext": "I include rooms, maintenance and back areas", "weight": 2.0}, {"id": "q32", "statement": "32. I look around when I arrive at the hotel", "subtext": "I share responsibility for the whole hotel", "weight": 0.5}, {"id": "q33", "statement": "33. I don't pass issues to others but act myself", "subtext": "I follow up later to make sure it's fixed", "weight": 1.0}, {"id": "q34", "statement": "34. I am not afraid of the CEO or my coach", "subtext": "I know I am allowed to make mistakes", "weight": 1.0}, {"id": "q35", "statement": "35. I have no manuals that show me what to do", "subtext": "That means I cannot do anything wrong", "weight": 0.5}]</script>
+</head>
 <body>
-<!-- Header -->
-<header class="sar-header">
-<div class="sar-logo-wrap">
-<div class="sar-logo">BED HOSPITALITY 2.0</div>
-<div aria-live="polite" class="sar-page-title" id="sarPageTitle"></div>
-<div aria-label="Progress" class="sar-dotbar" id="dotbar"></div>
-<!-- Global progress bar inside header -->
-<div aria-hidden="true" class="global-progress" id="gprog"><span id="gprogFill"></span></div>
-</div>
-</header>
-<main class="sar-wrap">
-<section class="sar-card">
-<!-- Welcome -->
-<div class="sar-page" data-step="welcome">
-<div class="card" style="margin-top:10px;">
-</div>
-<div class="card" style="margin-top:16px;">
-<h2 class="section-title">YOUR INFORMATION</h2>
-<label class="small field-label">your name</label>
-<input id="sarNick" placeholder="nick name" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="text"/>
-<label class="small field-label">your email </label>
-<input id="sarEmail" placeholder="email address" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="email"/>
-<label class="small field-label">your location</label>
-<select id="sarHotel" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 4px;">
-<option value="">select hotel</option>
-<option>BED Changkian</option>
-<option>BED Phrasing</option>
-<option>BED Nimman</option>
-<option>BED Chiangmai Gate</option>
-<option>BED Flying</option>
-<option>BED Support</option>
-</select>
-</div>
-<div class="card" style="margin-top:16px;">
-<h2 class="section-title">PEER INFORMATION</h2><div class="peer-subtext" style="font-size:11pt;color:#666;margin-top:4px;margin-bottom:12px;">your peer must work in BED for at least 12 months</div>
-<label class="small field-label">name peer</label>
-<input id="peerName" placeholder="nick name" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="text"/>
-<label class="small field-label">email peer</label>
-<input id="peerEmail" placeholder="email address" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="email"/>
-<label class="small field-label">peer location</label>
-<select id="peerHotel" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 4px;">
-<option value="">select hotel</option>
-<option>BED Changkian</option>
-<option>BED Phrasing</option>
-<option>BED Nimman</option>
-<option>BED Chiangmai Gate</option>
-<option>BED Flying</option>
-<option>BED Support</option>
-</select>
-</div>
-<div style="display:flex;justify-content:flex-end;margin:18px 0 8px;">
-<div class="btnrow" style="display:flex;justify-content:flex-end;margin:18px 0 8px;"><button class="btn-next primary" id="sarStart" type="button">Next</button></div>
-</div>
-</div><div class="sar-page" data-step="intro">
-<div class="card" style="margin-top:10px;">
-<h2 class="section-title">HOW THIS WORKS</h2>
-<div class="field-label" style="margin-top:6px;">
-    Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself.
-    The goal is to know your own strengths and opportunities.
+<header>
+  <div class="title">BED HOSPITALITY 2.0</div>
+  <div class="subtitle">SELF ASSESSMENT FORM</div>
+  <div class="dots" id="dots">
+    <div class="dot" data-step="0"></div>
+    <div class="dot" data-step="1"></div>
+    <div class="dot" data-step="2"></div>
   </div>
-</div>
-<div class="card" style="margin-top:16px;">
-<h3 class="section-title" style="font-size:14pt;">HOW YOU SCORE YOURSELF</h3>
-<div class="rating-dots">
-<div class="rating-row"><span class="dot">1</span><span class="label">I am not good at this</span></div>
-<div class="rating-row"><span class="dot">2</span><span class="label">I need to be better at this</span></div>
-<div class="rating-row"><span class="dot">3</span><span class="label">I am average at this</span></div>
-<div class="rating-row"><span class="dot">4</span><span class="label">I am good at this</span></div>
-<div class="rating-row"><span class="dot">5</span><span class="label">I am very good at this</span></div>
-</div>
-</div>
-<div class="btnrow" style="display:flex;justify-content:flex-end;margin:24px 0 8px;">
-<button class="btn-next" id="introStart" type="button">Start</button>
-</div>
-</div>
-<!-- Part 1 — Dynamic questions -->
-<div class="sar-page" data-step="q1">
-<!-- removed page-level thin progress bar (now in header) -->
-<div aria-live="polite" class="q-list" id="q1List"></div>
-<div class="sar-gap-3"></div>
-<div class="sar-actions">
-<button class="sar-btn" data-nav="back">Back</button>
-<button class="sar-btn primary" data-nav="goto" data-step="q2" disabled="" id="q1Next">Next</button>
-</div>
-</div>
-<!-- Part 2 — Dynamic questions -->
-<div class="sar-page" data-step="q2">
-<!-- removed page-level thin progress bar (now in header) -->
-<div aria-live="polite" class="q-list" id="q2List"></div>
-<div class="sar-gap-3"></div>
-<div class="sar-actions">
-<button class="sar-btn" data-nav="back">Back</button>
-<button class="sar-btn primary" data-nav="next" disabled="" id="q2Next">Next</button>
-</div>
-</div>
-<!-- Placeholders -->
-<div class="sar-page" data-step="score">
-<div aria-hidden="true" class="score-gap"><br/><br/><br/><br/></div>
-<div class="score-wrap">
-<div class="score-values">
-<div class="score-label">your self assessment results</div>
-<div class="score-raw" id="scoreNumber">YOUR SCORE IS 0%</div>
-</div>
-<div aria-label="Score on color bar" class="scorebar-wrap">
-<div class="scorebar" id="scoreBar">
-<span class="score-marker" id="scoreMarker" title="Your score"></span>
-</div>
-</div>
-<div class="score-label">our suggestion and recommendation</div>
-<div class="score-band" id="scoreBandText">—</div>
-</div>
-<div class="score-spacer"><br/><br/><br/><br/></div>
-<div class="sar-actions">
-<button class="sar-btn" data-nav="back">Back</button>
-<button class="sar-btn primary" data-nav="next">Next</button>
-</div>
-</div>
-<div class="sar-page" data-step="peer">
-<div class="sar-gap-1"></div>
-<div class="sar-para-title">FIND YOUR PEER REVIEWER</div>
-<div class="sar-intro" style="margin-bottom:12px"><p>You completed your self-assessment. The next step is peer review. Ask anyone in your team who has been in BED for at least 24 months to assess you. When they accept complete the information. When you click Done the review form is send to your peer</p></div>
-<div class="sar-gap-1"></div>
-<div class="sar-row sar-row-fields" style="margin-bottom:12px">
-<label class="sar-field">
-<span class="sar-label">peer nick name</span>
-<input class="sar-input" id="peerName" inputmode="text" type="text"/>
-</label>
-<label class="sar-field">
-<span class="sar-label">peer email address</span>
-<input autocomplete="email" class="sar-input" id="peerEmail" inputmode="email" type="email"/>
-</label>
-</div>
-<div aria-label="Choose peer's BED Hotel" class="sar-row sar-hotels" role="group" style="margin-bottom:12px">
-<button class="sar-btn sar-hotel" data-hotel="BCK">BCK</button>
-<button class="sar-btn sar-hotel" data-hotel="BPS">BPS</button>
-<button class="sar-btn sar-hotel" data-hotel="BNM">BNM</button>
-<button class="sar-btn sar-hotel" data-hotel="BCG">BCG</button>
-<button class="sar-btn sar-hotel" data-hotel="FLY">FLY</button>
-<button class="sar-btn sar-hotel" data-hotel="BED">BED</button>
-</div>
-<div class="sar-actions"><button class="sar-btn" data-nav="back">Back</button>
-<button class="sar-btn" id="peerSend" type="button">Send</button>
-<label class="sar-check" style="display:flex;gap:8px;align-items:flex-start;line-height:1.3;margin:10px 0; font-size:14px; font-family:inherit;">
-<input id="peerConsent" style="margin-top:3px;" type="checkbox"/>
-<span>I agree to share my self-assessment with my peer</span>
-</label>
-</div>
-</div>
-<div class="sar-page" data-step="done"><div class="sar-title">Done</div></div>
-<!-- FINISH PAGE -->
-<div class="sar-page" data-step="finish">
-<div class="sar-card">
-<div class="sar-gap-1"></div>
-<!-- Centered blue checkmark image -->
-<div aria-hidden="true" class="finish-hero">
-<svg style="width: 120px; height: 120px; display: block; background-color: #1E90FF;
-            border-radius: 50%; padding: 16px; box-sizing: border-box;" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<circle cx="12" cy="12" fill="#1E90FF" r="12"></circle>
-<path d="M7 13L10 16L17 9" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
-</svg>
-</div>
-<div class="sar-gap-1"></div>
-<!-- Congratulations text -->
-<div class="sar-sub" style="text-align:center;font-size:24px;font-weight:700;">Congratulations</div>
-<!-- Download hint text (same style as intro paragraphs) -->
-<div class="sar-intro" style="text-align:center;margin-top:6px;margin-bottom:8px">
-      To download your complete <br/>test results please click PDF
+</header>
+
+<main class="wrap">
+  <section class="sar-page" data-step="welcome" id="page-welcome" style="display:block">
+    <div class="card">
+      <h2 class="section-title">PERSONAL INFORMATION</h2>
+      <div class="p1-row">
+        <label for="sarNick">please enter your name</label>
+        <input id="sarNick" type="text"/>
+      </div>
+      <div class="p1-row">
+        <label for="sarEmail">your email address</label>
+        <input id="sarEmail" type="email"/>
+      </div>
+      <div class="p1-row">
+        <label for="sarHotel">select your location</label>
+        <select id="sarHotel">
+          <option value="">select hotel</option>
+          <option>BED Changkian</option>
+          <option>BED Phrasing</option>
+          <option>BED Nimman</option>
+          <option>BED Chiangmai Gate</option>
+          <option>BED Flying</option>
+          <option>BED Support</option>
+        </select>
+      </div>
     </div>
-<!-- Three blank lines -->
-<div class="sar-gap-1"></div>
-<div class="sar-gap-1"></div>
-<div class="sar-gap-1"></div>
-<div class="sar-actions">
-<button class="sar-btn" data-nav="goto" data-step="peer">Back</button>
-<button class="sar-btn" id="finishPDF">PDF</button>
-</div>
-</div></div>
-</section>
+
+    <div class="card">
+      <h2 class="section-title">PEER INFORMATION</h2>
+      <div class="muted" style="font-weight:700;margin:4px 0 12px;">the person that will review you must have been in BED for at least 12 months</div>
+      <div class="p1-row">
+        <label for="peerName">name of your peer reviewer</label>
+        <input id="peerName" type="text"/>
+      </div>
+      <div class="p1-row">
+        <label for="peerEmail">email address of your peer reviewer</label>
+        <input id="peerEmail" type="email"/>
+      </div>
+      <div class="p1-row">
+        <label for="peerHotel">select peer location</label>
+        <select id="peerHotel">
+          <option value="">select hotel</option>
+          <option>BED Changkian</option>
+          <option>BED Phrasing</option>
+          <option>BED Nimman</option>
+          <option>BED Chiangmai Gate</option>
+          <option>BED Flying</option>
+          <option>BED Support</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button class="btn ghost" id="startBack" disabled>Back</button>
+      <button class="btn primary" id="startNext" disabled>Next</button>
+    </div>
+  </section>
+
+  <section class="sar-page" data-step="q1" id="page-q1" style="display:none">
+    <div class="card">
+      <h2 class="section-title">STATEMENTS PART 1</h2>
+      <div id="q1List"></div>
+    </div>
+    <div class="nav">
+      <button class="btn ghost" id="q1Back">Back</button>
+      <button class="btn primary" id="q1Next" disabled>Next</button>
+    </div>
+  </section>
+
+  <section class="sar-page" data-step="q2" id="page-q2" style="display:none">
+    <div class="card">
+      <h2 class="section-title">STATEMENTS PART 2</h2>
+      <div id="q2List"></div>
+    </div>
+    <div class="nav">
+      <button class="btn ghost" id="q2Back">Back</button>
+      <button class="btn primary" id="q2Next" disabled>Next</button>
+    </div>
+  </section>
+
+  <section class="sar-page" data-step="finish" id="page-finish" style="display:none">
+    <div class="card">
+      <h2 class="section-title">Finish</h2>
+      <p class="muted">Thanks! You can review and submit.</p>
+    </div>
+    <div class="nav">
+      <button class="btn ghost" id="finishBack">Back</button>
+      <button class="btn primary" id="finishDone">Done</button>
+    </div>
+  </section>
 </main>
+
+<div class="ver" id="ver">SAR baseline v8.5 — build 35Q</div>
+
 <script>
-    const SAR_STEPS = ["welcome","q1","q2","score","peer","done","finish"];
+(function(){
+  const SAR = window.SAR = { ver:'v8.5', state:{ user:{}, peer:{}, answers:{}, questions:[] } };
 
-    const sarState = {
-      step: "welcome",
-      user: { nickname: "", email: "", hotel: "" }, peer: { name: "", email: "", hotel: "" },
-      answers: {},
-      questions: []
-    };
-
-    function goTo(step){
-      if(!SAR_STEPS.includes(step)) return;
-      sarState.step = step;
-      document.querySelectorAll('.sar-page').forEach(p=>{
-        p.classList.toggle('active', p.dataset.step === step);
-      });
-      renderDots();
-      updateHeaderTitle();
-      updateGlobalProgress();
-      if(step === "welcome") ensureWelcomeBindings();
-      if(step === "q1") renderQ1();
-      if(step === "q2") renderQ2();
-      if(step === "score") renderScore();
-      if(step === "peer") ensurePeerBindings();
-      window.scrollTo({ top: 0, behavior: 'instant' });
-    }
-    function next(){
-      const i = SAR_STEPS.indexOf(sarState.step);
-      if(i < SAR_STEPS.length - 1) goTo(SAR_STEPS[i+1]);
-    }
-    function back(){
-      const i = SAR_STEPS.indexOf(sarState.step);
-      if(i > 0) goTo(SAR_STEPS[i-1]);
-    }
-    document.body.addEventListener('click', (e)=>{
-      const btn = e.target.closest('[data-nav]');
-      if(!btn) return;
-      const act = btn.getAttribute('data-nav');
-      if(act==='next') next();
-      else if(act==='back') back();
-      else if(act==='goto'){ const step = btn.getAttribute('data-step'); if(step) goTo(step); }
-    });
-
-    function renderDots(){
-      const bar = document.getElementById('dotbar');
-      bar.innerHTML = '';
-      const currentIndex = SAR_STEPS.indexOf(sarState.step);
-      SAR_STEPS.forEach((step, idx)=>{
-        const d = document.createElement('div');
-        let cls = 'sar-dot';
-        if(idx <= currentIndex){ cls += ' done'; }
-        if(idx === currentIndex){ cls += ' current'; }
-        d.className = cls;
-        bar.appendChild(d);
-      });
-    }
-
-    let welcomeBound = false;
-    function ensureWelcomeBindings(){
-      if(welcomeBound){ validateWelcome(); return; }
-      welcomeBound = true;
-      const card = document.querySelector('.sar-page[data-step="welcome"]');
-      const nick = card.querySelector('#sarNick');
-      const email = card.querySelector('#sarEmail');
-      const startBtn = card.querySelector('#sarStart');
-
-      card.addEventListener('click',(e)=>{
-        const btn = e.target.closest('.sar-hotel');
-        if(!btn) return;
-        card.querySelectorAll('.sar-hotel').forEach(b=>b.classList.remove('selected'));
-        btn.classList.add('selected');
-        sarState.user.hotel = btn.getAttribute('data-hotel') || "";
-        validateWelcome();
-      });
-      nick.addEventListener('input', ()=>{ sarState.user.nickname = nick.value.trim(); validateWelcome(); });
-      email.addEventListener('input', ()=>{ sarState.user.email = email.value.trim(); validateWelcome(); });
-      startBtn.addEventListener('click',(e)=>{ if(startBtn.disabled){ e.preventDefault(); e.stopPropagation(); } });
-      validateWelcome();
-    }
-    function validateWelcome(){
-      const card = document.querySelector('.sar-page[data-step="welcome"]');
-      if(!card) return;
-      const nick = card.querySelector('#sarNick');
-      const email = card.querySelector('#sarEmail');
-      const startBtn = card.querySelector('#sarStart');
-      const hasNick = (nick.value || "").trim().length > 0;
-      const hasEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((email.value || "").trim());
-      const hasHotel = !!sarState.user.hotel;
-      startBtn.disabled = !(hasNick && hasEmail && hasHotel);
-    }
-
-    async function loadQuestions(){
-      if (sarState.questions.length) return sarState.questions;
-      const res = await fetch('./questions.json?v=1', {cache: 'no-store'});
-      const data = await res.json();
-      sarState.questions = Array.isArray(data) ? data : [];
-      return sarState.questions;
-    }
-
-    async function renderQ1(){
-      const qs = await loadQuestions();
-      const slice = qs.slice(0, 18);
-      const mount = document.getElementById('q1List');
-      mount.innerHTML = slice.map(q => renderQuestionHTML(q)).join('');
-      slice.forEach(q => {
-        const v = sarState.answers[q.id];
-        if(v){ const el = document.getElementById(`${q.id}_${v}`); if (el) el.checked = true; }
-      });
-      mount.onchange = onRatingChanged;
-      updateGlobalProgress();
-      validateQ1Completed(slice);
-    }
-
-    async function renderQ2(){
-      const qs = await loadQuestions();
-      const slice = qs.slice(18, 35);
-      const mount = document.getElementById('q2List');
-      mount.innerHTML = slice.map(q => renderQuestionHTML(q)).join('');
-      slice.forEach(q => {
-        const v = sarState.answers[q.id];
-        if(v){ const el = document.getElementById(`${q.id}_${v}`); if (el) el.checked = true; }
-      });
-      mount.onchange = onRatingChanged;
-      updateGlobalProgress();
-      validateQ2Completed(slice);
-    }
-
-    function renderQuestionHTML(q){
-      const name = `rate_${q.id}`;
-      let radios = '';
-      for(let v=1; v<=5; v++){
-        const id = `${q.id}_${v}`;
-        radios += `
-          <input type="radio" name="${name}" id="${id}" value="${v}" />
-          <label for="${id}" aria-label="${q.id} rate ${v}">${v}</label>
-        `;
-      }
-      return `
-        <div class="q-item" data-qid="${q.id}">
-          <div class="q-title">${escapeHTML(q.statement)}</div>
-          <div class="q-sub">${escapeHTML(q.subtext)}</div>
-          <div class="q-scale">${radios}</div>
-        </div>
-      `;
-    }
-
-    // one handler for both pages
-    function onRatingChanged(e){
-      const input = e.target.closest('input[type="radio"]'); if(!input) return;
-      const wrap = input.closest('.q-item'); const qid = wrap?.getAttribute('data-qid');
-      const val = parseInt(input.value, 10);
-      if(qid && val>=1 && val<=5){
-        sarState.answers[qid] = val;
-        updateGlobalProgress();
-        if(sarState.step === 'q1'){
-          const list = Array.from(document.querySelectorAll('#q1List .q-item'));
-          validateQ1Completed(list);
-        } else if(sarState.step === 'q2'){
-          const list = Array.from(document.querySelectorAll('#q2List .q-item'));
-          validateQ2Completed(list);
-        }
-      }
-    }
-
-    function validateQ1Completed(list){
-      const items = Array.from(list);
-      const allAnswered = items.every(el => sarState.answers[el.getAttribute('data-qid')]);
-      document.getElementById('q1Next').disabled = !allAnswered;
-    }
-    function validateQ2Completed(list){
-      const items = Array.from(list);
-      const allAnswered = items.every(el => sarState.answers[el.getAttribute('data-qid')]);
-      document.getElementById('q2Next').disabled = !allAnswered;
-    }
-
-    // Global progress across all 20 questions; visible only on q1/q2
-    function updateGlobalProgress(){
-      const bar = document.getElementById('gprog');
-      const fill = document.getElementById('gprogFill');
-      const show = (sarState.step === 'q1' || sarState.step === 'q2');
-      bar.classList.toggle('show', show);
-      if(!show) return;
-      const total = (sarState.questions && sarState.questions.length) ? sarState.questions.length : 20;
-      const answered = Object.keys(sarState.answers).length;
-      const pct = total ? Math.round((answered/total)*100) : 0;
-      fill.style.width = pct + '%';
-    }
-
-    // Correct escapeHTML
-    function escapeHTML(s){
-      return String(s).replace(/[&<>\"']/g, function(c){
-        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]);
-      });
-    }
-
-    goTo(sarState.step);
-  
-function scoreBand(pct){
-  if (pct >= 80) return "Excellent! Inspire others.<br>Lead by example";
-  if (pct >= 60) return "Great hospitality!<br>Keep challenging yourself";
-  if (pct >= 40) return "Use self-development.<br>Practise makes you better";
-  return "You’re behind.<br>Ask your team for guidance";
-}
-function renderScore(){
-  const page = document.querySelector('.sar-page[data-step="score"]');
-  if(!page) return;
-  const qs = sarState.questions || [];
-  const total = qs.length * 5;
-  let sum = 0;
-  qs.forEach(q => { sum += (sarState.answers[q.id] || 0); });
-  const pct = total ? Math.round((sum / total) * 100) : 0;
-  const rawEl = page.querySelector('#scoreNumber');
-  const bandEl = page.querySelector('#scoreBandText');
-  if(rawEl) rawEl.textContent = "YOUR SCORE IS " + pct + "%";
-  if(bandEl) bandEl.innerHTML = scoreBand(pct);
-  const marker = page.querySelector('#scoreMarker');
-  if(marker){
-    const clamped = Math.max(0, Math.min(100, pct));
-    marker.style.left = `calc(${clamped}% - 4px)`;
+  function $(id){ return document.getElementById(id); }
+  function show(stepId){ 
+    document.querySelectorAll('.sar-page').forEach(p => p.style.display='none');
+    $(stepId).style.display = 'block';
+    updateDots(stepId);
+    if(stepId==='page-q1') ensureQ1();
+    if(stepId==='page-q2') ensureQ2();
+    if(stepId==='page-welcome') validateWelcome();
   }
-}
-let peerBound = false;
-function ensurePeerBindings(){
-  if(peerBound){ validatePeer(); return; }
-  peerBound = true;
-  const card = document.querySelector('.sar-page[data-step="peer"]');
-  if(!card) return;
-  const nameEl = card.querySelector('#peerName');
-  const emailEl = card.querySelector('#peerEmail');
-  const nextBtn = card.querySelector('#peerNext');
-  if(nextBtn){
-    nextBtn.addEventListener('click', function(e){
-      if(nextBtn.disabled){ e.preventDefault(); return; }
+  function updateDots(stepId){ 
+    const order = ['page-welcome','page-q1','page-q2'];
+    const idx = Math.max(0, order.indexOf(stepId));
+    document.querySelectorAll('#dots .dot').forEach((d,i)=>{
+      d.classList.toggle('active', i<=idx);
     });
   }
 
-  if(nextBtn){
-    nextBtn.addEventListener('click', function(e){
-      if(nextBtn.disabled){ e.preventDefault(); return; }
-      var hasName = (nameEl && nameEl.value || "").trim().length > 0;
-      var hasEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((emailEl && emailEl.value || "").trim());
-      var hasHotel = !!(sarState.peer && sarState.peer.hotel);
-      if(!(hasName && hasEmail && hasHotel)){
-        e.preventDefault();
-        alert('Please fill peer nick name, email address, and select a hotel.');
-        return;
-      }
-      if(!(sarState.peer && sarState.peer.confirm24)){
-        var ok = confirm('your peer has 24 months experience?');
-        if(!ok){
-          e.preventDefault();
-          alert('Please confirm YES to continue.');
-          return;
-        }
-        sarState.peer = sarState.peer || {};
-        sarState.peer.confirm24 = true;
-        validatePeer();
-        goTo('finish');
-      }
-    });
+  try{ 
+    const raw = document.getElementById('embeddedQuestions').textContent;
+    SAR.state.questions = JSON.parse(raw);
+  }catch(e){ SAR.state.questions = []; }
+
+  function validateWelcome(){ 
+    const nick  = $('sarNick').value.trim();
+    const email = $('sarEmail').value.trim();
+    const hotel = $('sarHotel').value.trim();
+    const pn = $('peerName').value.trim();
+    const pe = $('peerEmail').value.trim();
+    const ph = $('peerHotel').value.trim();
+    SAR.state.user.nickname = nick;
+    SAR.state.user.email = email;
+    SAR.state.user.hotel = hotel;
+    SAR.state.peer.name = pn;
+    SAR.state.peer.email = pe;
+    SAR.state.peer.hotel = ph;
+    const emailOK = (v)=>/^\S+@\S+\.\S+$/.test(v);
+    const ok = nick && emailOK(email) && hotel && pn && emailOK(pe) && ph;
+    $('startNext').disabled = !ok;
   }
-  const shareBtn = card.querySelector('#peerShare');
-card.addEventListener('click',(e)=>{
-    const btn = e.target.closest('.sar-hotel');
-    if(!btn) return;
-    card.querySelectorAll('.sar-hotel').forEach(b=>b.classList.remove('selected'));
-    btn.classList.add('selected');
-    sarState.peer = sarState.peer || {name:'',email:'',hotel:''};
-    sarState.peer.hotel = btn.getAttribute('data-hotel') || "";
-    validatePeer();
+
+  ['sarNick','sarEmail','sarHotel','peerName','peerEmail','peerHotel'].forEach(id=>{
+    document.addEventListener('input', (e)=>{ if(e.target && e.target.id===id) validateWelcome(); });
+    document.addEventListener('change', (e)=>{ if(e.target && e.target.id===id) validateWelcome(); });
   });
-  if(nameEl) nameEl.addEventListener('input', ()=>{ sarState.peer = sarState.peer || {}; sarState.peer.name = nameEl.value.trim(); validatePeer(); });
-  if(emailEl) emailEl.addEventListener('input', ()=>{ sarState.peer = sarState.peer || {}; sarState.peer.email = emailEl.value.trim(); validatePeer(); });
-  if(shareBtn){ shareBtn.addEventListener('click',(e)=>{ e.preventDefault(); downloadSarResults(); }); }
-      validatePeer();
-  if(sendBtn){
-    sendBtn.addEventListener('click', function(e){
-      e.preventDefault();
-      var hasName = (nameEl && nameEl.value || "").trim().length > 0;
-      var hasEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((emailEl && emailEl.value || "").trim());
-      var hasHotel = !!(sarState.peer && sarState.peer.hotel);
-      if(!(hasName && hasEmail && hasHotel)){
-        alert('Please fill peer nick name, email address, and select a hotel.');
-        return;
-      }
-      var ok = confirm('your peer has 24 months experience?');
-      if(!ok){
-        alert('Please confirm YES to continue.');
-        return;
-      }
-      sarState.peer = sarState.peer || {};
-      sarState.peer.confirm24 = true;
-      validatePeer();
-    });
-  }
-  validatePeer();
-  if(sendBtn){
-    sendBtn.addEventListener('click', function(e){
-      e.preventDefault();
-      var hasName = (nameEl && nameEl.value || "").trim().length > 0;
-      var hasEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((emailEl && emailEl.value || "").trim());
-      var hasHotel = !!(sarState.peer && sarState.peer.hotel);
-      if(!(hasName && hasEmail && hasHotel)){
-        alert('Please fill peer nick name, email address, and select a hotel.');
-        return;
-      }
-      var ok = confirm('your peer has 24 months experience?');
-      if(!ok){
-        alert('Please confirm YES to continue.');
-        return;
-      }
-      sarState.peer = sarState.peer || {};
-      sarState.peer.confirm24 = true;
-      validatePeer();
-    });
-  }
-  validatePeer();
-}
-function validatePeer(){
-  const card = document.querySelector('.sar-page[data-step="peer"]');
-  if(!card) return;
-  const nameEl = card.querySelector('#peerName');
-  const emailEl = card.querySelector('#peerEmail');
-  const nextBtn = card.querySelector('#peerNext');
 
-  if(nextBtn){
-    nextBtn.addEventListener('click', function(e){
-      if(nextBtn.disabled){ e.preventDefault(); return; }
-      var hasName = (nameEl && nameEl.value || "").trim().length > 0;
-      var hasEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((emailEl && emailEl.value || "").trim());
-      var hasHotel = !!(sarState.peer && sarState.peer.hotel);
-      if(!(hasName && hasEmail && hasHotel)){
-        e.preventDefault();
-        alert('Please fill peer nick name, email address, and select a hotel.');
-        return;
-      }
-      if(!(sarState.peer && sarState.peer.confirm24)){
-        var ok = confirm('your peer has 24 months experience?');
-        if(!ok){
-          e.preventDefault();
-          alert('Please confirm YES to continue.');
-          return;
-        }
-        sarState.peer = sarState.peer || {};
-        sarState.peer.confirm24 = true;
-        validatePeer();
-        goTo('finish');
-      }
-    });
-  }
-  const hasName = (nameEl?.value || "").trim().length > 0;
-  const hasEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((emailEl?.value || "").trim());
-  const hasHotel = !!(sarState.peer && sarState.peer.hotel);
-  if(nextBtn) nextBtn.disabled = !(hasName && hasEmail && hasHotel);
-}
-function updateHeaderTitle(){
-  const slot = document.getElementById('sarPageTitle');
-  if(!slot) return;
-  const activeTitle = document.querySelector('.sar-page.active .sar-title');
-  let text = '';
-  if(activeTitle){ text = activeTitle.textContent.trim(); }
-  const step = sarState.step;
-  if(!text){
-    const map = {welcome:'SELF ASSESSMENT FORM', q1:'STATEMENTS PART 1', q2:'STATEMENTS PART 2', score:'SELF-ASSESSMENT SCORE', peer:'PEER ASSESSMENT', done:'YOU\'RE DONE', finish:'SELF- ASSESSMENT COMPLETED'
-};
-    text = map[step] || '';
-  }
-  slot.textContent = text;
-}
-function downloadSarResults(){
-  const qs = sarState.questions || [];
-  const rows = [];
-  rows.push(['Nickname', sarState.user?.nickname || '']);
-  rows.push(['Email', sarState.user?.email || '']);
-  rows.push(['Hotel', sarState.user?.hotel || '']);
-  rows.push(['Peer Name', sarState.peer?.name || '']);
-  rows.push(['Peer Email', sarState.peer?.email || '']);
-  rows.push(['Peer Hotel', sarState.peer?.hotel || '']);
-  rows.push([]);
-  rows.push(['Question ID','Statement','Your Rating']);
-  let sum = 0, total = qs.length * 5;
-  qs.forEach(q => { const v = sarState.answers[q.id] || 0; sum += v; rows.push([q.id, q.statement, v]); });
-  rows.push([]);
-  rows.push(['Total Score', sum + '/' + total]);
-  const csv = rows.map(r => r.map(x => ('"'+String(x).replace(/"/g,'""')+'"')).join(',')).join('\n');
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  const stamp = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
-  a.download = `BED-SAR-Results-${stamp}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  URL.revokeObjectURL(url);
-  a.remove();
-}
+  $('startNext').addEventListener('click', ()=> show('page-q1'));
+  $('startBack').addEventListener('click', ()=> {});
 
-</script>
-<!-- Custom 24-month confirmation (no browser header) -->
-<style>
-  .exp24__mask{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;z-index:2147483646;}
-  .exp24__modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.25);min-width:260px;max-width:92vw;display:none;z-index:2147483647;font-family:inherit}
-  .exp24__hd{padding:14px 16px;border-bottom:1px solid #eee;font-weight:600}
-  .exp24__bd{padding:16px 16px 8px 16px;font-size:15px;line-height:1.35}
-  .exp24__ft{padding:12px 16px 16px 16px;display:flex;gap:10px;justify-content:flex-end}
-  .exp24__btn{border:none;border-radius:10px;padding:10px 14px;font-size:14px;cursor:pointer}
-  .exp24__btn--ghost{background:#f2f4f7}
-  .exp24__btn--primary{background:#1E90FF;color:#fff}
-</style>
-<div class="exp24__mask" id="exp24Mask"></div>
-<div aria-labelledby="exp24Title" aria-modal="true" class="exp24__modal" id="exp24Modal" role="dialog">
-<div class="exp24__hd" id="exp24Title">Peer eligibility</div>
-<div class="exp24__bd">Does your peer have at least 24 months of BED experience?</div>
-<div class="exp24__ft">
-<button class="exp24__btn exp24__btn--ghost" id="exp24Cancel" type="button">Cancel</button>
-<button class="exp24__btn exp24__btn--primary" id="exp24OK" type="button">OK</button>
-</div>
-</div>
-<script>
-(function(){
-  function qs(id){ return document.getElementById(id); }
-  const mask=qs('exp24Mask'), modal=qs('exp24Modal'), ok=qs('exp24OK'), no=qs('exp24Cancel');
-  function openM(){ if(mask) mask.style.display='block'; if(modal) modal.style.display='block'; }
-  function closeM(){ if(mask) mask.style.display='none'; if(modal) modal.style.display='none'; }
+  function escapeHtml(s){ return String(s).replace(/[&<>"]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
 
-  // Attach only to Peer Done button, without changing existing code.
-  function bind(){
-    const next = document.getElementById('peerNext') || document.getElementById('peerSend');
-    if(!next) return;
-    if(next.dataset.exp24Bound==='1') return;
-    next.dataset.exp24Bound='1';
-
-    let bypass=false;
-    next.addEventListener('click', function(e){
-      if(bypass){ bypass=false; return; }
-      e.preventDefault(); e.stopImmediatePropagation();
-      openM();
-      // On OK -> proceed exactly as the original click would
-      
-ok.onclick = function(){
-  closeM();
-  // Temporarily bypass any native confirm() the original handler shows
-  var __origConfirm = window.confirm;
-  window.__exp24Bypass = true;
-  window.confirm = function(msg){
-    if (window.__exp24Bypass) return true;
-    return __origConfirm.call(window, msg);
-  try {
-    var consent = document.getElementById('peerConsent');
-    var emailEl = document.getElementById('peerEmail');
-    var addr = emailEl && (emailEl.value || '').trim();
-    if (consent && consent.checked && addr) {
-      var subject = encodeURIComponent('BED Peer Review Request');
-      var bodyTxt = encodeURIComponent('test peer review email');
-      var href = 'mailto:' + encodeURIComponent(addr) + '?subject=' + subject + '&body=' + bodyTxt;
-      // Use a temporary anchor to trigger the client without interfering with navigation
-      var a = document.createElement('a');
-      a.href = href;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(function(){ if(a && a.parentNode) a.parentNode.removeChild(a); }, 1000);
-      alert("the email has been sent");
+  function makeQItem(q){ 
+    const div = document.createElement('div');
+    div.className = 'q-item';
+    div.innerHTML = '<div class="q-title"></div>';
+    div.querySelector('.q-title').textContent = q.id + '. ' + (q.title||'');
+    if (q.subtitle){
+      const sub = document.createElement('div');
+      sub.className = 'q-sub';
+      sub.textContent = q.subtitle;
+      div.appendChild(sub);
     }
-  } catch(e) { /* no-op */ }
-  try {
-    var consent = document.getElementById('peerConsent');
-    var emailEl = document.getElementById('peerEmail');
-    var addr = emailEl && (emailEl.value || '').trim();
-    if (consent && consent.checked && addr && window.emailjs && window.EMAILJS_SERVICE_ID && window.EMAILJS_TEMPLATE_ID) {
-      emailjs.send(window.EMAILJS_SERVICE_ID, window.EMAILJS_TEMPLATE_ID, {
-        to_email: addr,
-        subject: 'BED Peer Review Request',
-        message: 'test peer review email'
-      }).then(function() {
-        alert('the email has been sent');
-      }).catch(function(err) {
-        console.error(err);
-        alert('could not send the email');
-      });
+    const ch = document.createElement('div');
+    ch.className = 'choices';
+    div.appendChild(ch);
+    for(let v=1; v<=5; v++){ 
+      const b = document.createElement('div');
+      b.className = 'choice';
+      b.textContent = String(v);
+      b.dataset.qid = q.id;
+      b.dataset.val = v;
+      b.addEventListener('click', onChoice);
+      ch.appendChild(b);
     }
-  } catch(e) { console.error(e); }
-
-};
-  // Trigger the original click so navigation proceeds
-  bypass = true;
-  next && next.click();
-        try{ if(typeof goTo==='function'){ goTo('finish'); } }catch(_){ var target=document.querySelector('.sar-actions [data-nav="finish"]'); if(target) { target.removeAttribute('data-nav'); target.click(); } }
-  // Restore confirm after a short delay
-  setTimeout(function(){
-    window.__exp24Bypass = false;
-    window.confirm = __origConfirm;
-  }, 600);
-};
-
-      // On Cancel -> stay
-      no.onclick = closeM;
-      mask && (mask.onclick = closeM);
-    }, true); // capture so we intercept before app navigation
+    return div;
+  }
+  function onChoice(e){ 
+    const qid = String(e.currentTarget.dataset.qid);
+    const val = Number(e.currentTarget.dataset.val);
+    SAR.state.answers[qid] = val;
+    const parent = e.currentTarget.parentElement;
+    parent.querySelectorAll('.choice').forEach(c=>c.classList.toggle('selected', Number(c.dataset.val)===val));
+    validateQButtons();
+  }
+  function renderRange(containerId, startIdx, endIdxExclusive){ 
+    const list = $(containerId);
+    list.innerHTML = '';
+    const qs = SAR.state.questions.slice(startIdx, endIdxExclusive);
+    qs.forEach(q=> list.appendChild(makeQItem(q)));
+    list.querySelectorAll('.choice').forEach(c=>{ 
+      const qid = String(c.dataset.qid);
+      const val = SAR.state.answers[qid];
+      if (val && Number(c.dataset.val)===Number(val)) c.classList.add('selected');
+    });
+  }
+  function ensureQ1(){ renderRange('q1List', 0, 18); validateQButtons(); }
+  function ensureQ2(){ renderRange('q2List', 18, 35); validateQButtons(); }
+  function validateQButtons(){ 
+    const ok1 = countAnswered(1,18) === 18;
+    $('q1Next').disabled = !ok1;
+    const ok2 = countAnswered(19,35) === (35-19+1);
+    $('q2Next').disabled = !ok2;
+  }
+  function countAnswered(from, to){ 
+    let n=0;
+    for(let id=from; id<=to; id++){ if (SAR.state.answers[String(id)]) n++; }
+    return n;
   }
 
-  // initial + on step changes
-  bind();
-  window.addEventListener('hashchange', bind, {passive:true});
-  document.addEventListener('click', function(){ setTimeout(bind,0); }, {passive:true});
+  $('q1Back').addEventListener('click', ()=> show('page-welcome'));
+  $('q1Next').addEventListener('click', ()=> show('page-q2'));
+  $('q2Back').addEventListener('click', ()=> show('page-q1'));
+  $('q2Next').addEventListener('click', ()=> show('page-finish'));
+  $('finishBack').addEventListener('click', ()=> show('page-q2'));
+  $('finishDone').addEventListener('click', ()=> alert('Done'));
+
+  show('page-welcome');
+  validateWelcome();
 })();
 </script>
-<!-- Peer consent validation -->
-<script>
-(function(){
-  const peerNextButton = document.getElementById('peerNext');
-  const peerNameInput = document.getElementById('peerName');
-  const peerEmailInput = document.getElementById('peerEmail');
-  const peerConsent = document.getElementById('peerConsent');
-
-  function emailOK(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim()); }
-
-  function validatePeerConsent(){
-    const nameOk = !!(peerNameInput && peerNameInput.value.trim());
-    const emailOk = !!(peerEmailInput && emailOK(peerEmailInput.value));
-    const consentOk = !!(peerConsent && peerConsent.checked);
-    if (peerNextButton) peerNextButton.disabled = !(nameOk && emailOk && consentOk);
-  }
-
-  peerNameInput && peerNameInput.addEventListener('input', validatePeerConsent);
-  peerEmailInput && peerEmailInput.addEventListener('input', validatePeerConsent);
-  peerConsent && peerConsent.addEventListener('change', validatePeerConsent);
-
-  // initialize state
-  validatePeerConsent();
-})();
-</script>
-<!-- Peer Consent Checkbox (isolated, positioned under hotels) -->
-<script>
-(function(){
-  function injectPeerConsent(){
-    var next = document.getElementById('peerNext');
-    if(!next) return;
-    if(document.getElementById('peerConsent')) return;
-
-    // Find hotel buttons container
-    var hotelRow = document.querySelector('.sar-row.sar-hotels') || next.closest('.sar-page').querySelector('.sar-hotels');
-    if(!hotelRow) return;
-
-    // Build the checkbox block
-    var wrap = document.createElement('div');
-    wrap.style.margin = '10px 0 16px';
-    wrap.innerHTML = '<label class="sar-check" style="display:flex;gap:8px;align-items:flex-start;line-height:1.3; font-size:14px; font-family:inherit;">'
-                   + '  <input id="peerConsent" type="checkbox" style="margin-top:3px;">'
-                   + '  <span>I agree to share my self-assessment with my peer reviewer</span>'
-                   + '</label>';
-    var label = wrap.firstChild;
-
-    // Insert directly after hotel buttons
-    if(hotelRow && hotelRow.parentNode){
-      hotelRow.parentNode.insertBefore(label, hotelRow.nextSibling);
-    }
-
-    // Hook validation so Done is enabled only when consent given
-    var peerNameInput  = document.getElementById('peerName');
-    var peerEmailInput = document.getElementById('peerEmail');
-    var peerConsent    = document.getElementById('peerConsent');
-
-    function emailOK(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim()); }
-    function validatePeerConsent(){
-      var nameOk    = !!(peerNameInput && (peerNameInput.value||'').trim());
-      var emailOk   = !!(peerEmailInput && emailOK(peerEmailInput.value));
-      var consentOk = !!(peerConsent && peerConsent.checked);
-      if (next) next.disabled = !(nameOk && emailOk && consentOk);
-    }
-
-    peerNameInput && peerNameInput.addEventListener('input', validatePeerConsent);
-    peerEmailInput && peerEmailInput.addEventListener('input', validatePeerConsent);
-    peerConsent && peerConsent.addEventListener('change', validatePeerConsent);
-    validatePeerConsent();
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', injectPeerConsent, {once:true});
-  }else{
-    injectPeerConsent();
-  }
-  window.addEventListener('hashchange', function(){ setTimeout(injectPeerConsent, 0); }, {passive:true});
-})();
-</script>
-<!-- Peer Consent Adjustments: rename Send->Done, require consent, and chain to Next -->
-<script>
-(function(){
-  function run(){
-    var next = document.getElementById('peerNext');
-    var send = document.getElementById('peerSend');
-    if(!next && !send) return;
-
-    // Rename "Send" to "Done" (text only)
-    if(send && send.textContent && send.textContent.trim().toLowerCase() === 'send'){
-      send.textContent = 'Done';
-    }
-
-    // Ensure consent checkbox sits above actions
-    var consent = document.getElementById('peerConsent');
-    var actions = (next && next.closest('.sar-actions')) || (send && send.closest('.sar-actions')) || (next||send).parentElement;
-    if(consent && actions && actions.parentNode){
-      var label = consent.closest('label');
-      if(label && actions.previousElementSibling !== label){
-        actions.parentNode.insertBefore(label, actions);
-      }
-    }
-
-    // Validation: enable action only when name/email/consent valid
-    var nameEl  = document.getElementById('peerName');
-    var emailEl = document.getElementById('peerEmail');
-    function emailOK(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim()); }
-    function validate(){
-      var ok = !!(nameEl && (nameEl.value||'').trim()) &&
-               !!(emailEl && emailOK(emailEl.value)) &&
-               !!(document.getElementById('peerConsent') && document.getElementById('peerConsent').checked);
-      var target = send || next;
-      if(target) target.disabled = !ok;
-    
-    // Sync visual style: blue when enabled (uses existing .sar-btn.primary)
-    if (target) {
-      if (target.disabled) {
-        target.classList.remove('primary');
-      } else {
-        target.classList.add('primary');
-      }
-    }
-    } else {
-        target.classList.add('sar-btn-active');
-      }
-    }
-    }
-    nameEl && nameEl.addEventListener('input', validate);
-    emailEl && emailEl.addEventListener('input', validate);
-    if(consent) consent.addEventListener('change', validate);
-    validate();
-
-    // Clicking the action button should also trigger Next (for 24-month confirm + navigation)
-    var actionBtn = send || next;
-    if(actionBtn && !actionBtn.dataset.chainBound){
-      actionBtn.dataset.chainBound = '1';
-      actionBtn.addEventListener('click', function(){
-        if(actionBtn.disabled) return;
-        if(next && actionBtn !== next){ setTimeout(function(){ next && next.click();
-        try{ if(typeof goTo==='function'){ goTo('finish'); } }catch(_){ var target=document.querySelector('.sar-actions [data-nav="finish"]'); if(target) { target.removeAttribute('data-nav'); target.click(); } } }, 0); }
-      });
-    }
-  }
-  if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', run, {once:true}); }
-  else { run(); }
-  window.addEventListener('hashchange', function(){ setTimeout(run,0); }, {passive:true});
-})();
-</script>
-<!-- Peer page tidy-up: place consent under hotels, rename Send->Done, enable when valid -->
-<script>
-(function(){
-  function emailOK(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim()); }
-
-  function runPeerFix(){
-    var page = document.querySelector('.sar-page[data-step="peer"]') || document.querySelector('[data-step="peer"]');
-    if(!page) return;
-
-    var nameEl  = document.getElementById('peerName');
-    var emailEl = document.getElementById('peerEmail');
-    var consent = document.getElementById('peerConsent');
-    var nextBtn = document.getElementById('peerNext');
-    var sendBtn = document.getElementById('peerSend');
-    var action  = sendBtn || nextBtn;
-    if(!action) return;
-
-    // 1) Move consent just above actions row (i.e., under hotels)
-    if(consent){
-      var label = consent.closest('label');
-      var actions = action.closest('.sar-actions') || action.parentElement;
-      if(label && actions && label.nextSibling !== actions){
-        actions.parentNode.insertBefore(label, actions);
-      }
-    }
-
-    // 2) Rename Send -> Done (visual text only)
-    if(sendBtn && /send/i.test(sendBtn.textContent.trim())){
-      sendBtn.textContent = 'Done';
-    }
-
-    // 3) Validate -> enable/disable + visual state (blue when enabled)
-    function validate(){
-      var ok = !!(nameEl && (nameEl.value||'').trim())
-            && !!(emailEl && emailOK(emailEl.value))
-            && !!(consent && consent.checked);
-      action.disabled = !ok;
-      // Use your existing primary style for blue buttons
-      if(action.classList){
-        if(action.disabled){ action.classList.remove('primary'); }
-        else { action.classList.add('primary'); }
-      }
-    }
-    nameEl  && nameEl.addEventListener('input', validate);
-    emailEl && emailEl.addEventListener('input', validate);
-    consent && consent.addEventListener('change', validate);
-    validate();
-  }
-
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', runPeerFix, {once:true});
-  } else { runPeerFix(); }
-  window.addEventListener('hashchange', function(){ setTimeout(runPeerFix, 0); }, {passive:true});
-})();
-
-// --- Welcome page robust binder (fallback) ---
-(function(){
-  function bindWelcomeFallback(){
-    try{
-      const card = document.querySelector('.sar-page[data-step="welcome"]');
-      if(!card) return;
-      const nick = card.querySelector('#sarNick');
-      const email = card.querySelector('#sarEmail');
-      const startBtn = card.querySelector('#sarStart');
-      if(!window.sarState) window.sarState = { user:{}, answers:{}, questions:[], step:'welcome' };
-      if(!window.sarState.user) window.sarState.user = {};
-
-      // Delegate for hotel buttons
-      card.addEventListener('click', function(e){
-        const btn = e.target.closest('.sar-hotel');
-        if(!btn) return;
-        card.querySelectorAll('.sar-hotel').forEach(b=>b.classList.remove('selected'));
-        btn.classList.add('selected');
-        window.sarState.user.hotel = btn.getAttribute('data-hotel') || "";
-        if(typeof validateWelcome==='function') validateWelcome();
-      }, {capture:false});
-
-      if(nick){
-        nick.addEventListener('input', function(){
-          window.sarState.user.nickname = (nick.value||"").trim();
-          if(typeof validateWelcome==='function') validateWelcome();
-        });
-      }
-      if(email){
-        email.addEventListener('input', function(){
-          window.sarState.user.email = (email.value||"").trim();
-          if(typeof validateWelcome==='function') validateWelcome();
-        });
-      }
-      if(startBtn){
-        startBtn.addEventListener('click', function(e){
-          if(startBtn.disabled){ e.preventDefault(); e.stopPropagation(); }
-        });
-      }
-    }catch(_){/*noop*/}
-  }
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', bindWelcomeFallback, {once:true});
-  } else { bindWelcomeFallback(); }
-  window.addEventListener('pageshow', bindWelcomeFallback, {once:true});
-})();
-
-</script>
-<script>
-(() => {
-  // Draw a simple, robust text PDF (no canvas) using jsPDF
-  async function generatePdfFromState() {
-    // Wait for jsPDF to load
-    const ready = await waitFor(() => window.jspdf && window.jspdf.jsPDF, 2000);
-    const jsPDF = window.jspdf && window.jspdf.jsPDF;
-    if (!jsPDF) throw new Error("jsPDF failed to load.");
-
-    const doc = new jsPDF({ unit: "pt", format: "a4" }); // 595x842pt
-    const margin = { l: 42, r: 42, t: 48, b: 56 };
-    const pageW = doc.internal.pageSize.getWidth();
-    const pageH = doc.internal.pageSize.getHeight();
-    const lineH = 16;
-    let x = margin.l, y = margin.t;
-
-    function addLine(text, opts={bold:false, size:12}) {
-      doc.setFont("helvetica", opts.bold ? "bold" : "normal");
-      doc.setFontSize(opts.size || 12);
-      const maxWidth = pageW - margin.l - margin.r;
-      const lines = doc.splitTextToSize(String(text ?? ""), maxWidth);
-      for (const ln of lines) {
-        if (y + lineH > pageH - margin.b) { doc.addPage(); y = margin.t; }
-        doc.text(ln, x, y);
-        y += lineH;
-      }
-    }
-    function addGap(px=8){ y += px; if (y > pageH - margin.b) { doc.addPage(); y = margin.t; } }
-    function addTableRow(c1, c2, c3) {
-      const maxWidth = pageW - margin.l - margin.r;
-      const col1W = Math.round(maxWidth * 0.70);
-      const col2W = Math.round(maxWidth * 0.15);
-      const col3W = Math.round(maxWidth * 0.15);
-      const rowText = [
-        doc.splitTextToSize(String(c1 ?? ""), col1W),
-        doc.splitTextToSize(String(c2 ?? ""), col2W),
-        doc.splitTextToSize(String(c3 ?? ""), col3W),
-      ];
-      const rowLines = Math.max(rowText[0].length, rowText[1].length, rowText[2].length);
-      const rowHeight = rowLines * lineH;
-
-      if (y + rowHeight > pageH - margin.b) { doc.addPage(); y = margin.t; }
-
-      // Draw text columns
-      let colX = x;
-      for (let i = 0; i < 3; i++) {
-        const colYStart = y;
-        const lines = rowText[i];
-        let yy = colYStart;
-        for (const ln of lines) {
-          doc.text(ln, colX, yy);
-          yy += lineH;
-        }
-        colX += (i === 0 ? col1W : (i === 1 ? col2W : col3W));
-      }
-      y += rowHeight;
-    }
-
-    // Read state
-    const S = window.sarState || {};
-    const user = S.user || {}, peer = S.peer || {};
-    const qs = Array.isArray(S.questions) ? S.questions : [];
-    const A = S.answers || {};
-
-    // Weighted totals
-    let weightedScore = 0, weightedMax = 0;
-    for (const q of qs) {
-      const w = (typeof q.weight === "number" && isFinite(q.weight)) ? q.weight : 1.0;
-      const v = (A[q.id] ?? 0);
-      weightedScore += v * w;
-      weightedMax   += 5 * w;
-    }
-    const pct = weightedMax ? Math.round((weightedScore / weightedMax) * 100) : 0;
-
-    // Header
-    doc.setFont("helvetica", "bold"); doc.setFontSize(16);
-    doc.text("BED Self-Assessment — Completed Report", x, y); y += 22;
-
-    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-    doc.text("Generated: " + new Date().toLocaleString(), x, y); y += 18;
-
-    // Participant
-    addLine("Participant", {bold:true, size:12});
-    addLine(`User: ${user.nickname ?? "-"} (${user.email ?? "-"}) — ${user.hotel ?? "-"}`);
-    addLine(`Peer: ${peer.name ?? "-"} (${peer.email ?? "-"}) — ${peer.hotel ?? "-"}`);
-    addGap(6);
-
-    // Score
-    addLine("Score", {bold:true, size:12});
-    addLine(`${weightedScore.toFixed(1)} / ${weightedMax.toFixed(1)}  (${pct}%)`);
-    addLine("Note: Weighted scoring applied. High-importance statements influence the score more.");
-    addGap(10);
-
-    // Table header
-    doc.setFont("helvetica", "bold"); doc.setFontSize(11);
-    addTableRow("Statement", "Answer", "Weight");
-    doc.setFont("helvetica", "normal"); doc.setFontSize(11);
-
-    // Rows
-    qs.forEach((q, i) => {
-      const st  = q.statement ?? `Statement ${i+1}`;
-      const sub = q.subtext ? (" — " + q.subtext) : "";
-      const ans = (A[q.id] ?? "-");
-      const w   = (typeof q.weight === "number" && isFinite(q.weight)) ? q.weight : 1.0;
-      addTableRow(`${i+1}. ${st}${sub}`, String(ans), String(w));
-    });
-
-    // File name
-    const ts = new Date().toISOString().slice(0,19).replace(/[:T]/g, "-");
-    const nick = (user.nickname || "user").replace(/\s+/g, "_");
-    const fname = `BED_Assessment_${nick}_${ts}.pdf`;
-
-    // Save
-    doc.save(fname);
-  }
-
-  function waitFor(cond, timeoutMs=1500, interval=50){
-    return new Promise((resolve) => {
-      const start = Date.now();
-      (function tick(){
-        if (cond()) return resolve(true);
-        if (Date.now() - start > timeoutMs) return resolve(false);
-        setTimeout(tick, interval);
-      })();
-    });
-  }
-
-  // Fallback (existing print flow)
-  function fallbackPrint() {
-    try {
-      const evt = new Event("click");
-      // If you still have the previous open/print handler, trigger it by clicking a hidden button if needed.
-    } catch (e) {}
-  }
-
-  async function handlePDFDownload(e){
-    e?.preventDefault?.();
-    try {
-      if (!Array.isArray(window.sarState?.questions) || !sarState.questions.length) {
-        alert("Please complete the assessment first.");
-        return;
-      }
-      const ok = await generatePdfFromState();
-      if (!ok) throw new Error("PDF generation failed.");
-    } catch (err) {
-      console.error(err);
-      // Fallback to the existing open-and-print method (if present in the page)
-      try {
-        // If you had a previous handler named handlePDF(), call it:
-        if (typeof window.handlePDF === "function") {
-          window.handlePDF();
-          return;
-        }
-      } catch(_) {}
-      alert("PDF download failed. Please try the Print option.");
-    }
-  }
-
-  function bindDownload(){
-    const btn = document.getElementById("finishPDF");
-    if (btn && !btn._pdfDLBound) {
-      btn.addEventListener("click", handlePDFDownload);
-      btn._pdfDLBound = true;
-    }
-  }
-  (document.readyState === "loading") ? window.addEventListener("DOMContentLoaded", bindDownload, {once:true}) : bindDownload();
-  new MutationObserver(bindDownload).observe(document.documentElement, {childList:true, subtree:true});
-})();
-</script>
-<!-- PDF Success Modal -->
-<div class="modal-mask" id="pdfDoneMask"></div>
-<div aria-labelledby="pdfDoneTitle" aria-modal="true" class="modal" id="pdfDoneModal" role="dialog">
-<div class="modal-header">
-<h3 id="pdfDoneTitle">Done! Your test results are ready.</h3>
-</div>
-<div class="modal-body">
-<p>Test results downloaded.</p>
-</div>
-<div class="modal-footer">
-<button class="btn btn-primary" id="pdfDoneOK" type="button">OK</button>
-</div>
-</div>
-<!-- Embedded questions for sync PDF -->
-<script id="embeddedQuestions" type="application/json">[
-  {
-    "id": "q1",
-    "statement": "1. I reply to guests very quickly",
-    "subtext": "I often check for messages and answer right away"
-  },
-  {
-    "id": "q2",
-    "statement": "2. I make my replies warm and personal",
-    "subtext": "I use their name and add helpful information"
-  },
-  {
-    "id": "q3",
-    "statement": "3. I make a great first impression",
-    "subtext": "I know that starts from the very first message"
-  },
-  {
-    "id": "q4",
-    "statement": "4. I can see if a guest is stressed or relaxed",
-    "subtext": "I adjust the way I check-in to the mood"
-  },
-  {
-    "id": "q5",
-    "statement": "5. I ask questions before I ask passports",
-    "subtext": "I welcome guests like friends"
-  },
-  {
-    "id": "q6",
-    "statement": "6. I can check-in a guest in 60 seconds",
-    "subtext": "I timed this three times with standard check-ins"
-  },
-  {
-    "id": "q7",
-    "statement": "7. I check in groups differently than FIT",
-    "subtext": "I usually check-in groups with the leader"
-  },
-  {
-    "id": "q8",
-    "statement": "8. I don't tell guests that check-in time is 14:00",
-    "subtext": "They can check-in as soon as the room is ready"
-  },
-  {
-    "id": "q9",
-    "statement": "9. I don't show stress when there is a problem",
-    "subtext": "I know that makes guests really worry"
-  },
-  {
-    "id": "q10",
-    "statement": "10. I show genuine interest during check-out",
-    "subtext": "I ask about their stay or next destination"
-  },
-  {
-    "id": "q11",
-    "statement": "11. I make great last impressions",
-    "subtext": "I walk them out and wait until their car has left"
-  },
-  {
-    "id": "q12",
-    "statement": "12. I use names to connect with guests",
-    "subtext": "When it feels right I tell my name and use theirs"
-  },
-  {
-    "id": "q13",
-    "statement": "13. I scan every guest every time",
-    "subtext": "I don't look at a group but at each individual"
-  },
-  {
-    "id": "q14",
-    "statement": "14. I am good at scanning",
-    "subtext": "I see what people need before they ask"
-  },
-  {
-    "id": "q15",
-    "statement": "15. I create unique surprises for guests",
-    "subtext": "I do more than offering free things"
-  },
-  {
-    "id": "q16",
-    "statement": "16. Music is an essential part of the vibe",
-    "subtext": "I listen to make sure we play the right music"
-  },
-  {
-    "id": "q17",
-    "statement": "17. I invite guests to share other BED facilities",
-    "subtext": "I offer downtown coffee, bigger pool or breakfast"
-  },
-  {
-    "id": "q18",
-    "statement": "18. its annoying when a room key doesn't work",
-    "subtext": "I go up to make sure the new key works"
-  },
-  {
-    "id": "q19",
-    "statement": "19. I talk with guests because I am interested",
-    "subtext": "When I force myself it will not be real"
-  },
-  {
-    "id": "q20",
-    "statement": "20. I often give my friends honest feedback",
-    "subtext": "I’m happy to help them to grow"
-  },
-  {
-    "id": "q21",
-    "statement": "21. My friends often give me honest feedback",
-    "subtext": "I’m happy they help me to grow"
-  },
-  {
-    "id": "q22",
-    "statement": "22. I can answer most questions about BED",
-    "subtext": "I have visited the rooms in all our hotels"
-  },
-  {
-    "id": "q23",
-    "statement": "23. I understand the meaning of \"showtime\"",
-    "subtext": "The magic happens from 07:00-10:00"
-  },
-  {
-    "id": "q24",
-    "statement": "24. I know the story of \"peeling the onion\"",
-    "subtext": "I don't act. Usually I show my true self"
-  },
-  {
-    "id": "q25",
-    "statement": "25. I never gossip. I signed “I Promise”",
-    "subtext": "I don't talk bad when someone's not here"
-  },
-  {
-    "id": "q26",
-    "statement": "26. I really understand that rules can be flexible",
-    "subtext": "Without reasons many rules just disappear"
-  },
-  {
-    "id": "q27",
-    "statement": "27. I am confident about my own judgment",
-    "subtext": "I make decisions without asking permission"
-  },
-  {
-    "id": "q28",
-    "statement": "28. I look after the rooms and public areas",
-    "subtext": "I share responsibility for the whole hotel"
-  },
-  {
-    "id": "q29",
-    "statement": "29. I look around when I arrive at the hotel",
-    "subtext": "I share responsibility for the whole hotel"
-  },
-  {
-    "id": "q30",
-    "statement": "30. I don't pass problems to others but act myself",
-    "subtext": "I follow up later to make sure it's fixed"
-  },
-  {
-    "id": "q31",
-    "statement": "31. I am not afraid of the CEO or my coach",
-    "subtext": "I know I am allowed to make mistakes"
-  },
-  {
-    "id": "q32",
-    "statement": "32. I have no manuals that show me what to do",
-    "subtext": "That means I cannot do anything wrong"
-  }
-]</script>
-<!-- Clean synchronous PDF flow -->
-<script>
-(function(){
-  // Modal helpers
-  function openPdfDone(){
-    try{
-      var k = document.getElementById('pdfDoneMask');
-      var m = document.getElementById('pdfDoneModal');
-      if (k) k.style.display = 'block';
-      if (m) {
-        m.style.display = 'block';
-        var ok = document.getElementById('pdfDoneOK');
-        if (ok) ok.onclick = closePdfDone;
-      }
-    }catch(_){}
-  }
-  function closePdfDone(){
-    var k = document.getElementById('pdfDoneMask');
-    var m = document.getElementById('pdfDoneModal');
-    if (k) k.style.display = 'none';
-    if (m) m.style.display = 'none';
-  }
-  window.openPdfDone = openPdfDone; window.closePdfDone = closePdfDone;
-
-  // Helper: get jsPDF
-  function getJsPDF(){
-    try { return (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : null; } catch(_) { return null; }
-  }
-  // Helper: embedded questions
-  function getQuestionsSync(){
-    try {
-      if (window.sarState && Array.isArray(window.sarState.questions) && window.sarState.questions.length) return window.sarState.questions;
-      var node = document.getElementById('embeddedQuestions');
-      if (node && node.textContent) {
-        var arr = JSON.parse(node.textContent);
-        if (Array.isArray(arr) && arr.length) {
-          window.sarState = window.sarState || {};
-          window.sarState.questions = arr;
-          return arr;
-        }
-      }
-    } catch(_){}
-    return [];
-  }
-  // Harvest answers
-  function harvestAnswers(S){
-    try {
-      var picked = document.querySelectorAll('.q-item input[type="radio"]:checked');
-      picked.forEach(function(inp){
-        var wrap = inp.closest('.q-item'); if (!wrap) return;
-        var qid = wrap.getAttribute('data-qid'); var v = parseInt(inp.value,10);
-        if (!S.answers) S.answers = {};
-        if (qid && v>=1 && v<=5) S.answers[qid] = v;
-      });
-    } catch(_){}
-    if (!S.answers || Object.keys(S.answers).length===0){
-      try {
-        var saved = localStorage.getItem('sarState');
-        if (saved){
-          var tmp = JSON.parse(saved);
-          if (tmp && tmp.answers) S.answers = tmp.answers;
-          if (tmp && tmp.user && !S.user) S.user = tmp.user;
-          if (tmp && tmp.peer && !S.peer) S.peer = tmp.peer;
-        }
-      } catch(_){}
-    }
-    S.answers = S.answers || {};
-  }
-  function fmtStamp(d){
-    function p(n){ return String(n).padStart(2,'0'); }
-    return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'_'+p(d.getHours())+'-'+p(d.getMinutes())+'-'+p(d.getSeconds());
-  }
-  function savePdfNow(){
-    var JS = (function(){ try { return (window.jspdf && window.jspdf.jsPDF) ? window.jspdf.jsPDF : null; } catch(_) { return null; } })();
-    if (!JS) { try { alert('PDF library is not loaded.'); } catch(_){ } return false; }
-    var S = (window.sarState = window.sarState || {});
-
-    // Helpers to pick best value from possible keys (for peer/user fields)
-    function pick(obj, keys){
-      if (!obj) return '';
-      for (var i=0;i<keys.length;i++){
-        var v = obj[keys[i]];
-        if (v !== undefined && v !== null && String(v).trim() !== '') return String(v);
-      }
-      return '';
-    }
-
-    // Answers: DOM -> localStorage fallback
-    (function harvestAnswers(){
-      try {
-        var picked = document.querySelectorAll('.q-item input[type="radio"]:checked');
-        picked.forEach(function(inp){
-          var wrap = inp.closest('.q-item'); if (!wrap) return;
-          var qid = wrap.getAttribute('data-qid'); var v = parseInt(inp.value,10);
-          if (!S.answers) S.answers = {};
-          if (qid && v>=1 && v<=5) S.answers[qid] = v;
-        });
-      } catch(_){}
-      if (!S.answers || Object.keys(S.answers).length===0){
-        try {
-          var saved = localStorage.getItem('sarState');
-          if (saved){
-            var tmp = JSON.parse(saved);
-            if (tmp && tmp.answers) S.answers = tmp.answers;
-            if (tmp && tmp.user && !S.user) S.user = tmp.user;
-            if (tmp && tmp.peer && !S.peer) S.peer = tmp.peer;
-          }
-        } catch(_){}
-      }
-      S.answers = S.answers || {};
-    })();
-
-    // Questions: embedded JSON or cached
-    var qs = (function(){
-      if (S.questions && Array.isArray(S.questions) && S.questions.length) return S.questions;
-      var node = document.getElementById('embeddedQuestions');
-      if (node && node.textContent){
-        try { var arr = JSON.parse(node.textContent); if (Array.isArray(arr)) { S.questions = arr; return arr; } } catch(_){}
-      }
-      return [];
-    })();
-    var A = S.answers || {};
-
-    // Weighted score
-    var totalW=0, earned=0;
-    for (var i=0;i<qs.length;i++){
-      var wNum = (typeof qs[i].weight==='number' && isFinite(qs[i].weight)) ? qs[i].weight : 1;
-      var v = parseInt(A[qs[i].id],10);
-      totalW += wNum;
-      if (v>=1 && v<=5) earned += v*wNum;
-    }
-    var pct = totalW>0 ? Math.round((earned/(totalW*5))*100) : 0;
-
-    // Doc & layout constants
-    var doc = new JS({unit:'pt', format:'a4'});
-    var x=42, y=56, line=16;
-    var maxWidth = 370, colResp = x + maxWidth + 14, colW = x + maxWidth + 70;
-
-    function add(txt,b){ doc.setFont('helvetica', b?'bold':'normal'); doc.setFontSize(11); doc.text(String(txt), x, y); y += line; }
-    function addAt(txt, xx, bold){ doc.setFont('helvetica', bold?'bold':'normal'); doc.setFontSize(11); doc.text(String(txt), xx, y); }
-    function gap(px){ y += (px||8); }
-
-    // Title
-    doc.setFont('helvetica','bold'); doc.setFontSize(16);
-    doc.text('BED SELF-ASSESSMENT RESULT', x, y); y += 24;
-
-    // (1) Self-assessment date: Day, dd mmm yyyy
-    var d = new Date();
-    var days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-    var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    var dateLine = 'Self-assessment date: ' + days[d.getDay()] + ', ' + String(d.getDate()).padStart(2,'0') + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
-    doc.setFont('helvetica','normal'); doc.setFontSize(10);
-    doc.text(dateLine, x, y); 
-    // (2) blank line after date
-    y += 18; gap(8);
-
-    // Team Member
-    add('TEAM MEMBER', true);
-    add('Name: ' + (pick(S.user, ['nickname','name','fullName']) || '-'));
-    add('BED Hotel: ' + (pick(S.user, ['hotel','bedHotel','team']) || '-'));
-    add('Email address: ' + (pick(S.user, ['email','mail']) || '-'));
-    gap(8);
-
-    // (3) Peer Reviewer
-    add('PEER REVIEWER', true);
-    add('Name: ' + (pick(S.peer, ['name','nickname','fullName']) || '-'));
-    add('BED Hotel: ' + (pick(S.peer, ['hotel','bedHotel','team']) || '-'));
-    add('Email address: ' + (pick(S.peer, ['email','mail']) || '-'));
-    gap(10);
-
-    // Assessment Score
-    add('ASSESSMENT SCORE', true);
-    // (4) blank line after header
-    gap(10);
-    add('YOUR SCORE IS ' + pct + '%', true);
-    // (5) points: '(points) out of (total points)', no decimals
-    var points = Math.round(earned);
-    var totalPts = Math.round(totalW*5);
-    add(points + ' out of ' + totalPts);
-    gap(10);
-
-    // Headers row
-    add('Statement', true);
-    // (8 + 9) Response/Weight headers aligned with values
-    var oldY = y;
-    addAt('Response', colResp, true);
-    addAt('Weight', colW, true);
-    y = oldY; gap(8);
-
-    // Items
-    for (var j=0;j<qs.length;j++){
-      var st = (qs[j].statement || ('Statement ' + (j+1)));
-      var sub = qs[j].subtext ? String(qs[j].subtext) : '';
-      var vStr = (A[qs[j].id] != null ? String(A[qs[j].id]) : '-');
-      var wNum = (typeof qs[j].weight==='number' && isFinite(qs[j].weight)) ? qs[j].weight : 1;
-      var wStr = wNum.toFixed(1); // (10) one decimal
-
-      // (6) remove extra numbering: do NOT prefix with j+1
-      // (7) subtext on next line, aligned with statement
-
-      // wrap statement
-      doc.setFont('helvetica','normal'); doc.setFontSize(11);
-      var lines = doc.splitTextToSize(st, maxWidth);
-      for (var k=0;k<lines.length;k++){
-        doc.text(lines[k], x, y);
-        if (k===0){ 
-          doc.text(vStr, colResp, y); 
-          doc.text(wStr, colW, y); 
-        }
-        y += line;
-        if (y > 780){ doc.addPage(); y = 56; }
-      }
-      if (sub){
-        var subLines = doc.splitTextToSize(sub, maxWidth);
-        for (var sIdx=0; sIdx<subLines.length; sIdx++){
-          doc.text(subLines[sIdx], x, y);
-          y += line;
-          if (y > 780){ doc.addPage(); y = 56; }
-        }
-      }
-    }
-
-    // Filename
-    var namePart = String(pick(S.user, ['nickname','name','fullName']) || 'User').replace(/\s+/g,'_');
-    var ts = (function(d){function p(n){return String(n).padStart(2,'0');} return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+'_'+p(d.getHours())+'-'+p(d.getMinutes())+'-'+p(d.getSeconds());})(new Date());
-    var fname = 'BED_Assessment_' + namePart + '_' + ts + '.pdf';
-    try {
-      doc.save(fname);
-      setTimeout(function(){ try { openPdfDone(); } catch(_){ } }, 120);
-    } catch(e){
-      try { alert('PDF save failed: ' + e); } catch(_){ }
-      return false;
-    }
-    return true;
-  }
-  // One-download-per-click guard// One-download-per-click guard + wiring
-  (function(){
-    var firing = false;
-    document.addEventListener('click', function(e){
-      var t = e.target;
-      var btn = (t && (t.id==='finishPDF' ? t : (t.closest && t.closest('#finishPDF')))) || null;
-      if (!btn) return;
-      if (firing){ e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); return; }
-      firing = true;
-      var ok = savePdfNow();
-      if (ok){ try { e.preventDefault(); e.stopImmediatePropagation(); e.stopPropagation(); } catch(_){ } }
-      setTimeout(function(){ firing = false; }, 500);
-    }, true);
-  })();
-  window.savePdfNow = savePdfNow;
-})();
-</script>
-<script>
-// DEFENSIVE_NEXT_HANDLER v3 (strict page-1 validation: ALL fields required)
-(function(){
-  function q(sel, root){ return (root||document).querySelector(sel); }
-  function on(el, ev, fn){ if(el) el.addEventListener(ev, fn); }
-  function validEmailLite(v){
-    v = (v||"").trim();
-    return v.includes("@") && v.includes(".") && v.indexOf("@")>0 && v.lastIndexOf(".")>v.indexOf("@")+1;
-  }
-  function enableWhenValid(){
-    var page = q('.sar-page[data-step="welcome"]') || document;
-    var btn = q('#sarStart', page);
-
-    // Personal info
-    var name  = q('#sarNick', page);
-    var email = q('#sarEmail', page);
-    var hotel = q('#sarHotel', page);
-
-    // Peer info
-    var peerName  = q('#peerName', page);
-    var peerEmail = q('#peerEmail', page);
-    var peerHotel = q('#peerHotel', page);
-
-    var ok = true;
-    if (name)      ok = ok && name.value.trim().length>0;
-    if (email)     ok = ok && validEmailLite(email.value);
-    if (hotel)     ok = ok && (hotel.value||"").trim()!=="";
-    if (peerName)  ok = ok && peerName.value.trim().length>0;
-    if (peerEmail) ok = ok && validEmailLite(peerEmail.value);
-    if (peerHotel) ok = ok && (peerHotel.value||"").trim()!=="";
-
-    if (btn) btn.disabled = !ok;
-  }
-  function goIntro(e){
-    var page = q('.sar-page[data-step="welcome"]') || document;
-    var btn = q('#sarStart', page);
-    if (btn && btn.disabled){ if(e) e.preventDefault(); return; }
-
-    if (window.BED && window.BED.App && typeof window.BED.App.go === "function"){
-      if (e) e.preventDefault();
-      try{ window.BED.App.go("intro"); return; }catch(err){ console.warn("Router go failed", err); }
-    }
-    try{
-      if (e) e.preventDefault();
-      var all = document.querySelectorAll(".sar-page");
-      all.forEach(function(p){ p.classList.remove("active"); });
-      var intro = q('.sar-page[data-step="intro"]');
-      if (intro){ intro.classList.add("active"); }
-      if (window.BED && window.BED.App){
-        try{ window.BED.App.state.step = "intro"; }catch(_){}
-        try{ if (typeof window.BED.App.renderDots === "function") window.BED.App.renderDots(); }catch(_){}
-        try{ if (typeof window.BED.App.updateHeaderTitle === "function") window.BED.App.updateHeaderTitle(); }catch(_){}
-      }
-    }catch(err){
-      console.error("Fallback navigation failed", err);
-    }
-  }
-
-  function attach(){
-    var page = q('.sar-page[data-step="welcome"]') || document;
-    var btn = q('#sarStart', page);
-    if (!btn) return;
-    // Initial state
-    enableWhenValid();
-    // Watch inputs
-    ["input","change","blur"].forEach(function(ev){
-      on(q('#sarNick',page), ev, enableWhenValid);
-      on(q('#sarEmail',page), ev, enableWhenValid);
-      on(q('#sarHotel',page), ev, enableWhenValid);
-      on(q('#peerName',page), ev, enableWhenValid);
-      on(q('#peerEmail',page), ev, enableWhenValid);
-      on(q('#peerHotel',page), ev, enableWhenValid);
-    });
-    // Click
-    on(btn, "click", goIntro);
-  }
-
-  if (document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", attach);
-  } else {
-    attach();
-  }
-})();</script><script>
-(function(){
-  var page = document.querySelector('.sar-page[data-step="intro"]');
-  if (!page) return;
-  var btn = page.querySelector('#introStart');
-  if (!btn) return;
-  btn.addEventListener('click', function(e){
-    if (window.BED && window.BED.App && typeof window.BED.App.go === 'function'){
-      e.preventDefault();
-      window.BED.App.go('q1');
-    } else {
-      // Fallback: switch pages manually without altering anything else
-      e.preventDefault();
-      var all = document.querySelectorAll('.sar-page');
-      all.forEach(function(p){ p.classList.remove('active'); });
-      var q1 = document.querySelector('.sar-page[data-step="q1"]');
-      if (q1) q1.classList.add('active');
-    }
-  });
-})();</script><script>
-(function(){
-  function q(sel, root){ return (root||document).querySelector(sel); }
-  function all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
-  var STEPS = ["welcome","intro","q1","q2","score","peer","done","finish"];
-
-  function setProgress(step){
-    var bar = document.getElementById('dotbar');
-    if (!bar) return;
-    var dots = all('.sar-dot', bar);
-    var idx = Math.max(0, STEPS.indexOf(step));
-    // reset
-    dots.forEach(function(d){ d.classList.remove('done','current'); });
-    // mark
-    dots.forEach(function(d, i){
-      if (i <= idx) d.classList.add('done');
-    });
-    if (dots[idx]) dots[idx].classList.add('current');
-  }
-
-  // Initial pass based on whatever page is active
-  var active = q('.sar-page.active');
-  var step = active ? active.getAttribute('data-step') : 'welcome';
-  setProgress(step);
-
-  // Hook Page 1 Next
-  var nextBtn = q('.sar-page[data-step="welcome"] #sarStart');
-  if (nextBtn){
-    nextBtn.addEventListener('click', function(){
-      // After navigation, ensure intro is active then update
-      setTimeout(function(){
-        setProgress('intro');
-      }, 30);
-    });
-  }
-
-  // Hook Page 2 Start
-  var startBtn = q('.sar-page[data-step="intro"] #introStart');
-  if (startBtn){
-    startBtn.addEventListener('click', function(){
-      setTimeout(function(){
-        setProgress('q1');
-      }, 30);
-    });
-  }
-})();</script><script>
-// CONSOLIDATED_QUESTIONS_AND_NAV v4 (fix Q2 numbering + label click reliability)
-(function(){
-  function q(sel, root){ return (root||document).querySelector(sel); }
-  function all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
-  var STEPS = ["welcome","intro","q1","q2","score","peer","done","finish"];
-
-  function setProgress(step){
-    var bar = q('#dotbar'); if (!bar) return;
-    var dots = all('.sar-dot', bar);
-    var idx = Math.max(0, STEPS.indexOf(step));
-    dots.forEach(function(d){ d.classList.remove('done','current'); });
-    dots.forEach(function(d,i){ if (i <= idx) d.classList.add('done'); });
-    if (dots[idx]) dots[idx].classList.add('current');
-  }
-  function go(step){
-    all('.sar-page').forEach(function(p){ p.classList.remove('active'); });
-    var pg = q('.sar-page[data-step="'+step+'"]');
-    if (pg){ pg.classList.add('active'); setProgress(step); }
-  }
-
-  // ------- Render questions safely -------
-  function makeId(it, idx, base){
-    var id = (it && it.id ? String(it.id) : "").trim();
-    if (!id){
-      var s = (it && it.statement ? String(it.statement) : "");
-      var m = s.match(/^\s*(\d+)/);
-      if (m) id = "q"+m[1];
-      else id = "q"+(base + idx + 1);
-    }
-    return id.replace(/[^\w\-]/g, "_");
-  }
-  function displayNumbered(statement, idx, base){
-    // Always prefix computed number to ensure correct 19..35 on page 2
-    var num = base + idx + 1;
-    // Strip any existing leading number like "19. "
-    var text = String(statement||"").replace(/^\s*\d+\.\s*/,'').trim();
-    return num + ". " + text;
-  }
-  function renderList(target, items, base){
-    var host = q('#'+target);
-    if (!host) return;
-    var html = items.map(function(it, idx){
-      var id = makeId(it, idx, base);
-      var stmt = displayNumbered(it.statement, idx, base);
-      var sub  = it.subtext || '';
-      var radios = [1,2,3,4,5].map(function(v){
-        var rid = id+"_"+v;
-        return '<input type="radio" name="rate_'+id+'" id="'+rid+'" value="'+v+'" />\
-                <label for="'+rid+'" tabindex="0">'+v+'</label>';
-      }).join('');
-      return '<div class="q-item" data-qid="'+id+'">\
-        <div class="q-title">'+stmt+'</div>'+(sub?'<div class="q-help">'+sub+'</div>':'')+'\
-        <div class="q-scale">'+radios+'</div>\
-      </div>';
-    }).join('');
-    host.innerHTML = html;
-  }
-
-  // ------- Q1 activation logic -------
-  function q1UpdateNext(){
-    var rows = all('#q1List .q-item');
-    var answered = rows.filter(function(row){
-      var qid = row.getAttribute('data-qid');
-      var checked = q('input[name="rate_'+qid+'"]:checked', row);
-      return !!checked;
-    }).length;
-    var btn = q('.sar-page[data-step="q1"] #q1Next');
-    if (btn){
-      var total = rows.length;
-      btn.disabled = !(total >= 18 && answered >= 18); // require all 18 on first page
-    }
-  }
-
-  // ------- Q2 label click reliability -------
-  function attachQ2LabelFix(){
-    var mount = q('#q2List');
-    if (!mount) return;
-    mount.addEventListener('click', function(e){
-      var lab = e.target.closest('label');
-      if (!lab) return;
-      var fid = lab.getAttribute('for');
-      if (!fid) return;
-      var inp = document.getElementById(fid);
-      if (inp && inp.type === 'radio'){
-        inp.checked = true;
-        // trigger change to allow any listeners to update
-        var ev = new Event('change', {bubbles:true});
-        inp.dispatchEvent(ev);
-      }
-    });
-    // Also support keyboard activation on label
-    mount.addEventListener('keydown', function(e){
-      if (e.target && e.target.matches('#q2List label') && (e.key === 'Enter' || e.key === ' ')){
-        e.preventDefault();
-        var fid = e.target.getAttribute('for');
-        var inp = document.getElementById(fid);
-        if (inp && inp.type === 'radio'){
-          inp.checked = true;
-          var ev = new Event('change', {bubbles:true});
-          inp.dispatchEvent(ev);
-        }
-      }
-    });
-  }
-
-  // ------- Load questions and init listeners -------
-  fetch("./questions.json?v="+Date.now(), {cache:"no-store"})
-    .then(function(r){ return r.json(); })
-    .then(function(qs){
-      if (!Array.isArray(qs)) return;
-      var q1 = qs.slice(0, 18);
-      var q2 = qs.slice(18);
-      renderList("q1List", q1, 0);
-      renderList("q2List", q2, 18);
-
-      // Q1 enablement
-      var mountQ1 = q('#q1List');
-      if (mountQ1){
-        mountQ1.addEventListener('change', function(e){
-          if (e.target && e.target.matches('input[type="radio"]')) q1UpdateNext();
-        });
-        var btn = q('.sar-page[data-step="q1"] #q1Next');
-        if (btn) btn.disabled = true;
-      }
-
-      // Q2 label fix
-      attachQ2LabelFix();
-    })
-    .catch(function(e){ console.error("questions load failed", e); });
-
-  // ------- Nav buttons -------
-  var introNext = q('.sar-page[data-step="intro"] #introStart');
-  if (introNext){
-    introNext.addEventListener('click', function(){ setTimeout(function(){ go('q1'); }, 0); });
-  }
-  var q1Back = q('.sar-page[data-step="q1"] #q1Back');
-  var q1Next = q('.sar-page[data-step="q1"] #q1Next');
-  if (q1Back){ q1Back.addEventListener('click', function(){ go('intro'); }); }
-  if (q1Next){ q1Next.addEventListener('click', function(){ go('q2'); setProgress('q2'); }); }
-
-  var q2Back = q('.sar-page[data-step="q2"] #q2Back');
-  var q2Next = q('.sar-page[data-step="q2"] #q2Next');
-  if (q2Back){ q2Back.addEventListener('click', function(){ go('q1'); }); }
-  if (q2Next){ q2Next.addEventListener('click', function(){ go('score'); }); }
-
-  // Keep dots in sync
-  setInterval(function(){
-    var active = q('.sar-page.active');
-    var step = active ? active.getAttribute('data-step') : null;
-    if (step) setProgress(step);
-  }, 300);
-})();</script></body>
+</body>
 </html>
