@@ -2149,3 +2149,77 @@ ok.onclick = function(){
 })();
 </script>
 <!-- END PERSISTENCE/HYDRATION PATCH -->
+
+
+<!-- INSTRUCTIONS BACK BUTTON PATCH -->
+<script>
+(function(){
+  function injectBackButton(){
+    // Find the 'Scoring Instructions' page heuristically
+    var pages = document.querySelectorAll('.sar-page');
+    var target = null;
+    pages.forEach(function(pg){
+      if (pg.getAttribute('data-step') === 'instructions') target = pg;
+    });
+    if (!target){
+      // Fallback: pick a page that contains key phrases
+      pages.forEach(function(pg){
+        var t = (pg.textContent||'').toLowerCase();
+        if (!target && t.includes('scoring') && t.includes('instructions')) target = pg;
+      });
+    }
+    if (!target || target.dataset.backInjected === '1') return;
+
+    // Create container row if needed
+    var header = target.querySelector('.section-title, h2, h3') || target.firstElementChild || target;
+    var btn = document.createElement('button');
+    btn.id = 'backFromInstructions';
+    btn.type = 'button';
+    btn.className = 'btn btn-light';
+    btn.textContent = 'Back';
+    btn.style.margin = '8px 0 12px 0';
+
+    // Insert button before header
+    target.insertBefore(btn, header);
+
+    // Click handler: navigate back to Welcome without resetting state
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      // Prefer SPA navigation if present
+      if (typeof window.navigateTo === 'function') {
+        window.navigateTo('welcome');
+      } else {
+        // Hash-based fallback
+        location.hash = '#welcome';
+      }
+      // Re-apply hydration shortly after navigation
+      setTimeout(function(){
+        document.dispatchEvent(new Event('hydrationRequest'));
+      }, 50);
+    });
+
+    target.dataset.backInjected = '1';
+  }
+
+  // Initial attempt
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', injectBackButton, {once:true});
+  } else {
+    injectBackButton();
+  }
+  // Try again on SPA route changes
+  window.addEventListener('hashchange', function(){ setTimeout(injectBackButton, 0); }, {passive:true});
+  document.addEventListener('click', function(){ setTimeout(injectBackButton, 0); }, {passive:true});
+})();
+</script>
+<!-- END INSTRUCTIONS BACK BUTTON PATCH -->
+
+
+<script>
+document.addEventListener('hydrationRequest', function(){
+  try {
+    // Re-run our hydration routine if it exists in the page (from the previous patch)
+    if (typeof hydrateAll === 'function') hydrateAll();
+  } catch(e){ /* no-op */ }
+});
+</script>
