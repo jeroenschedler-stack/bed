@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
+<title>BED HOSPITALITY — Self Assessment</title>
 <style>
   * { box-sizing: border-box; }
   body { font-family: system-ui, Arial, sans-serif; background:#F9FAFB; color:#434343; margin:0; }
-  .container { width:100%; margin:0; padding:24px 20px; }
+  .container { width:100%; margin:0; padding:24px 20px; position:relative; }
 
   h1 { font-size:22pt; margin:0 0 8px 0; line-height:1.2; color:#434343; }
   .subheader { font-size:18pt; margin:0 0 12px 0; font-weight:700; color:#434343; }
@@ -33,8 +33,12 @@
   .row > input,
   .row > select {
     width:260px; max-width:100%; padding:8px 10px; font-size:10pt; color:#434343;
-    border:1px solid grey; border-radius:4px;
-    background:#ffffff; /* all fields white */
+    border:1px solid grey; border-radius:4px; background:#ffffff;
+    transition: background-color .15s ease;
+  }
+  .row > input.filled,
+  .row > select.filled {
+    background:#e6f4ff; /* light blue after filled */
   }
   select:invalid { color:#aaa; }
 
@@ -44,6 +48,7 @@
   .pill.selected { background:#1E90FF; color:#fff; }
 
   button { padding:10px 14px; border:1px solid #ccc; border-radius:10px; background:#fff; cursor:pointer; color:#434343; }
+  .button-right { position:absolute; right:20px; bottom:20px; }
 </style>
 <script id="embeddedQuestions" type="application/json">[
   {
@@ -269,7 +274,8 @@
         </select>
       </div>
 
-      <button id="start">Start</button>
+      <!-- Start button removed -->
+      <button id="nextPage1" class="button-right">Next</button>
     </div>
 
     <div id="q1" style="display:none">
@@ -297,6 +303,20 @@
     dots.forEach((d,i) => d.classList.toggle('active', i < count));
   }
 
+  // mark inputs/selects as filled when they have content/selection
+  function bindFilled(el) {
+    const apply = () => {
+      if (el.tagName === 'SELECT') {
+        el.classList.toggle('filled', el.selectedIndex > 0);
+      } else {
+        el.classList.toggle('filled', (el.value || '').trim().length > 0);
+      }
+    };
+    el.addEventListener('input', apply);
+    el.addEventListener('change', apply);
+    apply();
+  }
+
   function makeQ(q,ord){
     const d = document.createElement('div');
     d.className = 'q-item';
@@ -317,22 +337,31 @@
     return d;
   }
 
-  $('start').onclick = () => {
+  // Initial state: page 1 -> first dot red
+  document.addEventListener('DOMContentLoaded', () => {
+    updateDots(1);
+    ['nick','email','peerName','peerEmail','hotel','peerHotel'].forEach(id => bindFilled($(id)));
+  });
+
+  // Page 1 Next button -> go to statements part 1
+  $('nextPage1').onclick = () => {
     const l = $('list-q1'); l.innerHTML = '';
     S.questions.slice(0,18).forEach((q,i) => l.appendChild(makeQ(q, i+1)));
     document.getElementById('welcome').style.display = 'none';
     document.getElementById('q1').style.display = 'block';
-    updateDots(1);
+    updateDots(2);
   };
 
+  // Part 1 Next -> Part 2
   $('toQ2').onclick = () => {
     const l = $('list-q2'); l.innerHTML = '';
     S.questions.slice(18,35).forEach((q,i) => l.appendChild(makeQ(q, 19+i)));
     document.getElementById('q1').style.display = 'none';
     document.getElementById('q2').style.display = 'block';
-    updateDots(2);
+    updateDots(3);
   };
 
+  // Finish -> all dots red
   $('finish').onclick = () => { updateDots(7); alert('Done'); };
 })();
 </script>
