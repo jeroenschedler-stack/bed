@@ -193,14 +193,7 @@ p{color:#434343;line-height:1.6;}
 .modal-footer { text-align: right; }
 
 </style>
-<style>
-/* Page 1 specific typography (pt units as requested) */
-#formHeaderCard { margin-top: 10px; }
-#fhTitle { font-size: 18pt; font-weight: 800; letter-spacing: 0.3px; }
-#fhSubtitle { font-size: 16pt; font-weight: 700; color: #434343; margin-top: 2px; }
-.sar-page[data-step="welcome"] h2 { font-size: 14pt; font-weight: 700; margin: 0 0 10px 0; }
-.sar-page[data-step="welcome"] label.small { font-size: 11pt; color: #666; }
-</style></head>
+</head>
 <body>
 <!-- Header -->
 <header class="sar-header">
@@ -215,7 +208,7 @@ p{color:#434343;line-height:1.6;}
 <main class="sar-wrap">
 <section class="sar-card">
 <!-- Welcome -->
-<div class="sar-page" data-step="welcome"><div class="card" id="formHeaderCard"><div id="fhTitle">BED HOSPITALITY 2.0</div><div id="fhSubtitle">SELF ASSESSMENT FORM</div><div id="dotbar"><div class="sar-dot done current"></div><div class="sar-dot"></div><div class="sar-dot"></div><div class="sar-dot"></div><div class="sar-dot"></div><div class="sar-dot"></div></div></div>
+<div class="sar-page" data-step="welcome">
 <div class="card" style="margin-top:10px;">
 
 </div>
@@ -254,9 +247,9 @@ p{color:#434343;line-height:1.6;}
 </select>
 </div>
 <div style="display:flex;justify-content:flex-end;margin:18px 0 8px;">
-
+<div class="btnrow" style="display:flex;justify-content:flex-end;margin:18px 0 8px;"><button class="primary" id="sarStart">Next</button></div>
 </div>
-<div class="btnrow"><button class="primary" id="sarStart">Next</button></div></div>
+</div>
 <!-- Part 1 — Dynamic questions -->
 <div class="sar-page" data-step="q1">
 <!-- removed page-level thin progress bar (now in header) -->
@@ -1718,7 +1711,6 @@ ok.onclick = function(){
 (function(){
   var page = document.querySelector('.sar-page[data-step="welcome"]') || document;
   var btn = page.querySelector('#sarStart');
-  if (!btn) return;
   var name = page.querySelector('#sarNick');
   var email = page.querySelector('#sarEmail');
   var hotel = page.querySelector('#sarHotel');
@@ -1728,7 +1720,7 @@ ok.onclick = function(){
     if (name) ok = ok && name.value.trim().length>0;
     if (email) ok = ok && validEmail(email.value.trim());
     if (hotel) ok = ok && hotel.value && hotel.value !== '';
-    btn.disabled = !ok;
+    if (btn) btn.disabled = !ok;
   }
   ['input','change'].forEach(function(evt){
     if (name) name.addEventListener(evt, update);
@@ -1736,13 +1728,14 @@ ok.onclick = function(){
     if (hotel) hotel.addEventListener(evt, update);
   });
   update();
-  btn.addEventListener('click', function(e){
-    // prevent if disabled
-    if (btn.disabled) { e.preventDefault(); return; }
-    if (window.BED && window.BED.App && typeof window.BED.App.go === 'function'){
-      e.preventDefault();
-      window.BED.App.go('intro');
-    }
-  });
+  if (btn){
+    btn.addEventListener('click', function(e){
+      if (btn.disabled) { e.preventDefault(); return; }
+      if (window.BED && window.BED.App && typeof window.BED.App.go === 'function'){
+        e.preventDefault();
+        window.BED.App.go('intro');
+      }
+    });
+  }
 })();</script></body>
 </html>
