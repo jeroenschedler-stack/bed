@@ -1860,28 +1860,48 @@ ok.onclick = function(){
   });
 })();</script><script>
 (function(){
-  function updateDotbarForIntro(){
+  function q(sel, root){ return (root||document).querySelector(sel); }
+  function all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  var STEPS = ["welcome","intro","q1","q2","score","peer","done","finish"];
+
+  function setProgress(step){
     var bar = document.getElementById('dotbar');
     if (!bar) return;
-    var dots = bar.querySelectorAll('.sar-dot');
-    if (!dots.length) return;
-    // Reset
+    var dots = all('.sar-dot', bar);
+    var idx = Math.max(0, STEPS.indexOf(step));
+    // reset
     dots.forEach(function(d){ d.classList.remove('done','current'); });
-    // Set first two as done; second is current (page 2)
-    if (dots[0]) dots[0].classList.add('done');
-    if (dots[1]) { dots[1].classList.add('done','current'); }
+    // mark
+    dots.forEach(function(d, i){
+      if (i <= idx) d.classList.add('done');
+    });
+    if (dots[idx]) dots[idx].classList.add('current');
   }
-  // If router exists and we navigate, router should repaint; still do a safety update when intro becomes active
-  function maybeUpdate(){
-    var intro = document.querySelector('.sar-page[data-step="intro"]');
-    if (intro && intro.classList.contains('active')){
-      updateDotbarForIntro();
-    }
+
+  // Initial pass based on whatever page is active
+  var active = q('.sar-page.active');
+  var step = active ? active.getAttribute('data-step') : 'welcome';
+  setProgress(step);
+
+  // Hook Page 1 Next
+  var nextBtn = q('.sar-page[data-step="welcome"] #sarStart');
+  if (nextBtn){
+    nextBtn.addEventListener('click', function(){
+      // After navigation, ensure intro is active then update
+      setTimeout(function(){
+        setProgress('intro');
+      }, 30);
+    });
   }
-  if (document.readyState === "loading"){
-    document.addEventListener("DOMContentLoaded", maybeUpdate);
-  } else {
-    maybeUpdate();
+
+  // Hook Page 2 Start
+  var startBtn = q('.sar-page[data-step="intro"] #introStart');
+  if (startBtn){
+    startBtn.addEventListener('click', function(){
+      setTimeout(function(){
+        setProgress('q1');
+      }, 30);
+    });
   }
 })();</script></body>
 </html>
