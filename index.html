@@ -39,7 +39,7 @@
 
     .sar-logo-wrap{ display:flex; flex-direction:column; align-items:flex-start; gap:6px; }
     .sar-logo{ font-size:28px; font-weight:800; letter-spacing:.35px; color:var(--text); white-space:nowrap; }
-    .sar-dotbar{ display:flex; gap:10px; align-items:center; justify-content:flex-start }
+    .sar-dotbar{ display:flex; gap:6px; align-items:center; justify-content:flex-start }
     /* Dots 20% smaller (16px -> ~13px), no borders, new red for done/current */
     .sar-dot{ width:13px; height:13px; border-radius:50%; background:#E5E7EB; box-shadow:none; border:none; }
     .sar-dot.done{ background:var(--active); }
@@ -109,7 +109,7 @@ p{color:#434343;line-height:1.6;}
     /* Intro & scale (welcome) */
     .sar-intro p,.sar-scale{font-size:14px;line-height:1.45}
     @media (max-width:360px){ .sar-intro p,.sar-scale{font-size:13px} }
-    .sar-scale-row{display:flex;align-items:center;gap:10px;margin:6px 0}
+    .sar-scale-row{display:flex;align-items:center;gap:6px;margin:6px 0}
     .sar-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:50%;background:var(--brand);color:#fff;font-size:13px;font-weight:600}
 
     /* Extra space above start */
@@ -214,8 +214,8 @@ p{color:#434343;line-height:1.6;}
 .field-label   { font-size:11pt !important; line-height:1.45; }
 </style><style>
 /* Rating scale dots on Page 2 */
-.rating-dots { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
-.rating-row { display:flex; align-items:center; gap:10px; }
+.rating-dots { display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+.rating-row { display:flex; align-items:center; gap:6px; }
 .rating-row .dot {
   width:28px; height:28px; border-radius:50%;
   display:inline-flex; align-items:center; justify-content:center;
@@ -243,10 +243,10 @@ p{color:#434343;line-height:1.6;}
 <div class="card" style="margin-top:16px;">
   <style>
     /* Page-1 only: inline labels */
-    .field-inline{display:flex;align-items:center;gap:10px;margin:6px 0 12px;}
-    .field-inline > label{min-width:160px;font-size:11pt;color:#6B7280;white-space:nowrap;}
+    .field-inline{display:flex;align-items:center;gap:6px;margin:6px 0 12px;}
+    .field-inline > label{min-width:110px;font-size:11pt;color:#6B7280;white-space:nowrap;}
     .field-inline > input, .field-inline > select{
-      flex:1;min-width:0;width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;
+      flex:1 1 100%;min-width:0;width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;
     }
   </style>
   <h2 class="section-title">YOUR INFORMATION</h2>
@@ -847,7 +847,7 @@ function downloadSarResults(){
   .exp24__modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.25);min-width:260px;max-width:92vw;display:none;z-index:2147483647;font-family:inherit}
   .exp24__hd{padding:14px 16px;border-bottom:1px solid #eee;font-weight:600}
   .exp24__bd{padding:16px 16px 8px 16px;font-size:15px;line-height:1.35}
-  .exp24__ft{padding:12px 16px 16px 16px;display:flex;gap:10px;justify-content:flex-end}
+  .exp24__ft{padding:12px 16px 16px 16px;display:flex;gap:6px;justify-content:flex-end}
   .exp24__btn{border:none;border-radius:10px;padding:10px 14px;font-size:14px;cursor:pointer}
   .exp24__btn--ghost{background:#f2f4f7}
   .exp24__btn--primary{background:#1E90FF;color:#fff}
@@ -2096,3 +2096,24 @@ ok.onclick = function(){
   }, 300);
 })();</script></body>
 </html>
+
+
+<!-- PAGE-1 NAV ROBUSTNESS -->
+<script>
+(function(){
+  function bindNav(){
+    if (typeof ensureWelcomeBindings === 'function') {
+      try { ensureWelcomeBindings(); } catch(e){}
+    }
+  }
+  window.addEventListener('hashchange', bindNav, {passive:true});
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if (!t) return;
+    if (t.matches && (t.matches('.btn-back') || t.matches('[data-nav="back"]') || t.id === 'sarBack')) {
+      setTimeout(bindNav, 0);
+    }
+  }, {passive:true});
+})();
+</script>
+
