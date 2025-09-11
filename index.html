@@ -209,81 +209,65 @@ p{color:#434343;line-height:1.6;}
 <section class="sar-card">
 <!-- Welcome -->
 <div class="sar-page" data-step="welcome">
-<div style="max-width:75%">
+<div class="card" style="margin-top:10px;">
+<h1 style="margin:0 0 2px 0;">BED HOSPITALITY 20.0</h1>
+<div class="small" id="formSubheader">SELF ASSESSMENT FORM</div>
+<div id="dotbar" style="margin-top:12px; display:flex; gap:10px;">
+<div class="sar-dot done current"></div>
+<div class="sar-dot"></div>
+<div class="sar-dot"></div>
+<div class="sar-dot"></div>
+<div class="sar-dot"></div>
+<div class="sar-dot"></div>
 </div>
-
-  <div class="sar-section">
-    <h3 class="sar-section-title">team memberQ</h3>
-    <p class="sar-note">This part is for the team member to fill out.</p>
-    <div class="sar-row sar-row-fields" style="margin-bottom:12px">
-<label class="sar-field">
-<span class="sar-label">your nickname</span>
-<input autocomplete="nickname" class="sar-input" id="sarNick" inputmode="text" type="text"/>
-</label>
-<label class="sar-field">
-<span class="sar-label">your email</span>
-<input autocomplete="email" class="sar-input" id="sarEmail" inputmode="email" type="email"/>
-</label>
 </div>
-    <div aria-label="Choose your BED Hotel" class="sar-row sar-hotels" role="group" style="margin-bottom:12px">
-<button class="sar-btn sar-hotel" data-hotel="BCK">BCK</button>
-<button class="sar-btn sar-hotel" data-hotel="BPS">BPS</button>
-<button class="sar-btn sar-hotel" data-hotel="BNM">BNM</button>
-<button class="sar-btn sar-hotel" data-hotel="BCG">BCG</button>
-<button class="sar-btn sar-hotel" data-hotel="FLY">FLY</button>
-<button class="sar-btn sar-hotel" data-hotel="BED">BED</button>
+<div class="card" style="margin-top:16px;">
+<h2>PERSONAL INFORMATION</h2>
+<label class="small">please enter your name</label>
+<input id="sarNick" placeholder="nick name" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="text"/>
+<label class="small">your email address</label>
+<input id="sarEmail" placeholder="email address" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="email"/>
+<label class="small">select your location</label>
+<select id="sarHotel" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 4px;">
+<option value="">select hotel</option>
+<option>BED Changkian</option>
+<option>BED Phrasing</option>
+<option>BED Nimman</option>
+<option>BED Chiangmai Gate</option>
+<option>BED Flying</option>
+<option>BED Support</option>
+</select>
 </div>
-  </div>
-  <div class="sar-section" style="margin-top:18px">
-    <h3 class="sar-section-title">peer reviewer</h3>
-    <p class="sar-note">This part is for the team member to fill out.</p>
-    <div class="sar-row sar-row-fields" style="margin-bottom:12px">
-<label class="sar-field">
-<span class="sar-label">your nickname</span>
-<input autocomplete="nickname" class="sar-input" id="sarNick" inputmode="text" type="text"/>
-</label>
-<label class="sar-field">
-<span class="sar-label">your email</span>
-<input autocomplete="email" class="sar-input" id="sarEmail" inputmode="email" type="email"/>
-</label>
+<div class="card" style="margin-top:16px;">
+<h2>PEER INFORMATION</h2>
+<label class="small">name of your peer reviewer</label>
+<input id="peerName" placeholder="nick name" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="text"/>
+<label class="small">email address of your peer reviewer</label>
+<input id="peerEmail" placeholder="email address" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="email"/>
+<label class="small">select peer location</label>
+<select id="peerHotel" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 4px;">
+<option value="">select hotel</option>
+<option>BED Changkian</option>
+<option>BED Phrasing</option>
+<option>BED Nimman</option>
+<option>BED Chiangmai Gate</option>
+<option>BED Flying</option>
+<option>BED Support</option>
+</select>
 </div>
-    <div aria-label="Choose your BED Hotel" class="sar-row sar-hotels peer" role="group" style="margin-bottom:12px">
-<button class="sar-btn sar-hotel-ghost" data-hotel="BCK">BCK</button>
-<button class="sar-btn sar-hotel-ghost" data-hotel="BPS">BPS</button>
-<button class="sar-btn sar-hotel-ghost" data-hotel="BNM">BNM</button>
-<button class="sar-btn sar-hotel-ghost" data-hotel="BCG">BCG</button>
-<button class="sar-btn sar-hotel-ghost" data-hotel="FLY">FLY</button>
-<button class="sar-btn sar-hotel-ghost" data-hotel="BED">BED</button>
+<div style="display:flex;justify-content:flex-end;margin:18px 0 8px;">
+<button class="primary" id="sarStart" style="min-width:120px;">Start</button>
 </div>
-  </div>
-<div class="sar-actions">
-  <button class="sar-btn primary" data-nav="goto" data-step="intro" id="toIntro">next</button>
-</div>
-
-<div class="sar-page" data-step="intro">
-<div class="sar-intro" style="margin-bottom:8px">
-<p>Self-assessment helps your personal growth and development. Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities.</p>
-</div>
-<div class="sar-scale" style="margin-bottom:8px">
-<div class="sar-scale-row"><span class="sar-badge">1</span><span>I'm not good at this</span></div>
-<div class="sar-scale-row"><span class="sar-badge">2</span><span>I can do better in this</span></div>
-<div class="sar-scale-row"><span class="sar-badge">3</span><span>I'm good at this</span></div>
-<div class="sar-scale-row"><span class="sar-badge">4</span><span>I'm great at this</span></div>
-<div class="sar-scale-row"><span class="sar-badge">5</span><span>I'm excellent at this</span></div>
-</div>
-<div class="sar-gap-3"></div>
-<div class="sar-gap-3"></div>
 </div>
 <!-- Part 1 — Dynamic questions -->
-
-<div class="sar-actions">
-  <button class="sar-btn primary" data-nav="goto" data-step="q1" id="sarStart">start</button>
-</div>
-</div>
 <div class="sar-page" data-step="q1">
 <!-- removed page-level thin progress bar (now in header) -->
 <div aria-live="polite" class="q-list" id="q1List"></div>
 <div class="sar-gap-3"></div>
+<div class="sar-actions">
+<button class="sar-btn" data-nav="back">Back</button>
+<button class="sar-btn primary" data-nav="goto" data-step="q2" disabled="" id="q1Next">Next</button>
+</div>
 </div>
 <!-- Part 2 — Dynamic questions -->
 <div class="sar-page" data-step="q2">
@@ -377,12 +361,10 @@ p{color:#434343;line-height:1.6;}
 <button class="sar-btn" id="finishPDF">PDF</button>
 </div>
 </div></div>
-
-
 </section>
 </main>
 <script>
-    const SAR_STEPS = ["welcome","intro","q1","q2","score","peer","done","finish"];
+    const SAR_STEPS = ["welcome","q1","q2","score","peer","done","finish"];
 
     const sarState = {
       step: "welcome",
@@ -445,7 +427,7 @@ p{color:#434343;line-height:1.6;}
       const card = document.querySelector('.sar-page[data-step="welcome"]');
       const nick = card.querySelector('#sarNick');
       const email = card.querySelector('#sarEmail');
-      const startBtn = card.querySelector('#toIntro') || card.querySelector('#sarStart');
+      const startBtn = card.querySelector('#sarStart');
 
       card.addEventListener('click',(e)=>{
         const btn = e.target.closest('.sar-hotel');
@@ -465,7 +447,7 @@ p{color:#434343;line-height:1.6;}
       if(!card) return;
       const nick = card.querySelector('#sarNick');
       const email = card.querySelector('#sarEmail');
-      const startBtn = card.querySelector('#toIntro') || card.querySelector('#sarStart');
+      const startBtn = card.querySelector('#sarStart');
       const hasNick = (nick.value || "").trim().length > 0;
       const hasEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((email.value || "").trim());
       const hasHotel = !!sarState.user.hotel;
@@ -482,7 +464,7 @@ p{color:#434343;line-height:1.6;}
 
     async function renderQ1(){
       const qs = await loadQuestions();
-      const slice = qs.slice(0, 18);
+      const slice = qs.slice(0, 16);
       const mount = document.getElementById('q1List');
       mount.innerHTML = slice.map(q => renderQuestionHTML(q)).join('');
       slice.forEach(q => {
@@ -496,7 +478,7 @@ p{color:#434343;line-height:1.6;}
 
     async function renderQ2(){
       const qs = await loadQuestions();
-      const slice = qs.slice(18, qs.length);
+      const slice = qs.slice(16, 32);
       const mount = document.getElementById('q2List');
       mount.innerHTML = slice.map(q => renderQuestionHTML(q)).join('');
       slice.forEach(q => {
@@ -1097,7 +1079,7 @@ ok.onclick = function(){
       if(!card) return;
       const nick = card.querySelector('#sarNick');
       const email = card.querySelector('#sarEmail');
-      const startBtn = card.querySelector('#toIntro') || card.querySelector('#sarStart');
+      const startBtn = card.querySelector('#sarStart');
       if(!window.sarState) window.sarState = { user:{}, answers:{}, questions:[], step:'welcome' };
       if(!window.sarState.user) window.sarState.user = {};
 
@@ -1137,7 +1119,6 @@ ok.onclick = function(){
 })();
 
 </script>
-
 <script>
 (() => {
   // Draw a simple, robust text PDF (no canvas) using jsPDF
@@ -1307,236 +1288,182 @@ ok.onclick = function(){
   new MutationObserver(bindDownload).observe(document.documentElement, {childList:true, subtree:true});
 })();
 </script>
-
-  <!-- PDF Success Modal -->
-  <div id="pdfDoneMask" class="modal-mask"></div>
-  <div id="pdfDoneModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="pdfDoneTitle">
-    <div class="modal-header">
-      <h3 id="pdfDoneTitle">Done! Your test results are ready.</h3>
-    </div>
-    <div class="modal-body">
-      <p>Test results downloaded.</p>
-    </div>
-    <div class="modal-footer">
-      <button id="pdfDoneOK" class="btn btn-primary" type="button">OK</button>
-    </div>
-  </div>
-
-  <!-- Embedded questions for sync PDF -->
-  <script id="embeddedQuestions" type="application/json">[
+<!-- PDF Success Modal -->
+<div class="modal-mask" id="pdfDoneMask"></div>
+<div aria-labelledby="pdfDoneTitle" aria-modal="true" class="modal" id="pdfDoneModal" role="dialog">
+<div class="modal-header">
+<h3 id="pdfDoneTitle">Done! Your test results are ready.</h3>
+</div>
+<div class="modal-body">
+<p>Test results downloaded.</p>
+</div>
+<div class="modal-footer">
+<button class="btn btn-primary" id="pdfDoneOK" type="button">OK</button>
+</div>
+</div>
+<!-- Embedded questions for sync PDF -->
+<script id="embeddedQuestions" type="application/json">[
   {
     "id": "q1",
-    "statement": "1. I answer very quickly to guest messages",
-    "subtext": "I often check and reply right away",
-    "weight": 1.0
+    "statement": "1. I reply to guests very quickly",
+    "subtext": "I often check for messages and answer right away"
   },
   {
     "id": "q2",
     "statement": "2. I make my replies warm and personal",
-    "subtext": "I use their name and add helpful information",
-    "weight": 1.0
+    "subtext": "I use their name and add helpful information"
   },
   {
     "id": "q3",
     "statement": "3. I make a great first impression",
-    "subtext": "I know it starts with the first message",
-    "weight": 0.5
+    "subtext": "I know that starts from the very first message"
   },
   {
     "id": "q4",
     "statement": "4. I can see if a guest is stressed or relaxed",
-    "subtext": "I adjust the way I check-in to the mood",
-    "weight": 2.0
+    "subtext": "I adjust the way I check-in to the mood"
   },
   {
     "id": "q5",
     "statement": "5. I ask questions before I ask passports",
-    "subtext": "I welcome guests like friends",
-    "weight": 2.0
+    "subtext": "I welcome guests like friends"
   },
   {
     "id": "q6",
     "statement": "6. I can check-in a guest in 60 seconds",
-    "subtext": "I timed three standard check-ins",
-    "weight": 1.0
+    "subtext": "I timed this three times with standard check-ins"
   },
   {
     "id": "q7",
     "statement": "7. I check in groups differently than FIT",
-    "subtext": "I usually check-in groups with the leader",
-    "weight": 0.5
+    "subtext": "I usually check-in groups with the leader"
   },
   {
     "id": "q8",
-    "statement": "8. I don't say that check-in time is 14:00",
-    "subtext": "Guests can check-in when the room is ready",
-    "weight": 1.5
+    "statement": "8. I don't tell guests that check-in time is 14:00",
+    "subtext": "They can check-in as soon as the room is ready"
   },
   {
     "id": "q9",
-    "statement": "9. I dont show stress when there is a problem",
-    "subtext": "I know that makes guests really worry",
-    "weight": 2.0
+    "statement": "9. I don't show stress when there is a problem",
+    "subtext": "I know that makes guests really worry"
   },
   {
     "id": "q10",
     "statement": "10. I show genuine interest during check-out",
-    "subtext": "I ask about their stay or next destination",
-    "weight": 1.0
+    "subtext": "I ask about their stay or next destination"
   },
   {
     "id": "q11",
     "statement": "11. I make great last impressions",
-    "subtext": "I walk them out and wait until their car has left",
-    "weight": 2.0
+    "subtext": "I walk them out and wait until their car has left"
   },
   {
     "id": "q12",
     "statement": "12. I use names to connect with guests",
-    "subtext": "When it feels right I introduce myself",
-    "weight": 0.5
+    "subtext": "When it feels right I tell my name and use theirs"
   },
   {
     "id": "q13",
     "statement": "13. I scan every guest every time",
-    "subtext": "I dont look at a group but at each individual",
-    "weight": 2.0
+    "subtext": "I don't look at a group but at each individual"
   },
   {
     "id": "q14",
     "statement": "14. I am good at scanning",
-    "subtext": "I see what people need before they ask",
-    "weight": 2.0
+    "subtext": "I see what people need before they ask"
   },
   {
     "id": "q15",
     "statement": "15. I create unique surprises for guests",
-    "subtext": "I do more than offering free things",
-    "weight": 2.0
+    "subtext": "I do more than offering free things"
   },
   {
     "id": "q16",
     "statement": "16. Music is an essential part of the vibe",
-    "subtext": "I listen to make sure we play the right music",
-    "weight": 0.5
+    "subtext": "I listen to make sure we play the right music"
   },
   {
     "id": "q17",
-    "statement": "17. I tell guests they can use other BED facilities",
-    "subtext": "I offer downtown coffee, big pool or breakfast",
-    "weight": 1.5
+    "statement": "17. I invite guests to share other BED facilities",
+    "subtext": "I offer downtown coffee, bigger pool or breakfast"
   },
   {
     "id": "q18",
-    "statement": "18. It's annoying when a room key doesn't work",
-    "subtext": "I go up to make sure the new key works",
-    "weight": 2.0
+    "statement": "18. its annoying when a room key doesn't work",
+    "subtext": "I go up to make sure the new key works"
   },
   {
     "id": "q19",
     "statement": "19. I talk with guests because I am interested",
-    "subtext": "When I force myself it will not be real",
-    "weight": 1.0
+    "subtext": "When I force myself it will not be real"
   },
   {
     "id": "q20",
     "statement": "20. I often give my friends honest feedback",
-    "subtext": "Im happy to help them to grow",
-    "weight": 1.5
+    "subtext": "I’m happy to help them to grow"
   },
   {
     "id": "q21",
     "statement": "21. My friends often give me honest feedback",
-    "subtext": "I'm happy they help me to grow",
-    "weight": 1.0
+    "subtext": "I’m happy they help me to grow"
   },
   {
     "id": "q22",
     "statement": "22. I can answer most questions about BED",
-    "subtext": "I have visited the rooms in all our hotels",
-    "weight": 0.5
+    "subtext": "I have visited the rooms in all our hotels"
   },
   {
     "id": "q23",
-    "statement": "23. I understand the meaning of showtime",
-    "subtext": "The magic happens from 0700-1000",
-    "weight": 0.5
+    "statement": "23. I understand the meaning of \"showtime\"",
+    "subtext": "The magic happens from 07:00-10:00"
   },
   {
     "id": "q24",
-    "statement": "24. I have peeled my own onion",
-    "subtext": "I dont act. Usually I show my true self",
-    "weight": 1.5
+    "statement": "24. I know the story of \"peeling the onion\"",
+    "subtext": "I don't act. Usually I show my true self"
   },
   {
     "id": "q25",
-    "statement": "25. I use ChatGPT or Gemini",
-    "subtext": "I ask for help with e.g., guest messages",
-    "weight": 0.5
+    "statement": "25. I never gossip. I signed “I Promise”",
+    "subtext": "I don't talk bad when someone's not here"
   },
   {
     "id": "q26",
-    "statement": "26. I send messages that look like I wrote them",
-    "subtext": "I don't copy AI because guests will know",
-    "weight": 1.5
+    "statement": "26. I really understand that rules can be flexible",
+    "subtext": "Without reasons many rules just disappear"
   },
   {
     "id": "q27",
-    "statement": "27. I use ChatGPT or Gemini",
-    "subtext": "I ask help to analyze and solve problems",
-    "weight": 1.5
+    "statement": "27. I am confident about my own judgment",
+    "subtext": "I make decisions without asking permission"
   },
   {
     "id": "q28",
-    "statement": "28. I never gossip. I signed I Promise",
-    "subtext": "I dont talk badly when someones not here",
-    "weight": 2.0
+    "statement": "28. I look after the rooms and public areas",
+    "subtext": "I share responsibility for the whole hotel"
   },
   {
     "id": "q29",
-    "statement": "29. I really understand that rules can be flexible",
-    "subtext": "Without reasons many rules just disappear",
-    "weight": 1.0
+    "statement": "29. I look around when I arrive at the hotel",
+    "subtext": "I share responsibility for the whole hotel"
   },
   {
     "id": "q30",
-    "statement": "30. I am confident about my own judgment",
-    "subtext": "I make decisions without asking permission",
-    "weight": 1.0
+    "statement": "30. I don't pass problems to others but act myself",
+    "subtext": "I follow up later to make sure it's fixed"
   },
   {
     "id": "q31",
-    "statement": "31. I look after the whole hotel, not only front",
-    "subtext": "I include rooms, maintenance and back areas",
-    "weight": 2.0
+    "statement": "31. I am not afraid of the CEO or my coach",
+    "subtext": "I know I am allowed to make mistakes"
   },
   {
     "id": "q32",
-    "statement": "32. I look around when I arrive at the hotel",
-    "subtext": "I share responsibility for the whole hotel",
-    "weight": 0.5
-  },
-  {
-    "id": "q33",
-    "statement": "33. I don't pass issues to others but act myself",
-    "subtext": "I follow up later to make sure it's fixed",
-    "weight": 1.0
-  },
-  {
-    "id": "q34",
-    "statement": "34. I am not afraid of the CEO or my coach",
-    "subtext": "I know I am allowed to make mistakes",
-    "weight": 1.0
-  },
-  {
-    "id": "q35",
-    "statement": "35. I have no manuals that show me what to do",
-    "subtext": "That means I cannot do anything wrong",
-    "weight": 0.5
+    "statement": "32. I have no manuals that show me what to do",
+    "subtext": "That means I cannot do anything wrong"
   }
 ]</script>
-
-
 <!-- Clean synchronous PDF flow -->
 <script>
 (function(){
@@ -1789,6 +1716,5 @@ ok.onclick = function(){
   window.savePdfNow = savePdfNow;
 })();
 </script>
-
 </body>
 </html>
