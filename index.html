@@ -239,27 +239,66 @@ p{color:#434343;line-height:1.6;}
 <section class="sar-card">
 <!-- Welcome -->
 <div class="sar-page" data-step="welcome">
-<div class="card" style="margin-top:10px;">
-</div>
+
 <div class="card" style="margin-top:16px;">
-<h2 class="section-title">YOUR INFORMATION</h2>
-<label class="small field-label">your name</label>
-<input id="sarNick" placeholder="nick name" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="text"/>
-<label class="small field-label">your email </label>
-<input id="sarEmail" placeholder="email address" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="email"/>
-<label class="small field-label">your location</label>
-<select id="sarHotel" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 4px;">
-<option value="">select hotel</option>
-<option>BED Changkian</option>
-<option>BED Phrasing</option>
-<option>BED Nimman</option>
-<option>BED Chiangmai Gate</option>
-<option>BED Flying</option>
-<option>BED Support</option>
-</select>
+  <style>
+    /* Page-1 only: inline labels */
+    .field-inline{display:flex;align-items:center;gap:10px;margin:6px 0 12px;}
+    .field-inline > label{min-width:160px;font-size:11pt;color:#6B7280;white-space:nowrap;}
+    .field-inline > input, .field-inline > select{
+      flex:1;min-width:0;width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;
+    }
+  </style>
+  <h2 class="section-title">YOUR INFORMATION</h2>
+  <div class="field-inline">
+    <label class="small field-label" for="sarNick">your name</label>
+    <input id="sarNick" type="text"/>
+  </div>
+  <div class="field-inline">
+    <label class="small field-label" for="sarEmail">your email</label>
+    <input id="sarEmail" type="email"/>
+  </div>
+  <div class="field-inline">
+    <label class="small field-label" for="sarHotel">your location</label>
+    <select id="sarHotel">
+      <option value="">select hotel</option>
+      <option>BED Changkian</option>
+      <option>BED Phrasing</option>
+      <option>BED Nimman</option>
+      <option>BED Chiangmai Gate</option>
+      <option>BED Flying</option>
+      <option>BED Support</option>
+    </select>
+  </div>
 </div>
+
 <div class="card" style="margin-top:16px;">
-<h2 class="section-title">PEER INFORMATION</h2><div class="peer-subtext" style="font-size:11pt;color:#666;margin-top:4px;margin-bottom:12px;">your peer must work in BED for at least 12 months</div>
+  <h2 class="section-title">PEER INFORMATION</h2>
+  <div class="peer-subtext" style="font-size:11pt;font-weight:700;color:#666;margin-top:4px;margin-bottom:12px;">
+    your peer must work in BED for at least 12 months
+  </div>
+  <div class="field-inline">
+    <label class="small field-label" for="peerName">name peer</label>
+    <input id="peerName" type="text"/>
+  </div>
+  <div class="field-inline">
+    <label class="small field-label" for="peerEmail">email peer</label>
+    <input id="peerEmail" type="email"/>
+  </div>
+  <div class="field-inline">
+    <label class="small field-label" for="peerHotel">peer location</label>
+    <select id="peerHotel">
+      <option value="">select hotel</option>
+      <option>BED Changkian</option>
+      <option>BED Phrasing</option>
+      <option>BED Nimman</option>
+      <option>BED Chiangmai Gate</option>
+      <option>BED Flying</option>
+      <option>BED Support</option>
+    </select>
+  </div>
+</div>
+
 <label class="small field-label">name peer</label>
 <input id="peerName" placeholder="nick name" style="width:100%;padding:10px;border:1px solid #ccc;border-radius:8px;margin:6px 0 12px;" type="text"/>
 <label class="small field-label">email peer</label>
