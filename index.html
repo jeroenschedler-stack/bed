@@ -10,15 +10,21 @@
   .container { width:100%; margin:0; padding:24px 20px; }
 
   h1 { font-size:22pt; margin:0 0 8px 0; line-height:1.2; color:#434343; }
-  .subheader { font-size:18pt; margin:0 0 20px 0; font-weight:700; color:#434343; }
-  h2 { font-size:14pt; margin:22px 0 10px 0; line-height:1.25; color:#434343; }
+  .subheader { font-size:18pt; margin:0 0 12px 0; font-weight:700; color:#434343; }
+  .progress-dots { text-align:center; margin-bottom:20px; }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:red; margin:0 4px; }
+
+  h2 { font-size:14pt; margin:32px 0 10px 0; line-height:1.25; color:#434343; }
   h2::after { content:""; display:block; height:12px; } /* blank line after page headers */
+
+  .intro { font-size:10pt; margin:6px 0 16px 0; color:#434343; }
 
   .row { display:flex; align-items:center; margin:10px 0; }
   .row > label { width:120px; font-size:10pt; font-weight:400; color:#434343; }
   .row > input,
   .row > select {
     width:260px; max-width:100%; padding:8px 10px; font-size:10pt; color:#434343;
+    border:1px solid grey; border-radius:4px;
   }
   select:invalid { color:#aaa; }
 
@@ -211,6 +217,12 @@
   <main class="container">
     <h1>BED HOSPITALITY 2.0</h1>
     <p class="subheader">TEAM MEMBER FORM</p>
+    <div class="progress-dots">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
 
     <div id="welcome">
       <h2>Your Information</h2>
@@ -229,6 +241,7 @@
       </div>
 
       <h2>Peer Information</h2>
+      <p class="intro">after you completed your self assessment one of your peers will review you. select one of your team members who worked in BED for at least 12 months</p>
       <div class="row"><label for="peerName">name peer</label><input id="peerName"></div>
       <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email"></div>
       <div class="row"><label for="peerHotel">peer location</label>
