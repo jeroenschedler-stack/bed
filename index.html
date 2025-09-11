@@ -228,7 +228,11 @@ p{color:#434343;line-height:1.6;}
 <button class="sar-btn sar-hotel" data-hotel="BCG">BCG</button>
 <button class="sar-btn sar-hotel" data-hotel="FLY">FLY</button>
 <button class="sar-btn sar-hotel" data-hotel="BED">BED</button>
+<div class="sar-actions">
+  <button class="sar-btn primary" data-nav="goto" data-step="intro" id="toIntro">next</button>
 </div>
+</div>
+<div class="sar-page" data-step="intro">
 <div class="sar-intro" style="margin-bottom:8px">
 <p>Self-assessment helps your personal growth and development. Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities.</p>
 </div>
@@ -246,6 +250,8 @@ p{color:#434343;line-height:1.6;}
 </div>
 </div>
 <!-- Part 1 — Dynamic questions -->
+
+</div>
 <div class="sar-page" data-step="q1">
 <!-- removed page-level thin progress bar (now in header) -->
 <div aria-live="polite" class="q-list" id="q1List"></div>
