@@ -6,61 +6,54 @@
 <title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
 <style>
   * { box-sizing: border-box; }
-  body {
-    font-family: system-ui, Arial, sans-serif;
-    background: #F9FAFB;
-    color: #111;
-    margin: 0;
-  }
-  /* Apply 20px left/right margin to ALL pages */
-  .container {
-    width: 100%;
-    margin: 0 auto;
-    padding: 24px 20px;
-  }
+  body { font-family: system-ui, Arial, sans-serif; background:#F9FAFB; color:#111; margin:0; }
 
-  /* Headers */
-  h1 { font-size: 20pt; margin: 0 0 8px 0; line-height: 1.2; }
-  .subheader { font-size: 18pt; margin: 0 0 20px 0; font-weight: 500; }
-  h2 { font-size: 14pt; margin: 22px 0 10px 0; line-height: 1.25; }
+  /* Apply equal 20px margins on ALL pages */
+  .container { width:100%; margin:0; padding:24px 20px; }
 
-  /* Form rows */
+  /* Headers (from earlier steps) */
+  h1 { font-size:20pt; margin:0 0 8px 0; line-height:1.2; }
+  .subheader { font-size:18pt; margin:0 0 20px 0; font-weight:500; }
+  h2 { font-size:14pt; margin:22px 0 10px 0; line-height:1.25; }
+
+  /* Base row layout (desktop/tablet) */
   .row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 150px 1fr;   /* fixed label + flexible field */
     align-items: center;
+    column-gap: 6px;                    /* default gap */
     margin: 10px 0;
   }
-  .row > label {
-    width: 120px;
-    font-weight: 400;
-    font-size: 10pt;
-    margin-right: 4px;
-    text-align: left;
-  }
+  .row > label { font-weight:400; font-size:10pt; }
   .row > input,
-  .row > select {
-    flex: 1;
-    font-size: 10pt;
-    padding: 8px 10px;
-    width: 100%;
+  .row > select { width:100%; padding:8px 10px; font-size:10pt; }
+
+  /* Mobile optimization: widen fields, reduce whitespace, keep 20px right margin */
+  @media (max-width: 480px) {
+    .row {
+      grid-template-columns: 110px 1fr; /* narrower label => wider field */
+      column-gap: 4px;                  /* reduce space between label & field */
+      margin: 10px 0;
+    }
+    .row > label { font-size:10pt; }
+    .row > input, .row > select { font-size:10pt; }
   }
 
-  select:invalid { color: #aaa; font-size: 10pt; }
+  /* Placeholder styling for selects */
+  select:invalid { color:#aaa; font-size:10pt; }
 
-  .q-item { padding: 12px 0; border-top: 1px solid #ddd; }
+  /* Questions UI */
+  .q-item { padding:12px 0; border-top:1px solid #ddd; }
   .pill {
-    display: inline-block; width: 32px; height: 32px; line-height: 32px;
-    text-align: center; border: 1px solid #ccc; border-radius: 50%;
-    margin-right: 6px; cursor: pointer; user-select: none;
+    display:inline-block; width:32px; height:32px; line-height:32px; text-align:center;
+    border:1px solid #ccc; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none;
   }
-  .pill.selected { background: #1E90FF; color: #fff; }
+  .pill.selected { background:#1E90FF; color:#fff; }
 
-  button {
-    padding: 10px 14px; border: 1px solid #ccc; border-radius: 10px;
-    background: #fff; cursor: pointer;
-  }
+  button { padding:10px 14px; border:1px solid #ccc; border-radius:10px; background:#fff; cursor:pointer; }
 
-  #welcome, #q1, #q2 { margin-top: 8px; }
+  /* Ensure sections on all pages sit under headers consistently */
+  #welcome, #q1, #q2 { margin-top:8px; }
 </style>
 <script id="embeddedQuestions" type="application/json">[
   {
