@@ -1726,33 +1726,74 @@ ok.onclick = function(){
 })();
 </script>
 <script>
+// DEFENSIVE_NEXT_HANDLER v2
 (function(){
-  var page = document.querySelector('.sar-page[data-step="welcome"]') || document;
-  var btn = page.querySelector('#sarStart');
-  if (!btn) return;
-  var name = page.querySelector('#sarNick');
-  var email = page.querySelector('#sarEmail');
-  var hotel = page.querySelector('#sarHotel');
-  function validEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v||''); }
-  function update(){
+  function q(sel, root){ return (root||document).querySelector(sel); }
+  function on(el, ev, fn){ if(el) el.addEventListener(ev, fn); }
+  function validEmailLite(v){
+    v = (v||"").trim();
+    return v.includes("@") && v.includes(".") && v.indexOf("@")>0 && v.lastIndexOf(".")>v.indexOf("@")+1;
+  }
+  function enableWhenValid(){
+    var page = q('.sar-page[data-step="welcome"]') || document;
+    var btn = q('#sarStart', page);
+    var name = q('#sarNick', page);
+    var email = q('#sarEmail', page);
+    var hotel = q('#sarHotel', page);
     var ok = true;
     if (name) ok = ok && name.value.trim().length>0;
-    if (email) ok = ok && validEmail(email.value.trim());
-    if (hotel) ok = ok && hotel.value && hotel.value !== '';
-    btn.disabled = !ok;
+    if (email) ok = ok && validEmailLite(email.value);
+    if (hotel) ok = ok && (hotel.value || "").trim() !== "";
+    if (btn) btn.disabled = !ok;
   }
-  ['input','change'].forEach(function(evt){
-    if (name) name.addEventListener(evt, update);
-    if (email) email.addEventListener(evt, update);
-    if (hotel) hotel.addEventListener(evt, update);
-  });
-  update();
-  btn.addEventListener('click', function(e){
-    if (btn.disabled) { e.preventDefault(); return; }
-    if (window.BED && window.BED.App && typeof window.BED.App.go === 'function'){
-      e.preventDefault();
-      window.BED.App.go('intro');
+  function goIntro(e){
+    var page = q('.sar-page[data-step="welcome"]') || document;
+    var btn = q('#sarStart', page);
+    if (btn && btn.disabled){ if(e) e.preventDefault(); return; }
+
+    // Preferred: use router if available
+    if (window.BED && window.BED.App && typeof window.BED.App.go === "function"){
+      if (e) e.preventDefault();
+      try{ window.BED.App.go("intro"); return; }catch(err){ console.warn("Router go failed", err); }
     }
-  });
+    // Fallback: manual DOM switch
+    try{
+      if (e) e.preventDefault();
+      var all = document.querySelectorAll(".sar-page");
+      all.forEach(function(p){ p.classList.remove("active"); });
+      var intro = q('.sar-page[data-step="intro"]');
+      if (intro){ intro.classList.add("active"); }
+      // also try to update dots/title if helpers exist
+      if (window.BED && window.BED.App){
+        try{ window.BED.App.state.step = "intro"; }catch(_){}
+        try{ if (typeof window.BED.App.renderDots === "function") window.BED.App.renderDots(); }catch(_){}
+        try{ if (typeof window.BED.App.updateHeaderTitle === "function") window.BED.App.updateHeaderTitle(); }catch(_){}
+      }
+    }catch(err){
+      console.error("Fallback navigation failed", err);
+    }
+  }
+
+  function attach(){
+    var page = q('.sar-page[data-step="welcome"]') || document;
+    var btn = q('#sarStart', page);
+    if (!btn) return;
+    // Initial state
+    enableWhenValid();
+    // Watch inputs
+    ["input","change","blur"].forEach(function(ev){
+      on(q('#sarNick',page), ev, enableWhenValid);
+      on(q('#sarEmail',page), ev, enableWhenValid);
+      on(q('#sarHotel',page), ev, enableWhenValid);
+    });
+    // Click
+    on(btn, "click", goIntro);
+  }
+
+  if (document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", attach);
+  } else {
+    attach();
+  }
 })();</script></body>
 </html>
