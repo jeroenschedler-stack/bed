@@ -211,7 +211,11 @@ p{color:#434343;line-height:1.6;}
 <div class="sar-page" data-step="welcome">
 <div style="max-width:75%">
 </div>
-<div class="sar-row sar-row-fields" style="margin-bottom:12px">
+
+  <div class="sar-section">
+    <h3 class="sar-section-title">team memberQ</h3>
+    <p class="sar-note">This part is for the team member to fill out.</p>
+    <div class="sar-row sar-row-fields" style="margin-bottom:12px">
 <label class="sar-field">
 <span class="sar-label">your nickname</span>
 <input autocomplete="nickname" class="sar-input" id="sarNick" inputmode="text" type="text"/>
@@ -221,7 +225,7 @@ p{color:#434343;line-height:1.6;}
 <input autocomplete="email" class="sar-input" id="sarEmail" inputmode="email" type="email"/>
 </label>
 </div>
-<div aria-label="Choose your BED Hotel" class="sar-row sar-hotels" role="group" style="margin-bottom:12px">
+    <div aria-label="Choose your BED Hotel" class="sar-row sar-hotels" role="group" style="margin-bottom:12px">
 <button class="sar-btn sar-hotel" data-hotel="BCK">BCK</button>
 <button class="sar-btn sar-hotel" data-hotel="BPS">BPS</button>
 <button class="sar-btn sar-hotel" data-hotel="BNM">BNM</button>
@@ -229,9 +233,29 @@ p{color:#434343;line-height:1.6;}
 <button class="sar-btn sar-hotel" data-hotel="FLY">FLY</button>
 <button class="sar-btn sar-hotel" data-hotel="BED">BED</button>
 </div>
-
+  </div>
+  <div class="sar-section" style="margin-top:18px">
+    <h3 class="sar-section-title">peer reviewer</h3>
+    <p class="sar-note">This part is for the team member to fill out.</p>
+    <div class="sar-row sar-row-fields" style="margin-bottom:12px">
+<label class="sar-field">
+<span class="sar-label">your nickname</span>
+<input autocomplete="nickname" class="sar-input" id="sarNick" inputmode="text" type="text"/>
+</label>
+<label class="sar-field">
+<span class="sar-label">your email</span>
+<input autocomplete="email" class="sar-input" id="sarEmail" inputmode="email" type="email"/>
+</label>
 </div>
-
+    <div aria-label="Choose your BED Hotel" class="sar-row sar-hotels peer" role="group" style="margin-bottom:12px">
+<button class="sar-btn sar-hotel-ghost" data-hotel="BCK">BCK</button>
+<button class="sar-btn sar-hotel-ghost" data-hotel="BPS">BPS</button>
+<button class="sar-btn sar-hotel-ghost" data-hotel="BNM">BNM</button>
+<button class="sar-btn sar-hotel-ghost" data-hotel="BCG">BCG</button>
+<button class="sar-btn sar-hotel-ghost" data-hotel="FLY">FLY</button>
+<button class="sar-btn sar-hotel-ghost" data-hotel="BED">BED</button>
+</div>
+  </div>
 <div class="sar-actions">
   <button class="sar-btn primary" data-nav="goto" data-step="intro" id="toIntro">next</button>
 </div>
