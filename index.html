@@ -21,7 +21,7 @@
     background:#ccc;
     margin-right:6px;
   }
-  .dot.active { background:#E60000; }
+  .dot.active { background:#ff0000; }
 
   h2 { font-size:14pt; margin:32px 0 10px 0; line-height:1.25; color:#434343; }
   h2::after { content:""; display:block; height:12px; }
@@ -34,6 +34,7 @@
   .row > select {
     width:260px; max-width:100%; padding:8px 10px; font-size:10pt; color:#434343;
     border:1px solid grey; border-radius:4px;
+    background:#ffffff; /* all fields white */
   }
   select:invalid { color:#aaa; }
 
@@ -291,7 +292,6 @@
   catch(e) { S.questions = []; }
   const $ = id => document.getElementById(id);
 
-  // update progress dots
   function updateDots(count) {
     const dots = document.querySelectorAll('#progressDots .dot');
     dots.forEach((d,i) => d.classList.toggle('active', i < count));
