@@ -11,11 +11,20 @@
 
   h1 { font-size:22pt; margin:0 0 8px 0; line-height:1.2; color:#434343; }
   .subheader { font-size:18pt; margin:0 0 12px 0; font-weight:700; color:#434343; }
-  .progress-dots { text-align:center; margin-bottom:20px; }
-  .dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:red; margin:0 4px; }
+
+  .progress-dots { text-align:left; margin:8px 0 20px 0; }
+  .dot {
+    display:inline-block;
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:#ccc;
+    margin-right:6px;
+  }
+  .dot.active { background:#E60000; }
 
   h2 { font-size:14pt; margin:32px 0 10px 0; line-height:1.25; color:#434343; }
-  h2::after { content:""; display:block; height:12px; } /* blank line after page headers */
+  h2::after { content:""; display:block; height:12px; }
 
   .intro { font-size:10pt; margin:6px 0 16px 0; color:#434343; }
 
@@ -217,7 +226,10 @@
   <main class="container">
     <h1>BED HOSPITALITY 2.0</h1>
     <p class="subheader">TEAM MEMBER FORM</p>
-    <div class="progress-dots">
+    <div class="progress-dots" id="progressDots">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
       <span class="dot"></span>
       <span class="dot"></span>
       <span class="dot"></span>
@@ -279,6 +291,12 @@
   catch(e) { S.questions = []; }
   const $ = id => document.getElementById(id);
 
+  // update progress dots
+  function updateDots(count) {
+    const dots = document.querySelectorAll('#progressDots .dot');
+    dots.forEach((d,i) => d.classList.toggle('active', i < count));
+  }
+
   function makeQ(q,ord){
     const d = document.createElement('div');
     d.className = 'q-item';
@@ -304,6 +322,7 @@
     S.questions.slice(0,18).forEach((q,i) => l.appendChild(makeQ(q, i+1)));
     document.getElementById('welcome').style.display = 'none';
     document.getElementById('q1').style.display = 'block';
+    updateDots(1);
   };
 
   $('toQ2').onclick = () => {
@@ -311,9 +330,10 @@
     S.questions.slice(18,35).forEach((q,i) => l.appendChild(makeQ(q, 19+i)));
     document.getElementById('q1').style.display = 'none';
     document.getElementById('q2').style.display = 'block';
+    updateDots(2);
   };
 
-  $('finish').onclick = () => { alert('Done'); };
+  $('finish').onclick = () => { updateDots(7); alert('Done'); };
 })();
 </script>
 </body>
