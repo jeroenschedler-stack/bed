@@ -1968,5 +1968,47 @@ ok.onclick = function(){
   var q2Next = q('.sar-page[data-step="q2"] #q2Next');
   if (q2Back){ q2Back.addEventListener('click', function(){ go('q1'); }); }
   if (q2Next){ q2Next.addEventListener('click', function(){ go('score'); }); }
+})();</script><script>
+// Q1_ALL_ANSWERED_ENABLE_NEXT
+(function(){
+  function q(sel, root){ return (root||document).querySelector(sel); }
+  function all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  function countAnsweredQ1(){
+    var rows = all('#q1List .q-item');
+    var answered = rows.filter(function(row){
+      var qid = row.getAttribute('data-qid');
+      if (!qid) return false;
+      var checked = q('input[name="rate_'+qid+'"]:checked', row);
+      return !!checked;
+    }).length;
+    return { answered: answered, total: rows.length };
+  }
+  function update(){
+    var btn = q('.sar-page[data-step="q1"] #q1Next');
+    if (!btn) return;
+    var stat = countAnsweredQ1();
+    // Expecting 18 questions on page 1
+    btn.disabled = !(stat.total >= 18 && stat.answered >= 18);
+  }
+  function attach(){
+    var mount = q('#q1List');
+    if (!mount) return;
+    // initialize disabled
+    var btn = q('.sar-page[data-step="q1"] #q1Next');
+    if (btn) btn.disabled = true;
+    mount.addEventListener('change', function(e){
+      var t = e.target;
+      if (t && t.matches('input[type="radio"]')){
+        update();
+      }
+    });
+    // in case the list was already rendered with some selections
+    update();
+  }
+  if (document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", attach);
+  } else {
+    attach();
+  }
 })();</script></body>
 </html>
