@@ -6,60 +6,43 @@
 <title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
 <style>
   * { box-sizing: border-box; }
-  :root {
-    --side-pad: 20px;
-    --label-w: 120px;   /* fixed label width */
-    --gap: 12px;        /* normal space between label and field */
-    --field-w: 100%;    /* fixed field width setting */
-  }
-  body {
-    font-family: system-ui, Arial, sans-serif;
-    background: #F9FAFB;
-    color: #111;
-    margin: 0;
-  }
-  .container {
-    width: 100%;
-    margin: 0;
-    padding: 24px var(--side-pad);
-  }
-  h1 { font-size: 20pt; margin: 0 0 8px 0; line-height: 1.2; }
-  .subheader { font-size: 18pt; margin: 0 0 20px 0; font-weight: 500; }
-  h2 { font-size: 14pt; margin: 22px 0 10px 0; line-height: 1.25; }
+  body { font-family: system-ui, Arial, sans-serif; background:#F9FAFB; color:#111; margin:0; }
+  /* Always 20px from the viewport edge on both sides */
+  .container { width:100%; margin:0; padding:24px 20px; }
 
+  /* Headers */
+  h1 { font-size:20pt; margin:0 0 8px 0; line-height:1.2; }
+  .subheader { font-size:18pt; margin:0 0 20px 0; font-weight:500; }
+  h2 { font-size:14pt; margin:22px 0 10px 0; line-height:1.25; }
+
+  /* Use CSS Grid so inputs always reach the right edge of the container */
   .row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 118px 1fr; /* compact label, full‑width field */
+    column-gap: 6px;                  /* small gap between label and field */
     align-items: center;
-    gap: var(--gap);
-    margin: 12px 0;
+    margin: 10px 0;
   }
-  .row > label {
-    flex: 0 0 var(--label-w);
-    font-weight: 400;
-    font-size: 10pt;
-  }
+  .row > label { font-size:10pt; font-weight:400; }
   .row > input,
   .row > select {
-    width: calc(var(--field-w) - var(--label-w) - var(--gap) - (2 * var(--side-pad)));
-    max-width: 500px; /* significantly wider fixed size */
+    width: 100%;                      /* ensures right edge lines up with page border */
     padding: 8px 10px;
     font-size: 10pt;
   }
-  select:invalid { color: #aaa; font-size: 10pt; }
+  select:invalid { color:#aaa; }
 
-  .q-item { padding: 12px 0; border-top: 1px solid #ddd; }
-  .pill {
-    display: inline-block; width: 32px; height: 32px; line-height: 32px;
-    text-align: center; border: 1px solid #ccc; border-radius: 50%;
-    margin-right: 6px; cursor: pointer; user-select: none;
-  }
-  .pill.selected { background: #1E90FF; color: #fff; }
+  .q-item { padding:12px 0; border-top:1px solid #ddd; }
+  .pill { display:inline-block; width:32px; height:32px; line-height:32px; text-align:center;
+          border:1px solid #ccc; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none; }
+  .pill.selected { background:#1E90FF; color:#fff; }
 
-  button {
-    padding: 10px 14px; border: 1px solid #ccc; border-radius: 10px;
-    background: #fff; cursor: pointer;
+  button { padding:10px 14px; border:1px solid #ccc; border-radius:10px; background:#fff; cursor:pointer; }
+
+  /* Fallback: on very narrow screens, stack label above field to avoid cramped layout */
+  @media (max-width: 340px) {
+    .row { grid-template-columns: 1fr; row-gap: 6px; }
   }
-  #welcome, #q1, #q2 { margin-top: 8px; }
 </style>
 <script id="embeddedQuestions" type="application/json">[
   {
@@ -293,7 +276,7 @@
 
 <script>
 (function(){
-  const S = {answers:{}, questions:[]};
+  const S = { answers:{}, questions:[] };
   try { S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }
   catch(e) { S.questions = []; }
   const $ = id => document.getElementById(id);
