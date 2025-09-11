@@ -102,8 +102,8 @@ p{color:#434343;line-height:1.6;}
     @media (max-width:420px){ .sar-row-fields{flex-direction:column} }
 
     /* Hotels one row */
-    .sar-hotels{display:flex;gap:6px;flex-wrap:nowrap;justify-content:space-between}
-    .sar-hotels .sar-hotel{flex:1 1 18%;min-width:0;text-transform:uppercase;font-weight:600;padding:10px 0;font-size:14px}
+    .sar-hotels{display:flex;gap:6px;flex-wrap:nowrap;justify-content:space-between;align-items:stretch}
+    .sar-hotels .sar-hotel{flex:1 1 16%;min-width:0;text-transform:uppercase;font-weight:600;padding:10px 0;font-size:14px}
     .sar-hotel.selected{background:var(--brand);color:#fff;border-color:var(--brand)}
 
     /* Intro & scale (welcome) */
@@ -228,6 +228,7 @@ p{color:#434343;line-height:1.6;}
 <button class="sar-btn sar-hotel" data-hotel="BCG">BCG</button>
 <button class="sar-btn sar-hotel" data-hotel="FLY">FLY</button>
 <button class="sar-btn sar-hotel" data-hotel="BED">BED</button>
+</div>
 <div class="sar-actions">
   <button class="sar-btn primary" data-nav="goto" data-step="intro" id="toIntro">next</button>
 </div>
@@ -358,7 +359,7 @@ p{color:#434343;line-height:1.6;}
 </section>
 </main>
 <script>
-    const SAR_STEPS = ["welcome","q1","q2","score","peer","done","finish"];
+    const SAR_STEPS = ["welcome","intro","intro","q1","q2","score","peer","done","finish"];
 
     const sarState = {
       step: "welcome",
@@ -421,7 +422,7 @@ p{color:#434343;line-height:1.6;}
       const card = document.querySelector('.sar-page[data-step="welcome"]');
       const nick = card.querySelector('#sarNick');
       const email = card.querySelector('#sarEmail');
-      const startBtn = card.querySelector('#sarStart');
+      const startBtn = card.querySelector('#toIntro') || card.querySelector('#sarStart');
 
       card.addEventListener('click',(e)=>{
         const btn = e.target.closest('.sar-hotel');
@@ -436,12 +437,20 @@ p{color:#434343;line-height:1.6;}
       startBtn.addEventListener('click',(e)=>{ if(startBtn.disabled){ e.preventDefault(); e.stopPropagation(); } });
       validateWelcome();
     }
+      if(startBtn && !startBtn.dataset.bound){
+        startBtn.dataset.bound = "1";
+        startBtn.addEventListener('click', function(){
+          if(startBtn.disabled) return;
+          goTo('intro');
+        });
+      }
+
     function validateWelcome(){
       const card = document.querySelector('.sar-page[data-step="welcome"]');
       if(!card) return;
       const nick = card.querySelector('#sarNick');
       const email = card.querySelector('#sarEmail');
-      const startBtn = card.querySelector('#sarStart');
+      const startBtn = card.querySelector('#toIntro') || card.querySelector('#sarStart');
       const hasNick = (nick.value || "").trim().length > 0;
       const hasEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((email.value || "").trim());
       const hasHotel = !!sarState.user.hotel;
@@ -1073,7 +1082,7 @@ ok.onclick = function(){
       if(!card) return;
       const nick = card.querySelector('#sarNick');
       const email = card.querySelector('#sarEmail');
-      const startBtn = card.querySelector('#sarStart');
+      const startBtn = card.querySelector('#toIntro') || card.querySelector('#sarStart');
       if(!window.sarState) window.sarState = { user:{}, answers:{}, questions:[], step:'welcome' };
       if(!window.sarState.user) window.sarState.user = {};
 
