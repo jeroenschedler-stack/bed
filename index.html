@@ -193,7 +193,11 @@ p{color:#434343;line-height:1.6;}
 .modal-footer { text-align: right; }
 
 </style>
-</head>
+<style>
+/* Lock consistent typography for Page 1 (as requested) */
+.sar-page[data-step="welcome"] h2 { font-size: 14pt; font-weight: 700; margin: 0 0 10px 0; }
+.sar-page[data-step="welcome"] label.small { font-size: 11pt; color: #666; }
+</style></head>
 <body>
 <!-- Header -->
 <header class="sar-header">
@@ -210,7 +214,6 @@ p{color:#434343;line-height:1.6;}
 <!-- Welcome -->
 <div class="sar-page" data-step="welcome">
 <div class="card" style="margin-top:10px;">
-
 </div>
 <div class="card" style="margin-top:16px;">
 <h2>PERSONAL INFORMATION</h2>
@@ -1711,6 +1714,7 @@ ok.onclick = function(){
 (function(){
   var page = document.querySelector('.sar-page[data-step="welcome"]') || document;
   var btn = page.querySelector('#sarStart');
+  if (!btn) return;
   var name = page.querySelector('#sarNick');
   var email = page.querySelector('#sarEmail');
   var hotel = page.querySelector('#sarHotel');
@@ -1720,7 +1724,7 @@ ok.onclick = function(){
     if (name) ok = ok && name.value.trim().length>0;
     if (email) ok = ok && validEmail(email.value.trim());
     if (hotel) ok = ok && hotel.value && hotel.value !== '';
-    if (btn) btn.disabled = !ok;
+    btn.disabled = !ok;
   }
   ['input','change'].forEach(function(evt){
     if (name) name.addEventListener(evt, update);
@@ -1728,14 +1732,12 @@ ok.onclick = function(){
     if (hotel) hotel.addEventListener(evt, update);
   });
   update();
-  if (btn){
-    btn.addEventListener('click', function(e){
-      if (btn.disabled) { e.preventDefault(); return; }
-      if (window.BED && window.BED.App && typeof window.BED.App.go === 'function'){
-        e.preventDefault();
-        window.BED.App.go('intro');
-      }
-    });
-  }
+  btn.addEventListener('click', function(e){
+    if (btn.disabled) { e.preventDefault(); return; }
+    if (window.BED && window.BED.App && typeof window.BED.App.go === 'function'){
+      e.preventDefault();
+      window.BED.App.go('intro');
+    }
+  });
 })();</script></body>
 </html>
