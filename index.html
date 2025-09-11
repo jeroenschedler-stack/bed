@@ -1726,7 +1726,7 @@ ok.onclick = function(){
 })();
 </script>
 <script>
-// DEFENSIVE_NEXT_HANDLER v2
+// DEFENSIVE_NEXT_HANDLER v3 (strict page-1 validation: ALL fields required)
 (function(){
   function q(sel, root){ return (root||document).querySelector(sel); }
   function on(el, ev, fn){ if(el) el.addEventListener(ev, fn); }
@@ -1737,13 +1737,25 @@ ok.onclick = function(){
   function enableWhenValid(){
     var page = q('.sar-page[data-step="welcome"]') || document;
     var btn = q('#sarStart', page);
-    var name = q('#sarNick', page);
+
+    // Personal info
+    var name  = q('#sarNick', page);
     var email = q('#sarEmail', page);
     var hotel = q('#sarHotel', page);
+
+    // Peer info
+    var peerName  = q('#peerName', page);
+    var peerEmail = q('#peerEmail', page);
+    var peerHotel = q('#peerHotel', page);
+
     var ok = true;
-    if (name) ok = ok && name.value.trim().length>0;
-    if (email) ok = ok && validEmailLite(email.value);
-    if (hotel) ok = ok && (hotel.value || "").trim() !== "";
+    if (name)      ok = ok && name.value.trim().length>0;
+    if (email)     ok = ok && validEmailLite(email.value);
+    if (hotel)     ok = ok && (hotel.value||"").trim()!=="";
+    if (peerName)  ok = ok && peerName.value.trim().length>0;
+    if (peerEmail) ok = ok && validEmailLite(peerEmail.value);
+    if (peerHotel) ok = ok && (peerHotel.value||"").trim()!=="";
+
     if (btn) btn.disabled = !ok;
   }
   function goIntro(e){
@@ -1751,19 +1763,16 @@ ok.onclick = function(){
     var btn = q('#sarStart', page);
     if (btn && btn.disabled){ if(e) e.preventDefault(); return; }
 
-    // Preferred: use router if available
     if (window.BED && window.BED.App && typeof window.BED.App.go === "function"){
       if (e) e.preventDefault();
       try{ window.BED.App.go("intro"); return; }catch(err){ console.warn("Router go failed", err); }
     }
-    // Fallback: manual DOM switch
     try{
       if (e) e.preventDefault();
       var all = document.querySelectorAll(".sar-page");
       all.forEach(function(p){ p.classList.remove("active"); });
       var intro = q('.sar-page[data-step="intro"]');
       if (intro){ intro.classList.add("active"); }
-      // also try to update dots/title if helpers exist
       if (window.BED && window.BED.App){
         try{ window.BED.App.state.step = "intro"; }catch(_){}
         try{ if (typeof window.BED.App.renderDots === "function") window.BED.App.renderDots(); }catch(_){}
@@ -1785,6 +1794,9 @@ ok.onclick = function(){
       on(q('#sarNick',page), ev, enableWhenValid);
       on(q('#sarEmail',page), ev, enableWhenValid);
       on(q('#sarHotel',page), ev, enableWhenValid);
+      on(q('#peerName',page), ev, enableWhenValid);
+      on(q('#peerEmail',page), ev, enableWhenValid);
+      on(q('#peerHotel',page), ev, enableWhenValid);
     });
     // Click
     on(btn, "click", goIntro);
