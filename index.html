@@ -2057,3 +2057,95 @@ ok.onclick = function(){
   }, 300);
 })();</script></body>
 </html>
+
+
+<!-- PERSISTENCE/HYDRATION PATCH -->
+<script>
+(function(){
+  // Ensure sarState exists
+  window.sarState = window.sarState || { user:{}, peer:{}, answers:{}, questions: window.sarQuestions || [] };
+
+  function saveField(idPath, el){
+    const val = (el.type === 'checkbox') ? !!el.checked : (el.value || '').trim();
+    var ref = window.sarState;
+    for (var i=0;i<idPath.length-1;i++){ ref = ref[idPath[i]] = ref[idPath[i]] || {}; }
+    ref[idPath[idPath.length-1]] = val;
+  }
+
+  function hydrateField(idPath, el){
+    var ref = window.sarState;
+    for (var i=0;i<idPath.length-1;i++){ ref = ref && ref[idPath[i]]; }
+    var v = ref && ref[idPath[idPath.length-1]];
+    if (typeof v === 'undefined' || v === null) return;
+    if (el.type === 'checkbox'){ el.checked = !!v; }
+    else { el.value = v; }
+    if (el.tagName === 'SELECT') {
+      // trigger any UI that relies on change
+      el.dispatchEvent(new Event('change', {bubbles:true}));
+    }
+  }
+
+  function bindWelcome(){
+    var card = document.querySelector('.sar-page[data-step="welcome"]');
+    if(!card || card.dataset.bound==='1') return;
+    card.dataset.bound = '1';
+    var nick = card.querySelector('#sarNick');
+    var email = card.querySelector('#sarEmail');
+    var hotel = card.querySelector('#sarHotel');
+    if(nick){ hydrateField(['user','nickname'], nick); nick.addEventListener('input',()=>saveField(['user','nickname'],nick)); }
+    if(email){ hydrateField(['user','email'], email); email.addEventListener('input',()=>saveField(['user','email'],email)); }
+    if(hotel){ hydrateField(['user','hotel'], hotel); hotel.addEventListener('change',()=>saveField(['user','hotel'],hotel)); }
+  }
+
+  function bindPeer(){
+    var card = document.querySelector('.sar-page[data-step="peer"]');
+    if(!card || card.dataset.bound==='1') return;
+    card.dataset.bound = '1';
+    var name   = card.querySelector('#peerName');
+    var email  = card.querySelector('#peerEmail');
+    var hotel  = card.querySelector('#peerHotel');
+    var agree  = card.querySelector('#peerConsent');
+    if(name){ hydrateField(['peer','name'], name);   name.addEventListener('input', ()=>saveField(['peer','name'], name)); }
+    if(email){ hydrateField(['peer','email'], email); email.addEventListener('input',()=>saveField(['peer','email'],email)); }
+    if(hotel){ hydrateField(['peer','hotel'], hotel); hotel.addEventListener('change',()=>saveField(['peer','hotel'],hotel)); }
+    if(agree){ hydrateField(['peer','consent'], agree); agree.addEventListener('change',()=>saveField(['peer','consent'],agree)); }
+  }
+
+  function bindQuestions(listSelector){
+    var list = document.querySelector(listSelector);
+    if(!list) return;
+    list.querySelectorAll('[data-qid]').forEach(function(item){
+      var qid = item.getAttribute('data-qid');
+      // radio buttons 1..5
+      item.querySelectorAll('input[type="radio"][name="q'+qid+'"]').forEach(function(radio){
+        // hydrate
+        if (String(window.sarState.answers[qid]||'') === String(radio.value)) {
+          radio.checked = true;
+        }
+        // save
+        radio.addEventListener('change', function(){
+          if (radio.checked) { window.sarState.answers[qid] = radio.value; }
+        });
+      });
+    });
+  }
+
+  function hydrateAll(){
+    bindWelcome();
+    bindPeer();
+    bindQuestions('#q1List');
+    bindQuestions('#q2List');
+  }
+
+  // On first load
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', hydrateAll);
+  } else {
+    hydrateAll();
+  }
+  // On navigation within the SPA
+  window.addEventListener('hashchange', function(){ setTimeout(hydrateAll, 0); }, {passive:true});
+  document.addEventListener('click', function(){ setTimeout(hydrateAll, 0); }, {passive:true});
+})();
+</script>
+<!-- END PERSISTENCE/HYDRATION PATCH -->
