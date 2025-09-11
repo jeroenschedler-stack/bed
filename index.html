@@ -2055,7 +2055,81 @@ ok.onclick = function(){
     var step = active ? active.getAttribute('data-step') : null;
     if (step) setProgress(step);
   }, 300);
-})();</script></body>
+})();</script>
+<div id="groupBreakdown" style="margin-top:12px;"></div>
+
+<!-- NEXT/START ENABLE FIX AFTER BACK NAV -->
+<script>
+(function(){
+  function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim()); }
+  function getWelcomeEls(){
+    const card  = document.querySelector('.sar-page[data-step="welcome"]') || document.getElementById('welcome') || document.body;
+    return {
+      card,
+      nick:  card.querySelector('#sarNick'),
+      email: card.querySelector('#sarEmail'),
+      hotel: card.querySelector('#sarHotel'),
+      start: card.querySelector('#sarStart') || card.querySelector('button.next, .btn.next, [data-next="instructions"]')
+    };
+  }
+  function enableIfValid(){
+    const els = getWelcomeEls();
+    if (!els.start) return;
+    const ok = !!(els.nick && els.nick.value.trim())
+            && !!(els.email && isValidEmail(els.email.value))
+            && !!(els.hotel && els.hotel.value.trim());
+    els.start.disabled = !ok;
+    if (ok) els.start.classList && els.start.classList.add('primary');
+  }
+
+  // Bind once to keep start button functional even if other handlers intercept
+  function bindStartSafety(){
+    const els = getWelcomeEls();
+    if (!els.start || els.start.dataset.enableFixBound==='1') return;
+    els.start.dataset.enableFixBound='1';
+    els.start.addEventListener('click', function(e){
+      // if still disabled, block; otherwise allow through
+      const ok = !els.start.disabled;
+      if (!ok){ e.preventDefault(); e.stopImmediatePropagation(); }
+    }, true);
+  }
+
+  function tick(){
+    enableIfValid();
+    bindStartSafety();
+  }
+
+  // Initial
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', tick, {once:true});
+  } else {
+    tick();
+  }
+  // On SPA route changes
+  window.addEventListener('hashchange', function(){ setTimeout(tick, 0); }, {passive:true});
+  // On user input (covers going back and editing fields)
+  document.addEventListener('input', function(e){
+    const t = e.target;
+    if (!t) return;
+    if (t.id === 'sarNick' || t.id === 'sarEmail' || t.id === 'sarHotel'){ enableIfValid(); }
+  }, {passive:true});
+
+  // Observe DOM changes that rebuild the welcome page
+  const mo = new MutationObserver(function(){ tick(); });
+  mo.observe(document.documentElement, {childList:true, subtree:true});
+
+  // Hard-remove any leftover back button in instructions page at runtime
+  function nukeInstrBack(){
+    const btn = document.getElementById('backFromInstructions');
+    if (btn && btn.parentNode) btn.parentNode.removeChild(btn);
+  }
+  nukeInstrBack();
+  window.addEventListener('hashchange', function(){ setTimeout(nukeInstrBack, 0); }, {passive:true});
+})();
+</script>
+<!-- END NEXT/START ENABLE FIX AFTER BACK NAV -->
+
+</body>
 </html>
 
 
@@ -2149,70 +2223,6 @@ ok.onclick = function(){
 })();
 </script>
 <!-- END PERSISTENCE/HYDRATION PATCH -->
-
-
-<!-- INSTRUCTIONS BACK BUTTON PATCH -->
-<script>
-(function(){
-  function injectBackButton(){
-    // Find the 'Scoring Instructions' page heuristically
-    var pages = document.querySelectorAll('.sar-page');
-    var target = null;
-    pages.forEach(function(pg){
-      if (pg.getAttribute('data-step') === 'instructions') target = pg;
-    });
-    if (!target){
-      // Fallback: pick a page that contains key phrases
-      pages.forEach(function(pg){
-        var t = (pg.textContent||'').toLowerCase();
-        if (!target && t.includes('scoring') && t.includes('instructions')) target = pg;
-      });
-    }
-    if (!target || target.dataset.backInjected === '1') return;
-
-    // Create container row if needed
-    var header = target.querySelector('.section-title, h2, h3') || target.firstElementChild || target;
-    var btn = document.createElement('button');
-    btn.id = 'backFromInstructions';
-    btn.type = 'button';
-    btn.className = 'btn btn-light';
-    btn.textContent = 'Back';
-    btn.style.margin = '8px 0 12px 0';
-
-    // Insert button before header
-    target.insertBefore(btn, header);
-
-    // Click handler: navigate back to Welcome without resetting state
-    btn.addEventListener('click', function(e){
-      e.preventDefault();
-      // Prefer SPA navigation if present
-      if (typeof window.navigateTo === 'function') {
-        window.navigateTo('welcome');
-      } else {
-        // Hash-based fallback
-        location.hash = '#welcome';
-      }
-      // Re-apply hydration shortly after navigation
-      setTimeout(function(){
-        document.dispatchEvent(new Event('hydrationRequest'));
-      }, 50);
-    });
-
-    target.dataset.backInjected = '1';
-  }
-
-  // Initial attempt
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectBackButton, {once:true});
-  } else {
-    injectBackButton();
-  }
-  // Try again on SPA route changes
-  window.addEventListener('hashchange', function(){ setTimeout(injectBackButton, 0); }, {passive:true});
-  document.addEventListener('click', function(){ setTimeout(injectBackButton, 0); }, {passive:true});
-})();
-</script>
-<!-- END INSTRUCTIONS BACK BUTTON PATCH -->
 
 
 <script>
@@ -2371,3 +2381,121 @@ document.addEventListener('hydrationRequest', function(){
 })();
 </script>
 <!-- END SUPER HYDRATION & NAV VALIDATION PATCH -->
+
+
+<!-- GROUP MAP (from Excel) -->
+<script>
+const SAR_GROUP_MAP = {
+  "q1": "Standard Skills",
+  "q2": "Competencies",
+  "q3": "Competencies",
+  "q4": "Competencies",
+  "q5": "Competencies",
+  "q6": "Standard Skills",
+  "q7": "Competencies",
+  "q8": "Competencies",
+  "q9": "Competencies",
+  "q10": "Competencies",
+  "q11": "Competencies",
+  "q12": "Competencies",
+  "q13": "Competencies",
+  "q14": "Competencies",
+  "q15": "Competencies",
+  "q16": "Standard Skills",
+  "q17": "Collaboration",
+  "q18": "Standard Skills",
+  "q19": "Competencies",
+  "q20": "Collaboration",
+  "q21": "Collaboration",
+  "q22": "Standard Skills",
+  "q23": "Standard Skills",
+  "q24": "Competencies",
+  "q25": "Standard Skills",
+  "q26": "Competencies",
+  "q27": "Ownership",
+  "q28": "Collaboration",
+  "q29": "Ownership",
+  "q30": "Ownership",
+  "q31": "Ownership",
+  "q32": "Ownership",
+  "q33": "Ownership",
+  "q34": "Ownership",
+  "q35": "Ownership"
+};
+
+// Unweighted overall & per-group scoring
+function computeOverallUnweighted(){
+  const qs = sarState.questions || [];
+  let sum = 0, count = 0;
+  qs.forEach(q=>{
+    const v = Number(sarState.answers[q.id] || 0);
+    if (v>0){ sum += v; count += 1; }
+  });
+  const avg = count ? (sum / count) : 0; // 1..5
+  return Math.round((avg/5)*100);
+}
+
+function computeGroupScores(){
+  const qs = sarState.questions || [];
+  const buckets = {}, counts = {}, avgs = {}, pct = {};
+  qs.forEach(q=>{
+    const g = SAR_GROUP_MAP[q.id] || 'Other';
+    if (!(g in buckets)){ buckets[g]=0; counts[g]=0; }
+    const v = Number(sarState.answers[q.id] || 0);
+    if (v>0){ buckets[g]+=v; counts[g]+=1; }
+  });
+  Object.keys(buckets).forEach(g=>{
+    const avg = counts[g] ? (buckets[g]/counts[g]) : 0;
+    avgs[g] = avg;
+    pct[g]  = Math.round((avg/5)*100);
+  });
+  return {avg: avgs, pct: pct, count: counts};
+}
+
+function renderScore(){
+  const page = document.querySelector('.sar-page[data-step="score"]');
+  if(!page) return;
+  const pct = computeOverallUnweighted();
+  const rawEl  = page.querySelector('#scoreNumber');
+  const bandEl = page.querySelector('#scoreBandText');
+  if(rawEl) rawEl.textContent = "YOUR SCORE IS " + pct + "%";
+  if(bandEl) bandEl.innerHTML = scoreBand(pct);
+  const marker = page.querySelector('#scoreMarker');
+  if(marker) marker.style.left = `calc(${pct}% - 4px)`;
+
+  // Render group breakdown and recommendations if container exists
+  const box = page.querySelector('#groupBreakdown');
+  if (box){
+    const gs = computeGroupScores();
+    const avg = gs.avg, gpct = gs.pct;
+    let html = '<h3 style="margin:8px 0">Pillar scores</h3><ul style="margin:6px 0 12px 16px">';
+    const entries = Object.entries(gpct);
+    entries.sort((a,b)=>a[0].localeCompare(b[0]));
+    entries.forEach(([g,v])=>{ html += `<li><strong>${g}</strong>: ${v}%` + (avg[g]?` (avg ${avg[g].toFixed(2)}/5)`:'') + `</li>`; });
+    html += '</ul>';
+
+    if (entries.length){
+      const minVal = Math.min.apply(null, entries.map(e=>e[1]));
+      const lows = entries.filter(e=>e[1]===minVal).map(e=>e[0]);
+      html += '<h4 style="margin:8px 0">Suggestions</h4>';
+      lows.forEach(g=>{ html += `<div style="margin:4px 0"><em>${g}</em>: ` + recommendForGroup(g) + `</div>`; });
+    }
+    box.innerHTML = html;
+  }
+}
+
+function recommendForGroup(g){
+  switch((g||'').toLowerCase()){
+    case 'standard skills':
+      return 'Practise daily basics: reply time, first impression, and accuracy. Set small goals for speed + clarity.';
+    case 'competencies':
+      return 'Work on reading guests and timing. After each shift, note a signal you saw and what you changed.';
+    case 'taking ownership':
+      return 'Choose one area to own this week from start to finish. Share the result with the team.';
+    case 'collaboration':
+      return 'Offer help across hotels once a week and share one best practice with your team.';
+    default:
+      return 'Pick your two lowest questions, define two habits, track for two weeks.';
+  }
+}
+</script>
