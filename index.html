@@ -2057,3 +2057,137 @@ ok.onclick = function(){
   }, 300);
 })();</script></body>
 </html>
+
+
+<!-- BEGIN PATCHES -->
+
+<script>
+(function(){
+  function run(){
+    var next   = document.getElementById('peerNext');
+    var send   = document.getElementById('peerSend');
+    var action = send || next;
+    if(!action) return;
+
+    if (send && /send/i.test(send.textContent.trim())) send.textContent = 'Done';
+
+    var nameEl  = document.getElementById('peerName');
+    var emailEl = document.getElementById('peerEmail');
+    var consent = document.getElementById('peerConsent');
+
+    function emailOK(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim()); }
+    function validate(){
+      var ok = !!(nameEl && (nameEl.value||'').trim()) &&
+               !!(emailEl && emailOK(emailEl.value)) &&
+               !!(consent && consent.checked);
+      if (action){
+        action.disabled = !ok;
+        if (ok) action.classList.add('primary'); else action.classList.remove('primary');
+      }
+    }
+
+    nameEl  && nameEl.addEventListener('input',  validate);
+    emailEl && emailEl.addEventListener('input',  validate);
+    consent && consent.addEventListener('change', validate);
+    validate();
+
+    if (action && next && action !== next && !action.dataset.chainBound){
+      action.dataset.chainBound = '1';
+      action.addEventListener('click', function(){
+        if (action.disabled) return;
+        setTimeout(function(){ next && next.click(); }, 0);
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', run, {once:true});
+  } else { run(); }
+  window.addEventListener('hashchange', function(){ setTimeout(run,0); }, {passive:true});
+})();
+</script>
+
+
+<script>
+(function(){
+  function qs(id){ return document.getElementById(id); }
+  const mask = qs('exp24Mask'), modal = qs('exp24Modal'), ok = qs('exp24OK'), no = qs('exp24Cancel');
+
+  function openM(){ mask.style.display='block'; modal.style.display='block'; }
+  function closeM(){ mask.style.display='none';  modal.style.display='none'; }
+
+  function bind(){
+    const next = document.getElementById('peerNext') || document.getElementById('peerSend');
+    if(!next || next.dataset.exp24Bound==='1') return;
+    next.dataset.exp24Bound = '1';
+
+    let bypass = false;
+    next.addEventListener('click', function(e){
+      if (bypass) { bypass = false; return; }
+      e.preventDefault(); e.stopImmediatePropagation();
+      openM();
+    }, true);
+
+    ok.onclick = function(){
+      closeM();
+      var __origConfirm = window.confirm;
+      window.__exp24Bypass = true;
+      window.confirm = function(msg){
+        if (window.__exp24Bypass) return true;
+        return __origConfirm.call(window, msg);
+      };
+
+      bypass = true;
+      next && next.click();
+
+      setTimeout(function(){
+        window.__exp24Bypass = false;
+        window.confirm = __origConfirm;
+      }, 600);
+    };
+    no.onclick = closeM;
+    mask.onclick = closeM;
+  }
+
+  bind();
+  window.addEventListener('hashchange', bind, {passive:true});
+  document.addEventListener('click', function(){ setTimeout(bind,0); }, {passive:true});
+})();
+</script>
+
+
+<script>
+function ensureWelcomeBindings(){
+  if(window.__welcomeBound){ validateWelcome(); return; }
+  window.__welcomeBound = true;
+
+  const card     = document.querySelector('.sar-page[data-step="welcome"]');
+  const nick     = card.querySelector('#sarNick');
+  const email    = card.querySelector('#sarEmail');
+  const hotelSel = card.querySelector('#sarHotel');
+  const startBtn = card.querySelector('#sarStart');
+
+  nick.addEventListener('input',  ()=>{ sarState.user.nickname = nick.value.trim();  validateWelcome(); });
+  email.addEventListener('input', ()=>{ sarState.user.email    = email.value.trim(); validateWelcome(); });
+  hotelSel.addEventListener('change', ()=>{ sarState.user.hotel = hotelSel.value.trim(); validateWelcome(); });
+
+  startBtn.addEventListener('click', (e)=>{ if(startBtn.disabled){ e.preventDefault(); e.stopPropagation(); } });
+  validateWelcome();
+}
+function validateWelcome(){
+  const card     = document.querySelector('.sar-page[data-step="welcome"]');
+  const nick     = card.querySelector('#sarNick');
+  const email    = card.querySelector('#sarEmail');
+  const hotelSel = card.querySelector('#sarHotel');
+  const startBtn = card.querySelector('#sarStart');
+
+  const hasNick  = (nick.value||'').trim().length>0;
+  const hasEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((email.value||'').trim());
+  const hasHotel = (hotelSel.value||'').trim().length>0;
+
+  sarState.user.hotel = hotelSel.value || '';
+  startBtn.disabled = !(hasNick && hasEmail && hasHotel);
+}
+</script>
+
+<!-- END PATCHES -->
