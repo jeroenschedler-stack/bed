@@ -6,10 +6,11 @@
 <title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
 <style>
   * { box-sizing: border-box; }
-  :root{
-    --side-pad:20px;
-    --label-w:120px;     /* fixed label width for alignment */
-    --gap:15px;          /* ~15px space between label and field */
+  :root {
+    --side-pad: 20px;
+    --label-w: 120px;   /* fixed label width */
+    --gap: 12px;        /* normal space between label and field */
+    --field-w: 100%;    /* fixed field width setting */
   }
   body {
     font-family: system-ui, Arial, sans-serif;
@@ -17,42 +18,35 @@
     color: #111;
     margin: 0;
   }
-  /* 20px left/right margins on ALL pages */
   .container {
     width: 100%;
     margin: 0;
     padding: 24px var(--side-pad);
   }
-
-  /* Headers */
   h1 { font-size: 20pt; margin: 0 0 8px 0; line-height: 1.2; }
   .subheader { font-size: 18pt; margin: 0 0 20px 0; font-weight: 500; }
   h2 { font-size: 14pt; margin: 22px 0 10px 0; line-height: 1.25; }
 
-  /* Form rows */
   .row {
     display: flex;
     align-items: center;
-    gap: var(--gap);      /* ~15px between label and field */
+    gap: var(--gap);
     margin: 12px 0;
   }
   .row > label {
-    flex: 0 0 var(--label-w);  /* fixed label width keeps vertical alignment */
-    width: var(--label-w);
-    font-weight: 400;          /* remove bold */
+    flex: 0 0 var(--label-w);
+    font-weight: 400;
     font-size: 10pt;
   }
   .row > input,
   .row > select {
-    flex: 1 1 auto;            /* fields extend to right edge */
+    width: calc(var(--field-w) - var(--label-w) - var(--gap) - (2 * var(--side-pad)));
+    max-width: 500px; /* significantly wider fixed size */
     padding: 8px 10px;
     font-size: 10pt;
   }
-
-  /* Placeholder styling for selects */
   select:invalid { color: #aaa; font-size: 10pt; }
 
-  /* Questions UI */
   .q-item { padding: 12px 0; border-top: 1px solid #ddd; }
   .pill {
     display: inline-block; width: 32px; height: 32px; line-height: 32px;
@@ -65,8 +59,6 @@
     padding: 10px 14px; border: 1px solid #ccc; border-radius: 10px;
     background: #fff; cursor: pointer;
   }
-
-  /* Section spacing across pages */
   #welcome, #q1, #q2 { margin-top: 8px; }
 </style>
 <script id="embeddedQuestions" type="application/json">[
