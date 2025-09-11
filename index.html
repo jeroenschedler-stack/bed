@@ -2058,234 +2058,144 @@ ok.onclick = function(){
 })();</script>
 <div id="groupBreakdown" style="margin-top:12px;"></div>
 
-<!-- FINAL FIX: Remove Back on Instructions + Enable Next after Back -->
+<!-- ULTRA START/NAV + INSTRUCTIONS BACK REMOVAL + HYDRATION -->
 <script>
 (function(){
-  // Utility helpers
+  // State bootstrap (keeps previous info + answers)
+  try{
+    if (!window.sarState){
+      const saved = localStorage.getItem('sarState.v1');
+      window.sarState = saved ? JSON.parse(saved) : { user:{}, peer:{}, answers:{}, questions: window.sarQuestions || [] };
+    }
+  }catch(_){
+    window.sarState = window.sarState || { user:{}, peer:{}, answers:{}, questions: window.sarQuestions || [] };
+  }
+
+  // Helpers
   function $(sel, root){ return (root||document).querySelector(sel); }
-  function $all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  function $closest(el, sel){
+    while (el){
+      if (el.matches && el.matches(sel)) return el;
+      el = el.parentElement;
+    }
+    return null;
+  }
   function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim()); }
+  function persist(){ try{ localStorage.setItem('sarState.v1', JSON.stringify(window.sarState)); }catch(_){ } }
 
-  // --- 1) Remove any Back button on the Instructions page ---
-  function findInstructionsPage(){
-    var p = document.querySelector('.sar-page[data-step="instructions"]');
-    if (p) return p;
-    var pages = document.querySelectorAll('.sar-page');
-    for (var i=0; i<pages.length; i++){
-      var t = (pages[i].textContent||'').toLowerCase();
-      if (t.includes('instructions') && (t.includes('assessment') || t.includes('scoring'))) return pages[i];
-    }
-    return document.getElementById('instructions') || document.getElementById('assessmentInstructions') || null;
-  }
-  function removeBackFromInstructions(){
-    var pg = findInstructionsPage();
-    if (!pg) return;
-    // Remove known IDs
-    ['backFromInstructions','backToWelcome'].forEach(function(id){
-      var el = pg.querySelector('#'+id);
-      if (el && el.parentNode) el.parentNode.removeChild(el);
-    });
-    // Remove generic back buttons/links
-    $all('button, a, [role="button"]', pg).forEach(function(el){
-      var txt = (el.textContent||'').trim().toLowerCase();
-      if (txt === 'back' || txt === 'go back'){
-        if (el.parentNode) el.parentNode.removeChild(el);
-      }
-    });
+  // Hydrate Welcome fields from sarState
+  function hydrateWelcome(){
+    const card = document.querySelector('.sar-page[data-step="welcome"]') || document.getElementById('welcome') || document.body;
+    const nick  = card.querySelector('#sarNick');
+    const email = card.querySelector('#sarEmail');
+    const hotel = card.querySelector('#sarHotel');
+    if (nick && window.sarState.user.nickname){ nick.value = window.sarState.user.nickname; }
+    if (email && window.sarState.user.email){ email.value = window.sarState.user.email; }
+    if (hotel && window.sarState.user.hotel){ hotel.value = window.sarState.user.hotel; hotel.dispatchEvent(new Event('change',{bubbles:true})); }
   }
 
-  // --- 2) Re-enable Next/Start after using Back ---
-  function getWelcomeEls(){
-    var card = document.querySelector('.sar-page[data-step="welcome"]') || document.getElementById('welcome') || document.body;
-    var hotelSel = card.querySelector('#sarHotel');
-    var hotelButtonsRoot = card.querySelector('.hotel-choices, .sar-hotels, .hotel-buttons');
-    return {
-      card,
-      nick: card.querySelector('#sarNick'),
-      email: card.querySelector('#sarEmail'),
-      hotelSel,
-      hotelButtonsRoot,
-      start: card.querySelector('#sarStart') ||
-             card.querySelector('button.next, .btn.next, [data-next="instructions"], [data-role="start"], [data-action="start"]')
-    };
-  }
-  function getHotelValue(els){
-    if (els.hotelSel) return (els.hotelSel.value||'').trim();
-    if (els.hotelButtonsRoot){
-      var active = els.hotelButtonsRoot.querySelector('.active,[aria-pressed="true"],[data-selected="true"]');
-      if (active){
-        return (active.getAttribute('data-hotel') || active.textContent || '').trim();
-      }
-    }
-    return '';
-  }
-  function enableStartIfValid(){
-    var els = getWelcomeEls();
-    if (!els.start) return;
-    var hasNick = !!(els.nick && (els.nick.value||'').trim());
-    var hasEmail = !!(els.email && isValidEmail(els.email.value||''));
-    var hotelVal = getHotelValue(els);
-    var ok = hasNick && hasEmail && !!hotelVal;
-
-    if (ok){
-      els.start.disabled = false;
-      els.start.classList && els.start.classList.remove('disabled');
-      els.start.classList && els.start.classList.add('primary');
-      // Replace stale listeners to ensure clicks work
-      if (!els.start.dataset._cleanCloned){
-        var clone = els.start.cloneNode(true);
-        els.start.parentNode.replaceChild(clone, els.start);
-        clone.dataset._cleanCloned = '1';
-      }
-    } else {
-      els.start.disabled = true;
-      els.start.classList && els.start.classList.add('disabled');
-      els.start.classList && els.start.classList.remove('primary');
-    }
-  }
-
-  function hydrateWelcomeFromState(){
-    try{
-      var s = window.sarState || {};
-      var els = getWelcomeEls();
-      if (els.nick && s.user && s.user.nickname){ els.nick.value = s.user.nickname; }
-      if (els.email && s.user && s.user.email){ els.email.value = s.user.email; }
-      if (els.hotelSel && s.user && s.user.hotel){
-        els.hotelSel.value = s.user.hotel;
-        els.hotelSel.dispatchEvent(new Event('change',{bubbles:true}));
-      }
-      if (els.hotelButtonsRoot && s.user && s.user.hotel){
-        var btns = els.hotelButtonsRoot.querySelectorAll('[data-hotel], button, .btn');
-        for (var i=0; i<btns.length; i++){
-          var val = (btns[i].getAttribute('data-hotel') || btns[i].textContent || '').trim();
-          if (val === s.user.hotel){
-            btns[i].classList && btns[i].classList.add('active');
-            btns[i].setAttribute && btns[i].setAttribute('aria-pressed','true');
-          } else {
-            btns[i].classList && btns[i].classList.remove('active');
-            btns[i].setAttribute && btns[i].setAttribute('aria-pressed','false');
-          }
-        }
-      }
-    }catch(e){}
-  }
-
-  function tick(){
-    removeBackFromInstructions();
-    hydrateWelcomeFromState();
-    enableStartIfValid();
-  }
-
-  // Run at key times
-  if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', tick, {once:true});
-  } else {
-    tick();
-  }
-  window.addEventListener('hashchange', function(){ setTimeout(tick, 0); }, {passive:true});
-  window.addEventListener('popstate', function(){ setTimeout(tick, 0); }, {passive:true});
-  window.addEventListener('pageshow', function(){ setTimeout(tick, 0); }, {passive:true});
-  new MutationObserver(function(){ tick(); }).observe(document.documentElement, {childList:true, subtree:true});
-  document.addEventListener('input', function(e){
-    var id = e && e.target && e.target.id;
-    if (id === 'sarNick' || id === 'sarEmail' || id === 'sarHotel'){ enableStartIfValid(); }
-  }, {passive:true});
-})();
-</script>
-
-
-<!-- START BUTTON NAVIGATION SAFETY PATCH -->
-<script>
-(function(){
-  function $(sel, root){ return (root||document).querySelector(sel); }
-  function isValidEmail(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v||'').trim()); }
-
-  function getWelcomeEls(){
-    var card  = document.querySelector('.sar-page[data-step="welcome"]') || document.getElementById('welcome') || document.body;
-    return {
-      card,
-      nick:  card.querySelector('#sarNick'),
-      email: card.querySelector('#sarEmail'),
-      hotel: card.querySelector('#sarHotel'),
-      start: card.querySelector('#sarStart') ||
-             card.querySelector('button.next, .btn.next, [data-next], [data-role="start"], [data-action="start"]')
-    };
-  }
-
-  function getTargetStep(btn){
-    if (!btn) return 'instructions';
-    // data-next="peer" or "instructions" etc.
-    var dnext = btn.getAttribute('data-next');
-    if (dnext) return dnext.replace(/^#/, '');
-    // fallback
-    return 'instructions';
-  }
-
-  function validWelcome(els){
-    if (!els) els = getWelcomeEls();
-    var hasNick  = !!(els.nick && (els.nick.value||'').trim());
-    var hasEmail = !!(els.email && isValidEmail(els.email.value||''));
-    var hotelVal = '';
-    if (els.hotel) hotelVal = (els.hotel.value||'').trim();
+  // Compute validity of Welcome page
+  function welcomeValid(){
+    const card = document.querySelector('.sar-page[data-step="welcome"]') || document.getElementById('welcome') || document.body;
+    const nick  = card.querySelector('#sarNick');
+    const email = card.querySelector('#sarEmail');
+    const hotelSel = card.querySelector('#sarHotel');
+    const hasNick  = !!(nick && (nick.value||'').trim());
+    const hasEmail = !!(email && isValidEmail(email.value||''));
+    let hotelVal = '';
+    if (hotelSel) hotelVal = (hotelSel.value||'').trim();
     else {
-      // try buttons
-      var root = els.card.querySelector('.hotel-choices, .sar-hotels, .hotel-buttons');
+      // Try button-based hotel UI
+      const root = card.querySelector('.hotel-choices, .sar-hotels, .hotel-buttons');
       if (root){
-        var active = root.querySelector('.active,[aria-pressed="true"],[data-selected="true"]');
+        const active = root.querySelector('.active,[aria-pressed="true"],[data-selected="true"]');
         hotelVal = active ? (active.getAttribute('data-hotel') || active.textContent || '').trim() : '';
       }
     }
     return hasNick && hasEmail && !!hotelVal;
   }
 
-  function ensureStartWorks(){
-    var els = getWelcomeEls();
-    if (!els.start) return;
-    if (els.start.dataset._navPatched==='1') return;
-    els.start.dataset._navPatched='1';
-
-    // Always re-evaluate disabled state
-    function sync(){
-      var ok = validWelcome(els);
-      els.start.disabled = !ok;
-      if (ok){ els.start.classList && els.start.classList.add('primary'); }
-      else { els.start.classList && els.start.classList.remove('primary'); }
+  // Force navigation to target step
+  function goTo(step){
+    if (!step) step = 'instructions';
+    step = step.replace(/^#/, '');
+    try {
+      if (typeof window.navigateTo === 'function'){ window.navigateTo(step); }
+      else { location.hash = '#' + step; }
+    } catch(_){
+      location.hash = '#' + step;
     }
-    sync();
+  }
 
-    // Final safety click: if valid, force navigation ourselves
-    els.start.addEventListener('click', function(e){
-      var ok = validWelcome(els);
-      if (!ok){
-        // block when invalid
-        e.preventDefault(); e.stopImmediatePropagation();
+  // Global click capture: guarantee Next/Start works when valid
+  document.addEventListener('click', function(e){
+    // Identify a start/next control
+    const btn = $closest(e.target, '#sarStart, button.next, .btn.next, [data-next], [data-role="start"], [data-action="start"]');
+    if (!btn) return;
+    // If we are on first page, enforce validity and navigation
+    const onWelcome = !!document.querySelector('.sar-page[data-step="welcome"]') || !!document.getElementById('welcome');
+    if (onWelcome){
+      if (!welcomeValid()){
+        // keep default blocker behavior if invalid
         return;
       }
-      // allow default, but also guarantee navigation after a tick
-      var target = getTargetStep(els.start);
-      setTimeout(function(){
-        try{
-          if (typeof window.navigateTo === 'function') window.navigateTo(target);
-          else location.hash = '#' + target;
-        }catch(_){
-          location.hash = '#' + target;
-        }
-      }, 0);
-    }, true);
+      // Stop any other handlers that might block
+      e.preventDefault(); e.stopImmediatePropagation();
+      const target = btn.getAttribute('data-next') || 'instructions';
+      // Small tick to allow UI updates
+      setTimeout(function(){ goTo(target); }, 0);
+    }
+  }, true);
+
+  // Keep start button visually enabled when valid
+  function syncStartButton(){
+    const page = document.querySelector('.sar-page[data-step="welcome"]') || document.getElementById('welcome') || document.body;
+    const start = page.querySelector('#sarStart') || page.querySelector('button.next, .btn.next, [data-next], [data-role="start"], [data-action="start"]');
+    if (!start) return;
+    const ok = welcomeValid();
+    start.disabled = !ok;
+    if (start.classList){
+      if (ok){ start.classList.remove('disabled'); start.classList.add('primary'); }
+      else { start.classList.add('disabled'); start.classList.remove('primary'); }
+    }
   }
 
-  // Run on load and route changes
-  function tick(){ ensureStartWorks(); }
-  if (document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', tick, {once:true});
-  } else {
-    tick();
+  // Save inputs to sarState
+  document.addEventListener('input', function(e){
+    const t = e.target;
+    if (!t || !t.id) return;
+    if (t.id === 'sarNick'){ window.sarState.user.nickname = t.value.trim(); persist(); syncStartButton(); }
+    if (t.id === 'sarEmail'){ window.sarState.user.email = t.value.trim(); persist(); syncStartButton(); }
+    if (t.id === 'sarHotel'){ window.sarState.user.hotel = (t.value||'').trim(); persist(); syncStartButton(); }
+  }, true);
+
+  // Remove any Back button on Instructions page
+  function removeBackOnInstructions(){
+    const pg = document.querySelector('.sar-page[data-step="instructions"]') || document.getElementById('instructions') || document.getElementById('assessmentInstructions');
+    if (!pg) return;
+    const maybe = pg.querySelectorAll('button, a, [role="button"]');
+    maybe.forEach(function(el){
+      const txt = (el.textContent||'').trim().toLowerCase();
+      if (txt === 'back' || txt === 'go back' || el.id === 'backFromInstructions' || el.id === 'backToWelcome'){
+        if (el.parentNode) el.parentNode.removeChild(el);
+      }
+    });
   }
+
+  // Initial + lifecycle hooks
+  function tick(){
+    hydrateWelcome();
+    syncStartButton();
+    removeBackOnInstructions();
+  }
+  if (document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', tick, {once:true}); }
+  else { tick(); }
   window.addEventListener('hashchange', function(){ setTimeout(tick,0); }, {passive:true});
-  window.addEventListener('pageshow', function(){ setTimeout(tick,0); }, {passive:true});
+  window.addEventListener('popstate',  function(){ setTimeout(tick,0); }, {passive:true});
+  window.addEventListener('pageshow',  function(){ setTimeout(tick,0); }, {passive:true});
+  new MutationObserver(function(){ tick(); }).observe(document.documentElement, {childList:true, subtree:true});
 })();
 </script>
-<!-- END START BUTTON NAVIGATION SAFETY PATCH -->
 
 </body>
 </html>
