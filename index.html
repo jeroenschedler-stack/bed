@@ -6,43 +6,58 @@
 <title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
 <style>
   * { box-sizing: border-box; }
-  body { font-family: system-ui, Arial, sans-serif; background:#F9FAFB; color:#434343; margin:0; }
+  body {
+    font-family: system-ui, Arial, sans-serif;
+    background: #F9FAFB;
+    color: #111;
+    margin: 0;
+  }
+  .container {
+    width: 100%;
+    margin: 0;
+    padding: 24px 20px;
+  }
+  h1 { font-size: 20pt; margin: 0 0 8px 0; line-height: 1.2; }
+  .subheader { font-size: 18pt; margin: 0 0 20px 0; font-weight: 500; }
+  h2 { font-size: 14pt; margin: 22px 0 10px 0; line-height: 1.25; }
 
-  .container { width:100%; margin:0; padding:24px 20px; }
-
-  /* Headers */
-  h1 { font-size:22pt; margin:0 0 8px 0; line-height:1.2; color:#434343; }
-  .subheader { font-size:18pt; font-weight:bold; margin:0 0 20px 0; color:#434343; }
-  h2 { font-size:14pt; margin:22px 0 10px 0; line-height:1.25; color:#434343; }
-
-  /* Add blank line after page headers */
-  h2::after { content:""; display:block; margin-bottom:10px; }
-
-  /* Form rows */
   .row {
-    display: grid;
-    grid-template-columns: 150px 1fr;
+    display: flex;
     align-items: center;
-    column-gap: 6px;
+    gap: 6px;
     margin: 10px 0;
   }
-  .row > label { font-weight:400; font-size:10pt; color:#434343; }
-  .row > input,
-  .row > select { width:100%; padding:8px 10px; font-size:10pt; color:#434343; }
-
-  /* Placeholder styling for selects */
-  select:invalid { color:#aaa; font-size:10pt; }
-
-  .q-item { padding:12px 0; border-top:1px solid #ddd; color:#434343; }
-  .pill {
-    display:inline-block; width:32px; height:32px; line-height:32px; text-align:center;
-    border:1px solid #ccc; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none; color:#434343;
+  .row > label {
+    width: 140px;
+    font-weight: 400;
+    font-size: 10pt;
+    flex: 0 0 140px;
   }
-  .pill.selected { background:#1E90FF; color:#fff; }
+  .row > input,
+  .row > select {
+    flex: 0 0 calc(100% - 140px - 6px);
+    padding: 8px 10px;
+    font-size: 10pt;
+    max-width: none;
+  }
+  .wide-field {
+    width: 120%;
+  }
+  select:invalid { color: #aaa; font-size: 10pt; }
 
-  button { padding:10px 14px; border:1px solid #ccc; border-radius:10px; background:#fff; cursor:pointer; color:#434343; }
+  .q-item { padding: 12px 0; border-top: 1px solid #ddd; }
+  .pill {
+    display: inline-block; width: 32px; height: 32px; line-height: 32px;
+    text-align: center; border: 1px solid #ccc; border-radius: 50%;
+    margin-right: 6px; cursor: pointer; user-select: none;
+  }
+  .pill.selected { background: #1E90FF; color: #fff; }
 
-  #welcome, #q1, #q2 { margin-top:8px; }
+  button {
+    padding: 10px 14px; border: 1px solid #ccc; border-radius: 10px;
+    background: #fff; cursor: pointer;
+  }
+  #welcome, #q1, #q2 { margin-top: 8px; }
 </style>
 <script id="embeddedQuestions" type="application/json">[
   {
@@ -229,10 +244,10 @@
 
     <div id="welcome">
       <h2>Your Information</h2>
-      <div class="row"><label for="nick">your name</label><input id="nick"></div>
-      <div class="row"><label for="email">your email</label><input id="email" type="email"></div>
+      <div class="row"><label for="nick">your name</label><input id="nick" class="wide-field"></div>
+      <div class="row"><label for="email">your email</label><input id="email" type="email" class="wide-field"></div>
       <div class="row"><label for="hotel">your location</label>
-        <select id="hotel" required>
+        <select id="hotel" required class="wide-field">
           <option value="" disabled selected>select hotel</option>
           <option>BED Changkian</option>
           <option>BED Phrasing</option>
@@ -244,10 +259,10 @@
       </div>
 
       <h2>Peer Information</h2>
-      <div class="row"><label for="peerName">name peer</label><input id="peerName"></div>
-      <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email"></div>
+      <div class="row"><label for="peerName">name peer</label><input id="peerName" class="wide-field"></div>
+      <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email" class="wide-field"></div>
       <div class="row"><label for="peerHotel">peer location</label>
-        <select id="peerHotel" required>
+        <select id="peerHotel" required class="wide-field">
           <option value="" disabled selected>select hotel</option>
           <option>BED Changkian</option>
           <option>BED Phrasing</option>
