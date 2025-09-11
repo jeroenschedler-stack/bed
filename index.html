@@ -3,52 +3,76 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>BED HOSPITALITY — Self Assessment</title>
+<title>BED HOSPITALITY — Self Assessment Clean Baseline</title>
 <style>
-  * { box-sizing: border-box; }
-  body { font-family: system-ui, Arial, sans-serif; background:#F9FAFB; color:#434343; margin:0; }
-  .container { width:100%; margin:0; padding:24px 20px; position:relative; }
-
-  h1 { font-size:22pt; margin:0 0 8px 0; line-height:1.2; color:#434343; }
-  .subheader { font-size:18pt; margin:0 0 12px 0; font-weight:700; color:#434343; }
-
-  .progress-dots { text-align:left; margin:8px 0 20px 0; }
-  .dot {
-    display:inline-block;
-    width:14px;
-    height:14px;
-    border-radius:50%;
-    background:#ccc;
-    margin-right:6px;
+  :root {
+    --pad: 20px;
+    --label-w: 118px;
+    --gap: 6px;
+    --brand-blue: #1E90FF;
   }
-  .dot.active { background:#ff0000; }
+  * { box-sizing: border-box; }
+  body { font-family: system-ui, Arial, sans-serif; background:#F9FAFB; color:#111; margin:0; }
+  .container { width:100%; margin:0; padding:24px var(--pad); }
 
-  h2 { font-size:14pt; margin:32px 0 10px 0; line-height:1.25; color:#434343; }
-  h2::after { content:""; display:block; height:12px; }
+  /* Headers */
+  h1 { font-size:20pt; margin:0 0 8px 0; line-height:1.2; }
+  .subheader { font-size:18pt; margin:0 0 20px 0; font-weight:500; }
+  h2 { font-size:14pt; margin:22px 0 8px 0; line-height:1.25; }
 
-  .intro { font-size:10pt; margin:6px 0 16px 0; color:#434343; }
+  /* Intro paragraphs */
+  .intro { margin:4px 0 14px 0; font-size:10.5pt; color:#333; }
+  h2 + .intro { margin-top:4px; }
+  .intro + .row { margin-top:14px; }
 
-  .row { display:flex; align-items:center; margin:10px 0; }
-  .row > label { width:120px; font-size:10pt; font-weight:400; color:#434343; }
+  /* Grid rows */
+  .row {
+    display: grid;
+    grid-template-columns: var(--label-w) 1fr;
+    column-gap: var(--gap);
+    align-items: center;
+    margin: 10px 0;
+  }
+  .row > label { font-size:10pt; font-weight:400; }
   .row > input,
   .row > select {
-    width:260px; max-width:100%; padding:8px 10px; font-size:10pt; color:#434343;
-    border:1px solid grey; border-radius:4px; background:#ffffff;
-    transition: background-color .15s ease;
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 10pt;
+    border: 1px solid #cfd4dc;
+    border-radius: 10px;
+    background: #fff;
   }
-  .row > input.filled,
-  .row > select.filled {
-    background:#e6f4ff; /* light blue after filled */
+  .row > input:focus,
+  .row > select:focus {
+    outline: none;
+    border-color: var(--brand-blue);
+    box-shadow: 0 0 0 3px rgba(30,144,255,0.18);
   }
   select:invalid { color:#aaa; }
 
-  .q-item { padding:12px 0; border-top:1px solid #ddd; color:#434343; }
-  .pill { display:inline-block; width:32px; height:32px; line-height:32px; text-align:center;
-          border:1px solid #ccc; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none; color:#434343; }
-  .pill.selected { background:#1E90FF; color:#fff; }
+  /* Buttons */
+  .actions { padding-left: calc(var(--label-w) + var(--gap)); margin-top: 14px; }
+  button {
+    padding: 12px 18px;
+    border: none;
+    border-radius: 12px;
+    background: var(--brand-blue);
+    color: #fff;
+    font-size: 12pt;
+    cursor: pointer;
+  }
 
-  button { padding:10px 14px; border:1px solid #ccc; border-radius:10px; background:#fff; cursor:pointer; color:#434343; }
-  .button-right { position:absolute; right:20px; bottom:20px; }
+  .q-item { padding:12px 0; border-top:1px solid #ddd; }
+  .pill { display:inline-block; width:32px; height:32px; line-height:32px;
+          text-align:center; border:1px solid #ccc; border-radius:50%;
+          margin-right:6px; cursor:pointer; user-select:none; }
+  .pill.selected { background: var(--brand-blue); color:#fff; }
+
+  @media (max-width: 340px) {
+    .row { grid-template-columns: 1fr; row-gap: 6px; }
+    .actions { padding-left: 0; }
+  }
 </style>
 <script id="embeddedQuestions" type="application/json">[
   {
@@ -232,18 +256,10 @@
   <main class="container">
     <h1>BED HOSPITALITY 2.0</h1>
     <p class="subheader">TEAM MEMBER FORM</p>
-    <div class="progress-dots" id="progressDots">
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
-    </div>
 
     <div id="welcome">
       <h2>Your Information</h2>
+      <p class="intro">This part is for the team member to fill out.</p>
       <div class="row"><label for="nick">your name</label><input id="nick"></div>
       <div class="row"><label for="email">your email</label><input id="email" type="email"></div>
       <div class="row"><label for="hotel">your location</label>
@@ -259,7 +275,7 @@
       </div>
 
       <h2>Peer Information</h2>
-      <p class="intro">after you completed your self assessment one of your peers will review you. select one of your team members who worked in BED for at least 12 months</p>
+      <p class="intro">This part is for the peer reviewer to fill out.</p>
       <div class="row"><label for="peerName">name peer</label><input id="peerName"></div>
       <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email"></div>
       <div class="row"><label for="peerHotel">peer location</label>
@@ -274,48 +290,34 @@
         </select>
       </div>
 
-      <!-- Start button removed -->
-      <button id="nextPage1" class="button-right">Next</button>
+      <div class="actions">
+        <button id="start">Start</button>
+      </div>
     </div>
 
     <div id="q1" style="display:none">
       <h2>Statements Part 1</h2>
       <div id="list-q1"></div>
-      <button id="toQ2">Next</button>
+      <div class="actions">
+        <button id="toQ2">Next</button>
+      </div>
     </div>
 
     <div id="q2" style="display:none">
       <h2>Statements Part 2</h2>
       <div id="list-q2"></div>
-      <button id="finish">Finish</button>
+      <div class="actions">
+        <button id="finish">Finish</button>
+      </div>
     </div>
   </main>
 
 <script>
 (function(){
-  const S = { answers:{}, questions:[] };
+  const S = {answers:{}, questions:[]};
   try { S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }
   catch(e) { S.questions = []; }
   const $ = id => document.getElementById(id);
-
-  function updateDots(count) {
-    const dots = document.querySelectorAll('#progressDots .dot');
-    dots.forEach((d,i) => d.classList.toggle('active', i < count));
-  }
-
-  // mark inputs/selects as filled when they have content/selection
-  function bindFilled(el) {
-    const apply = () => {
-      if (el.tagName === 'SELECT') {
-        el.classList.toggle('filled', el.selectedIndex > 0);
-      } else {
-        el.classList.toggle('filled', (el.value || '').trim().length > 0);
-      }
-    };
-    el.addEventListener('input', apply);
-    el.addEventListener('change', apply);
-    apply();
-  }
 
   function makeQ(q,ord){
     const d = document.createElement('div');
@@ -337,32 +339,21 @@
     return d;
   }
 
-  // Initial state: page 1 -> first dot red
-  document.addEventListener('DOMContentLoaded', () => {
-    updateDots(1);
-    ['nick','email','peerName','peerEmail','hotel','peerHotel'].forEach(id => bindFilled($(id)));
-  });
-
-  // Page 1 Next button -> go to statements part 1
-  $('nextPage1').onclick = () => {
+  $('start').onclick = () => {
     const l = $('list-q1'); l.innerHTML = '';
     S.questions.slice(0,18).forEach((q,i) => l.appendChild(makeQ(q, i+1)));
     document.getElementById('welcome').style.display = 'none';
     document.getElementById('q1').style.display = 'block';
-    updateDots(2);
   };
 
-  // Part 1 Next -> Part 2
   $('toQ2').onclick = () => {
     const l = $('list-q2'); l.innerHTML = '';
     S.questions.slice(18,35).forEach((q,i) => l.appendChild(makeQ(q, 19+i)));
     document.getElementById('q1').style.display = 'none';
     document.getElementById('q2').style.display = 'block';
-    updateDots(3);
   };
 
-  // Finish -> all dots red
-  $('finish').onclick = () => { updateDots(7); alert('Done'); };
+  $('finish').onclick = () => { alert('Done'); };
 })();
 </script>
 </body>
