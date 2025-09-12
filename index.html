@@ -28,31 +28,27 @@
   .row>label{font-size:10pt; font-weight:400; white-space:normal; word-break:break-word}
   .row>input, .row>select{width:100%; padding:10px 12px; font-size:10pt; border:1px solid var(--gray-300); border-radius:10px; background:#fff; transition:box-shadow .15s, border-color .15s}
   .row>input:focus, .row>select:focus{outline:none; border-color:rgba(30,144,255,.8); box-shadow:0 0 0 3px rgba(30,144,255,.18); background:#fff}
-  /* Keep fields white even when autofilled */
-  input:-webkit-autofill,
-  input:-webkit-autofill:hover,
-  input:-webkit-autofill:focus,
-  select:-webkit-autofill{ -webkit-box-shadow:0 0 0 1000px #fff inset; box-shadow:0 0 0 1000px #fff inset; background:#fff !important; }
   select:invalid{color:#aaa}
 
   .actions{padding-left:calc(var(--label-w) + var(--gap)); margin-top:14px; display:flex; gap:10px; justify-content:flex-end}
   button{padding:14px 24px; border:none; border-radius:14px; background:#1E90FF; color:#fff; font-size:14pt; cursor:pointer}
-  .btn-secondary{background:#fff; color:#111; border:1px solid var(--gray-300)}
+  .btn-secondary{background:#fff; color:#111; border:1px solid #e5e7eb}
 
   /* ===== DO NOT CHANGE: QUESTION FORMATTING =====
      - Statements bold, subtext normal
-     - Both at 11px font size
-     - Answer pills smaller (38px)
+     - Both at 12px font size
      - Number has its own column; statement & subtext align flush-left
   */
   .q-item{padding:12px 0; border-top:1px solid #e5e7eb; display:grid; grid-template-columns: 26px 1fr; column-gap:8px; align-items:start}
-  .q-num{font-size:11px; line-height:1.2; text-align:right; padding-top:2px; color:#111}
+  .q-num{font-size:12px; line-height:1.2; text-align:right; padding-top:2px; color:#111}
   .q-body{display:block}
-  .q-title{display:block; font-size:11px; font-weight:700; margin:0 0 3px 0; line-height:1.35}
-  .q-sub{display:block; font-size:11px; font-weight:400; margin:0 0 8px 0; color:#444; line-height:1.35}
+  .q-title{display:block; font-size:12px; font-weight:700; margin:0 0 3px 0; line-height:1.35}
+  .q-sub{display:block; font-size:12px; font-weight:400; margin:0 0 8px 0; color:#444; line-height:1.35}
 
-  /* ===== DO NOT CHANGE: ANSWER PILL SIZE ===== */
-  .pill{display:inline-block; width:38px; height:38px; line-height:38px; text-align:center; border:1px solid #cfcfcf; border-radius:50%; margin-right:8px; cursor:pointer; user-select:none; font-size:16px}
+  /* ===== DO NOT CHANGE: ANSWER PILL SIZE =====
+     - Pill circle 30px; number 30px
+  */
+  .pill{display:inline-block; width:30px; height:30px; line-height:30px; text-align:center; border:1px solid #cfcfcf; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none; font-size:30px}
   .pill.selected{background:#1E90FF; color:#fff}
 
   /* Score page */
@@ -456,7 +452,7 @@
   };
   el('backToQ1').onclick = () => show('q1');
 
-  // Submit + score (bands + marker)
+  // Submit + score
   el('submitAll').onclick = () => { 
     const ids = (S.questions || []).map(q => q.id);
     const answered = ids.filter(id => S.answers[id] != null);
