@@ -10,7 +10,7 @@
   body{font-family:system-ui, Arial, sans-serif; background:#F9FAFB; color:#111; margin:0}
   .container{width:100%; margin:0; padding:24px var(--pad)}
 
-  /* ===== DO NOT CHANGE: PAGE 1 STYLES ===== */
+  /* ===== PAGE 1 ===== */
   h1{font-size:20pt; margin:0 0 8px 0; line-height:1.2}
   .subheader{font-size:18pt; margin:0 0 12px 0; font-weight:500}
   .section-title{font-size:13pt; margin:16px 0 8px 0; line-height:1.25; font-weight:800; letter-spacing:.5px; text-transform:uppercase}
@@ -30,7 +30,7 @@
   button{padding:14px 24px; border:none; border-radius:14px; background:#1E90FF; color:#fff; font-size:14pt; cursor:pointer}
   .btn-secondary{background:#fff; color:#111; border:1px solid #e5e7eb}
 
-  /* ===== QUESTIONS LAYOUT ===== */
+  /* ===== QUESTIONS ===== */
   .q-item{padding:12px 0; border-top:1px solid #e5e7eb; display:grid; grid-template-columns: 26px 1fr; column-gap:8px; align-items:start}
   .q-num{font-size:12px; line-height:1.2; text-align:right; padding-top:2px; color:#111}
   .q-body{display:block}
@@ -39,7 +39,7 @@
   .pill{display:inline-block; width:30px; height:30px; line-height:30px; text-align:center; border:1px solid #cfcfcf; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none; font-size:16px}
   .pill.selected{background:#1E90FF; color:#fff}
 
-  /* Score page */
+  /* ===== SCORE ===== */
   .score-kicker{font-size:14px; color:#666; margin:12px 0 8px 0}
   .score-big{font-size:32px; font-weight:800; margin:0 0 24px 0}
   .gauge{position:relative; height:28px; border-radius:999px; background:linear-gradient(90deg,#ef4444 0%, #f59e0b 35%, #fbbf24 50%, #84cc16 70%, #22c55e 100%);}
@@ -47,13 +47,26 @@
   .rec-kicker{font-size:14px; color:#666; margin:24px 0 8px 0}
   .rec-text{font-size:28px; font-weight:800; line-height:1.2; margin:0 0 8px 0}
 
-  /* ===== PEER PAGE (restored) ===== */
+  /* ===== PEER PAGE ===== */
   .peer-lead{font-size:12pt; line-height:1.7; color:#333; margin:8px 0 16px 0}
   .peer-row{display:flex; flex-wrap:wrap; gap:12px; margin:8px 0 14px 0}
-  .chip{padding:10px 16px; border:1px solid #d1d5db; border-radius:12px; background:#fff; font-weight:700; letter-spacing:.5px}
+  .chip{padding:10px 16px; border:1px solid #d1d5db; border-radius:12px; background:#fff; font-weight:700; letter-spacing:.5px; cursor:pointer; user-select:none}
+  .chip.active{background:#1E90FF; color:#fff; border-color:#1E90FF}
   .agree{display:flex; align-items:center; gap:10px; margin:10px 0 18px 0}
   .page-actions{display:flex; justify-content:space-between; gap:14px; padding-left:0; margin-top:10px}
   .btn-wide{flex:1 1 0%; border-radius:12px; padding:14px 0; font-size:16px}
+
+  /* ===== Modal (Peer eligibility) ===== */
+  .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:50}
+  .modal{width:min(92vw,520px); background:#fff; border-radius:18px; padding:20px; box-shadow:0 20px 60px rgba(0,0,0,.25)}
+  .modal h3{margin:0 0 10px 0; font-size:18px}
+  .modal p{margin:0 0 18px 0; font-size:16px; line-height:1.5; color:#222}
+  .modal .row-btns{display:flex; justify-content:flex-end; gap:10px}
+
+  /* ===== Congrats Page ===== */
+  .big-check{width:120px; height:120px; border-radius:60px; background:#1E90FF; display:flex; align-items:center; justify-content:center; margin:16px auto}
+  .big-check:after{content:'✔'; color:#fff; font-weight:800; font-size:54px}
+  .center{text-align:center}
 
   @media (max-width:340px){ .row{grid-template-columns:1fr; row-gap:6px} .actions{padding-left:0} .q-item{grid-template-columns:20px 1fr} }
 </style>
@@ -245,7 +258,7 @@
       <span class="dot"></span>
     </div>
 
-    <!-- ===== DO NOT EDIT: PAGE 1 START ===== -->
+    <!-- ===== PAGE 1 ===== -->
     <section id="welcome">
       <h2 class="section-title">Your Information</h2>
       <div class="row"><label for="nick">your name</label><input id="nick"></div>
@@ -282,9 +295,8 @@
         <button id="toInstructions">Start</button>
       </div>
     </section>
-    <!-- ===== DO NOT EDIT: PAGE 1 END ===== -->
 
-    <!-- Instructions -->
+    <!-- ===== Instructions ===== -->
     <section id="instructions" style="display:none">
       <h2 class="section-title">HOW TO ASSESS YOURSELF</h2>
       <p class="intro">
@@ -304,7 +316,7 @@
       </div>
     </section>
 
-    <!-- Questions Part 1 -->
+    <!-- ===== Questions 1 ===== -->
     <section id="q1" style="display:none">
       <h2 class="section-title">STATEMENTS PART 1</h2>
       <div id="list-q1"></div>
@@ -314,7 +326,7 @@
       </div>
     </section>
 
-    <!-- Questions Part 2 -->
+    <!-- ===== Questions 2 ===== -->
     <section id="q2" style="display:none">
       <h2 class="section-title">STATEMENTS PART 2</h2>
       <div id="list-q2"></div>
@@ -324,7 +336,7 @@
       </div>
     </section>
 
-    <!-- Results -->
+    <!-- ===== Score ===== -->
     <section id="finish" style="display:none">
       <h2 class="section-title">SELF-ASSESSMENT SCORE</h2>
       <div class="score-kicker">your self assessment results</div>
@@ -338,7 +350,7 @@
       </div>
     </section>
 
-    <!-- Peer Assessment (RESTORED) -->
+    <!-- ===== Peer Assessment ===== -->
     <section id="peer" style="display:none">
       <h2 class="section-title">PEER ASSESSMENT</h2>
       <h3 class="section-title" style="margin-top:4px">FIND YOUR PEER REVIEWER</h3>
@@ -351,13 +363,13 @@
       <div class="row"><label for="pNick">peer nick name</label><input id="pNick" placeholder=""></div>
       <div class="row"><label for="pEmail">peer email address</label><input id="pEmail" type="email" placeholder=""></div>
 
-      <div class="peer-row">
-        <span class="chip">BCK</span>
-        <span class="chip">BPS</span>
-        <span class="chip">BNM</span>
-        <span class="chip">BCG</span>
-        <span class="chip">FLY</span>
-        <span class="chip">BED</span>
+      <div class="peer-row" id="hotelChips">
+        <span class="chip" data-code="BCK">BCK</span>
+        <span class="chip" data-code="BPS">BPS</span>
+        <span class="chip" data-code="BNM">BNM</span>
+        <span class="chip" data-code="BCG">BCG</span>
+        <span class="chip" data-code="FLY">FLY</span>
+        <span class="chip" data-code="BED">BED</span>
       </div>
 
       <label class="agree">
@@ -370,25 +382,57 @@
         <button class="btn-wide" id="peerDone">Done</button>
       </div>
     </section>
+
+    <!-- ===== Congratulations ===== -->
+    <section id="congrats" style="display:none">
+      <h2 class="section-title">SELF- ASSESSMENT COMPLETED</h2>
+      <div class="progress" id="congratsDots">
+        <span class="dot active"></span><span class="dot active"></span><span class="dot active"></span>
+        <span class="dot active"></span><span class="dot active"></span><span class="dot active"></span>
+        <span class="dot active"></span>
+      </div>
+      <div class="big-check"></div>
+      <div class="center">
+        <h3 style="font-size:28px; margin:8px 0 6px 0">Congratulations</h3>
+        <p style="font-size:18px; color:#374151">To download your complete test results please click PDF</p>
+      </div>
+      <div class="page-actions">
+        <button class="btn-secondary btn-wide" id="congratsBack">Back</button>
+        <button class="btn-wide" id="congratsPdf">PDF</button>
+      </div>
+    </section>
   </main>
+
+  <!-- Peer Eligibility Modal -->
+  <div id="eligBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <h3>Peer eligibility</h3>
+      <p>Does your peer have at least 24 months of BED experience?</p>
+      <div class="row-btns">
+        <button id="eligCancel" class="btn-secondary">Cancel</button>
+        <button id="eligOk">OK</button>
+      </div>
+    </div>
+  </div>
 
 <script>
 (function(){
-  const S = {answers:{}, questions:[]};
+  const S = {answers:{}, questions:[], selectedHotel:null};
   try { S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }
   catch(e) { S.questions = []; }
 
   const el = id => document.getElementById(id);
-  const sections = ['welcome','instructions','q1','q2','finish','peer'];
+  const sections = ['welcome','instructions','q1','q2','finish','peer','congrats'];
 
   function show(id){
-    sections.forEach(s => el(s).style.display = (s===id ? 'block' : 'none'));
+    sections.forEach(s => (document.getElementById(s).style.display = (s===id ? 'block' : 'none')));
     let n = 1;
     if(id==='instructions') n = 2;
     else if(id==='q1') n = 3;
     else if(id==='q2') n = 4;
     else if(id==='finish') n = 5;
     else if(id==='peer') n = 6;
+    else if(id==='congrats') n = 7;
     setProgress(n);
     window.scrollTo({top:0, behavior:'smooth'});
   }
@@ -399,47 +443,17 @@
   }
   setProgress(1);
 
-  function stripLeadingNumber(t){
-    return String(t).replace(/^\s*\d+\.\s*/, '');
-  }
+  function stripLeadingNumber(t){ return String(t).replace(/^\s*\d+\.\s*/, ''); }
 
   function makeQ(q, ord){
     const wrap = document.createElement('div');
-    wrap.className = 'q-item';
-    wrap.dataset.qid = q.id;
-
-    const num = document.createElement('div');
-    num.className = 'q-num';
-    num.textContent = ord + '.';
-    wrap.appendChild(num);
-
-    const body = document.createElement('div');
-    body.className = 'q-body';
-
-    const title = document.createElement('span');
-    title.className = 'q-title';
-    title.textContent = stripLeadingNumber(q.statement || '');
-    body.appendChild(title);
-
-    if(q.subtext){
-      const sub = document.createElement('span');
-      sub.className = 'q-sub';
-      sub.textContent = q.subtext;
-      body.appendChild(sub);
-    }
-
-    for(let v=1; v<=5; v++){
-      const p = document.createElement('span');
-      p.className = 'pill';
-      p.textContent = v;
-      p.dataset.val = v;
-      p.onclick = () => { 
-        S.answers[q.id] = v;
-        wrap.querySelectorAll('.pill').forEach(x => x.classList.toggle('selected', x===p));
-      };
-      body.appendChild(p);
-    }
-
+    wrap.className = 'q-item'; wrap.dataset.qid = q.id;
+    const num = document.createElement('div'); num.className = 'q-num'; num.textContent = ord + '.'; wrap.appendChild(num);
+    const body = document.createElement('div'); body.className='q-body';
+    const title = document.createElement('span'); title.className='q-title'; title.textContent = stripLeadingNumber(q.statement||''); body.appendChild(title);
+    if(q.subtext){ const sub = document.createElement('span'); sub.className='q-sub'; sub.textContent = q.subtext; body.appendChild(sub); }
+    for(let v=1; v<=5; v++){ const p=document.createElement('span'); p.className='pill'; p.textContent=v; p.dataset.val=v;
+      p.onclick=()=>{ S.answers[q.id]=v; wrap.querySelectorAll('.pill').forEach(x=>x.classList.toggle('selected',x===p)); }; body.appendChild(p); }
     wrap.appendChild(body);
     return wrap;
   }
@@ -447,47 +461,24 @@
   // Navigation
   el('toInstructions').onclick = () => show('instructions');
   el('backToWelcome').onclick = () => show('welcome');
-  el('toQ1').onclick = () => { 
-    const l = el('list-q1'); l.innerHTML = '';
-    (S.questions || []).slice(0,18).forEach((q,i)=> l.appendChild(makeQ(q, i+1)));
-    show('q1');
-  };
+  el('toQ1').onclick = () => { const l=el('list-q1'); l.innerHTML=''; (S.questions||[]).slice(0,18).forEach((q,i)=>l.appendChild(makeQ(q,i+1))); show('q1'); };
   el('backToInstructions').onclick = () => show('instructions');
-  el('toQ2').onclick = () => { 
-    const l = el('list-q2'); l.innerHTML = '';
-    (S.questions || []).slice(18,35).forEach((q,i)=> l.appendChild(makeQ(q, 19+i)));
-    show('q2');
-  };
+  el('toQ2').onclick = () => { const l=el('list-q2'); l.innerHTML=''; (S.questions||[]).slice(18,35).forEach((q,i)=>l.appendChild(makeQ(q,19+i))); show('q2'); };
   el('backToQ1').onclick = () => show('q1');
 
   // Submit + score
   el('submitAll').onclick = () => { 
-    const ids = (S.questions || []).map(q => q.id);
+    const ids = (S.questions||[]).map(q=>q.id);
     const answered = ids.filter(id => S.answers[id] != null);
-    const total = answered.reduce((sum,id) => sum + Number(S.answers[id]||0), 0);
-    const avg = answered.length ? total / answered.length : 0;
+    const total = answered.reduce((sum,id)=>sum + Number(S.answers[id]||0), 0);
+    const avg = answered.length ? total/answered.length : 0;
     const pct = answered.length ? Math.round(((avg - 1) / 4) * 100) : 0;
-
     el('scorePercent').textContent = 'YOUR SCORE IS ' + pct + '%';
-
-    const gauge = el('gauge');
-    gauge.style.setProperty('--marker', pct + '%');
-    gauge.style.position = 'relative';
-    let markerStyle = document.getElementById('markerStyle');
-    if(!markerStyle){ 
-      markerStyle = document.createElement('style');
-      markerStyle.id = 'markerStyle';
-      document.head.appendChild(markerStyle);
-    }
+    const gauge = el('gauge'); gauge.style.setProperty('--marker', pct + '%'); gauge.style.position='relative';
+    let markerStyle = document.getElementById('markerStyle'); if(!markerStyle){ markerStyle=document.createElement('style'); markerStyle.id='markerStyle'; document.head.appendChild(markerStyle);}
     markerStyle.textContent = '.gauge::after{left: calc(var(--marker) - 5px);}';
-
-    let rec = '';
-    if(pct < 50) rec = 'Keep practicing!\nFocus on one habit at a time.';
-    else if(pct < 70) rec = 'Good effort!\nPick two areas to improve next.';
-    else if(pct < 85) rec = 'Great hospitality!\nKeep challenging yourself';
-    else rec = 'Excellent!\nBe a coach for your peers';
+    let rec=''; if(pct<50) rec='Keep practicing!\nFocus on one habit at a time.'; else if(pct<70) rec='Good effort!\nPick two areas to improve next.'; else if(pct<85) rec='Great hospitality!\nKeep challenging yourself'; else rec='Excellent!\nBe a coach for your peers';
     el('recText').innerHTML = rec.replace(/\n/g,'<br>');
-
     show('finish');
   };
 
@@ -495,12 +486,34 @@
   el('backToQ2').onclick = () => show('q2');
   el('nextToPeer').onclick = () => show('peer');
 
+  // Chip selection
+  const chipWrap = document.getElementById('hotelChips');
+  chipWrap.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => { 
+    chipWrap.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
+    ch.classList.add('active');
+    S.selectedHotel = ch.dataset.code;
+  }));
+
+  // Modal helpers
+  const backdrop = document.getElementById('eligBackdrop');
+  const openModal = () => (backdrop.style.display = 'flex');
+  const closeModal = () => (backdrop.style.display = 'none');
+
+  document.getElementById('eligCancel').onclick = closeModal;
+  document.getElementById('eligOk').onclick = () => { closeModal(); show('congrats'); };
+
   // Peer page actions
   el('peerBack').onclick = () => show('finish');
   el('peerDone').onclick = () => { 
+    // Require chip + checkbox
+    if(!S.selectedHotel){ alert('Please select a hotel.'); return; }
     if(!document.getElementById('agree').checked){ alert('Please agree to share your self-assessment.'); return; }
-    alert('Saved. Thank you!');
+    openModal(); // show eligibility confirmation modal
   };
+
+  // Congrats
+  el('congratsBack').onclick = () => show('peer');
+  el('congratsPdf').onclick = () => window.print(); // simple export
 })();
 </script>
 </body>
