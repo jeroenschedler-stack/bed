@@ -36,20 +36,23 @@
   select:invalid{color:#aaa}
 
   .actions{padding-left:calc(var(--label-w) + var(--gap)); margin-top:14px; display:flex; gap:10px; justify-content:flex-end}
-  button{padding:14px 24px; border:none; border-radius:14px; background:var(--brand-blue); color:#fff; font-size:14pt; cursor:pointer}
+  button{padding:14px 24px; border:none; border-radius:14px; background:#1E90FF; color:#fff; font-size:14pt; cursor:pointer}
   .btn-secondary{background:#fff; color:#111; border:1px solid var(--gray-300)}
 
   /* ===== DO NOT CHANGE: QUESTION FORMATTING =====
-     - Number in its own narrow column
-     - Statement and subtext align to same left margin (not under number)
-     - Both 10pt; statement bold, subtext normal
+     - Statements bold, subtext normal
+     - Both at 11px font size
+     - Answer pills smaller (38px)
+     - Number has its own column; statement & subtext align flush-left
   */
   .q-item{padding:12px 0; border-top:1px solid #e5e7eb; display:grid; grid-template-columns: 26px 1fr; column-gap:8px; align-items:start}
-  .q-num{font-size:10pt; line-height:1.2; text-align:right; padding-top:2px; color:#111}
+  .q-num{font-size:11px; line-height:1.2; text-align:right; padding-top:2px; color:#111}
   .q-body{display:block}
-  .q-title{display:block; font-size:10pt; font-weight:700; margin:0 0 3px 0; line-height:1.35}
-  .q-sub{display:block; font-size:10pt; font-weight:400; margin:0 0 8px 0; color:#444; line-height:1.35}
-  .pill{display:inline-block; width:44px; height:44px; line-height:44px; text-align:center; border:1px solid #cfcfcf; border-radius:50%; margin-right:10px; cursor:pointer; user-select:none; font-size:18px}
+  .q-title{display:block; font-size:11px; font-weight:700; margin:0 0 3px 0; line-height:1.35}
+  .q-sub{display:block; font-size:11px; font-weight:400; margin:0 0 8px 0; color:#444; line-height:1.35}
+
+  /* ===== DO NOT CHANGE: ANSWER PILL SIZE ===== */
+  .pill{display:inline-block; width:38px; height:38px; line-height:38px; text-align:center; border:1px solid #cfcfcf; border-radius:50%; margin-right:8px; cursor:pointer; user-select:none; font-size:16px}
   .pill.selected{background:#1E90FF; color:#fff}
 
   /* Score page */
@@ -367,9 +370,9 @@
 
 <script>
 (function(){
-  const S = {answers:{}, questions:[]};
-  try { S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }
-  catch(e) { S.questions = []; }
+  const S = {{answers:{{}}, questions:[]}};
+  try {{ S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }}
+  catch(e) {{ S.questions = []; }}
 
   const el = id => document.getElementById(id);
   const sections = ['welcome','instructions','q1','q2','finish','peer'];
@@ -426,10 +429,10 @@
       p.className = 'pill';
       p.textContent = v;
       p.dataset.val = v;
-      p.onclick = () => { 
+      p.onclick = () => {{ 
         S.answers[q.id] = v;
         wrap.querySelectorAll('.pill').forEach(x => x.classList.toggle('selected', x===p));
-      };
+      }};
       body.appendChild(p);
     }
 
@@ -440,62 +443,62 @@
   // Navigation
   el('toInstructions').onclick = () => show('instructions');
   el('backToWelcome').onclick = () => show('welcome');
-  el('toQ1').onclick = () => { 
+  el('toQ1').onclick = () => {{ 
     const l = el('list-q1'); l.innerHTML = '';
     (S.questions || []).slice(0,18).forEach((q,i)=> l.appendChild(makeQ(q, i+1)));
     show('q1');
-  };
+  }};
   el('backToInstructions').onclick = () => show('instructions');
-  el('toQ2').onclick = () => { 
+  el('toQ2').onclick = () => {{ 
     const l = el('list-q2'); l.innerHTML = '';
     (S.questions || []).slice(18,35).forEach((q,i)=> l.appendChild(makeQ(q, 19+i)));
     show('q2');
-  };
+  }};
   el('backToQ1').onclick = () => show('q1');
 
   // Submit + score (bands + marker)
-  el('submitAll').onclick = () => { 
+  el('submitAll').onclick = () => {{ 
     const ids = (S.questions || []).map(q => q.id);
     const answered = ids.filter(id => S.answers[id] != null);
     const total = answered.reduce((sum,id) => sum + Number(S.answers[id]||0), 0);
     const avg = answered.length ? total / answered.length : 0;
     const pct = answered.length ? Math.round(((avg - 1) / 4) * 100) : 0;
 
-    document.getElementById('scorePercent').textContent = 'YOUR SCORE IS ' + pct + '%';
+    el('scorePercent').textContent = 'YOUR SCORE IS ' + pct + '%';
 
-    const gauge = document.getElementById('gauge');
+    const gauge = el('gauge');
     gauge.style.setProperty('--marker', pct + '%');
     gauge.style.position = 'relative';
     let markerStyle = document.getElementById('markerStyle');
-    if(!markerStyle){ 
+    if(!markerStyle){{ 
       markerStyle = document.createElement('style');
       markerStyle.id = 'markerStyle';
       document.head.appendChild(markerStyle);
-    }
-    markerStyle.textContent = '.gauge::after{left: calc(var(--marker) - 5px);}';
-    
+    }}
+    markerStyle.textContent = '.gauge::after{{left: calc(var(--marker) - 5px);}}';
+
     let rec = '';
     if(pct < 50) rec = 'Keep practicing!\nFocus on one habit at a time.';
     else if(pct < 70) rec = 'Good effort!\nPick two areas to improve next.';
     else if(pct < 85) rec = 'Great hospitality!\nKeep challenging yourself';
     else rec = 'Excellent!\nBe a coach for your peers';
-    document.getElementById('recText').innerHTML = rec.replace(/\n/g,'<br>');
+    el('recText').innerHTML = rec.replace(/\n/g,'<br>');
 
     // Prefill peer summary
-    document.getElementById('peerNameOut').textContent = (document.getElementById('peerName').value || '—');
-    document.getElementById('peerEmailOut').textContent = (document.getElementById('peerEmail').value || '—');
-    document.getElementById('peerHotelOut').textContent = (document.getElementById('peerHotel').value || '—');
+    el('peerNameOut').textContent = (document.getElementById('peerName').value || '—');
+    el('peerEmailOut').textContent = (document.getElementById('peerEmail').value || '—');
+    el('peerHotelOut').textContent = (document.getElementById('peerHotel').value || '—');
 
     show('finish');
-  };
+  }};
 
   // Score page buttons
-  document.getElementById('backToQ2').onclick = () => show('q2');
-  document.getElementById('nextToPeer').onclick = () => show('peer');
+  el('backToQ2').onclick = () => show('q2');
+  el('nextToPeer').onclick = () => show('peer');
 
   // Peer page
-  document.getElementById('backToFinish').onclick = () => show('finish');
-  document.getElementById('peerStart').onclick = () => console.log('Peer assessment flow starts');
+  el('backToFinish').onclick = () => show('finish');
+  el('peerStart').onclick = () => console.log('Peer assessment flow starts');
 })();
 </script>
 </body>
