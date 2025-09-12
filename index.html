@@ -1,624 +1,145 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>BED HOSPITALITY — Self Assessment</title>
-<style>
-  :root{
-    --pad:20px;
-    --label-w:96px;
-    --gap:6px;
-    --brand-blue:#1E90FF;
-    --progress-red:#E11D48;
-    --progress-gray:#f3f4f6;
-    --gray-300:#cfd4dc;
-    --pill-size:30px;
-    --pill-font:16px;
-    --stmt-size:15px;
-    --score-marker:50%;
-  }
-  *{box-sizing:border-box}
-  body{font-family:system-ui, Arial, sans-serif; background:#F9FAFB; color:#111; margin:0}
-  .container{width:100%; margin:0; padding:24px var(--pad)}
-
-  h1{font-size:20pt; margin:0 0 8px 0; line-height:1.2}
-  .subheader{font-size:18pt; margin:0 0 12px 0; font-weight:500}
-  .section-title{font-size:13pt; margin:16px 0 8px 0; line-height:1.25; font-weight:800; letter-spacing:.5px; text-transform:uppercase}
-  .intro{font-size:12pt; line-height:1.5; color:#333; margin:4px 0 14px 0}
-
-  .progress{display:flex; gap:10px; margin:6px 0 16px 0}
-  .dot{width:10px; height:10px; border-radius:50%; background:var(--progress-gray); border:1px solid #e5e7eb}
-  .dot.active{background:var(--progress-red); border-color:var(--progress-red)}
-
-  .row{display:grid; grid-template-columns:minmax(84px, var(--label-w)) 1fr; column-gap:var(--gap); align-items:center; margin:10px 0}
-  .row>label{font-size:10pt; font-weight:400; white-space:normal; word-break:break-word}
-  .row>input{width:100%; padding:10px 12px; font-size:10pt; border:1px solid var(--gray-300); border-radius:10px; background:#fff; transition:box-shadow .15s, border-color .15s}
-  .row>input:focus{outline:none; border-color:rgba(30,144,255,.8); box-shadow:0 0 0 3px rgba(30,144,255,.18)}
-
-  .picker-trigger{display:flex; align-items:center; justify-content:space-between; width:100%; padding:10px 12px; font-size:10pt; border:1px solid var(--gray-300); border-radius:10px; background:#fff; cursor:pointer}
-  .picker-trigger:focus{outline:none; border-color:rgba(30,144,255,.8); box-shadow:0 0 0 3px rgba(30,144,255,.18)}
-  .caret{border:solid #555; border-width:0 2px 2px 0; display:inline-block; padding:3px; transform:rotate(45deg); margin-left:8px}
-
-  .actions{padding-left:calc(var(--label-w) + var(--gap)); margin-top:14px; display:flex; gap:10px; justify-content:flex-end}
-  button{padding:14px 24px; border:none; border-radius:14px; background:var(--brand-blue); color:#fff; font-size:14pt; cursor:pointer}
-  .btn-secondary{background:#fff; color:#111; border:1px solid #e5e7eb}
-  .btn-wide{flex:1 1 0%; border-radius:12px; padding:14px 0; font-size:16px}
-
-  .q-item{padding:12px 0; border-top:1px solid #e5e7eb; display:grid; grid-template-columns: 26px 1fr; column-gap:8px; align-items:start}
-  .q-num{font-size:12px; line-height:1.2; text-align:right; padding-top:2px; color:#111}
-  .q-title{display:block; font-size:var(--stmt-size); font-weight:700; margin:0 0 3px 0; line-height:1.35}
-  .q-sub{display:block; font-size:var(--stmt-size); font-weight:400; margin:0 0 8px 0; color:#444; line-height:1.35}
-  .pill{display:inline-flex; align-items:center; justify-content:center; width:var(--pill-size); height:var(--pill-size); line-height:var(--pill-size); text-align:center; border:1px solid #cfcfcf; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none; font-size:var(--pill-font); outline:none}
-  .pill.selected{background:var(--brand-blue); color:#fff}
-  .pill:focus-visible{box-shadow:0 0 0 3px rgba(30,144,255,.25)}
-
-  .score-kicker{font-size:14px; color:#666; margin:12px 0 8px 0}
-  .score-big{font-size:32px; font-weight:800; margin:0 0 24px 0}
-  .gauge{position:relative; height:28px; border-radius:999px; background:linear-gradient(90deg,#ef4444 0%, #f59e0b 35%, #fbbf24 50%, #84cc16 70%, #22c55e 100%);}
-  .gauge::after{content:""; position:absolute; top:-8px; bottom:-8px; width:10px; border-radius:6px; background:#333; left:calc(var(--score-marker) - 5px);}
-  .rec-kicker{font-size:14px; color:#666; margin:24px 0 8px 0}
-  .rec-text{font-size:28px; font-weight:800; line-height:1.2; margin:0 0 8px 0}
-
-  .peer-lead{font-size:12pt; line-height:1.7; color:#333; margin:8px 0 16px 0}
-  .peer-row{display:flex; flex-wrap:wrap; gap:12px; margin:8px 0 14px 0}
-  .chip{padding:10px 16px; border:1px solid #d1d5db; border-radius:12px; background:#fff; font-weight:700; letter-spacing:.5px; cursor:pointer; user-select:none}
-  .chip.active{background:var(--brand-blue); color:#fff; border-color:var(--brand-blue)}
-  .agree{display:flex; align-items:center; gap:10px; margin:10px 0 18px 0}
-  .page-actions{display:flex; justify-content:space-between; gap:14px; padding-left:0; margin-top:10px}
-
-  .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:50}
-  .modal{width:min(92vw,520px); background:#fff; border-radius:18px; padding:20px; box-shadow:0 20px 60px rgba(0,0,0,.25)}
-  .modal h3{margin:0 0 10px 0; font-size:18px}
-  .modal p{margin:0 0 18px 0; font-size:16px; line-height:1.5; color:#222}
-  .modal .row-btns{display:flex; justify-content:flex-end; gap:10px}
-
-  .picker-title{font-weight:800; font-size:18px; margin:0 0 12px 0}
-  .picker-list{list-style:none; padding:0; margin:0; max-height:50vh; overflow:auto; border-top:1px solid #eee}
-  .picker-item{padding:14px 8px; border-bottom:1px solid #eee; cursor:pointer; display:flex; align-items:center; justify-content:space-between}
-  .picker-item:hover, .picker-item:focus{background:#f6f8fb; outline:none}
-  .radio-dot{width:18px; height:18px; border-radius:50%; border:2px solid #9aa4b2; display:inline-flex; align-items:center; justify-content:center}
-  .radio-dot::after{content:""; width:10px; height:10px; border-radius:50%; background:transparent}
-  .picker-item[aria-selected="true"] .radio-dot{border-color:var(--brand-blue)}
-  .picker-item[aria-selected="true"] .radio-dot::after{background:var(--brand-blue)}
-
-  .big-check{width:120px; height:120px; border-radius:60px; background:var(--brand-blue); display:flex; align-items:center; justify-content:center; margin:16px auto}
-  .big-check:after{content:'✔'; color:#fff; font-weight:800; font-size:54px}
-  .center{text-align:center}
-
-  @media (max-width:340px){ .row{grid-template-columns:1fr; row-gap:6px} .actions{padding-left:0} .q-item{grid-template-columns:20px 1fr} }
-</style>
-<script id="embeddedQuestions" type="application/json">[
-  {
-    "id": 1,
-    "statement": "1. I answer very quickly to guest messages",
-    "subtext": "I often check and reply right away"
-  },
-  {
-    "id": 2,
-    "statement": "2. I make my replies warm and personal",
-    "subtext": "I use their name and add helpful information"
-  },
-  {
-    "id": 3,
-    "statement": "3. I make a great first impression",
-    "subtext": "I know it starts with the first message"
-  },
-  {
-    "id": 4,
-    "statement": "4. I can see if a guest is stressed or relaxed",
-    "subtext": "I adjust the way I check-in to the mood"
-  },
-  {
-    "id": 5,
-    "statement": "5. I ask questions before I ask passports",
-    "subtext": "I welcome guests like friends"
-  },
-  {
-    "id": 6,
-    "statement": "6. I can check-in a guest in 60 seconds",
-    "subtext": "I timed three standard check-ins"
-  },
-  {
-    "id": 7,
-    "statement": "7. I check in groups differently than FIT",
-    "subtext": "I usually check-in groups with the leader"
-  },
-  {
-    "id": 8,
-    "statement": "8. I don't say that check-in time is 14:00",
-    "subtext": "Guests can check-in when the room is ready"
-  },
-  {
-    "id": 9,
-    "statement": "9. I dont show stress when there is a problem",
-    "subtext": "I know that makes guests really worry"
-  },
-  {
-    "id": 10,
-    "statement": "10. I show genuine interest during check-out",
-    "subtext": "I ask about their stay or next destination"
-  },
-  {
-    "id": 11,
-    "statement": "11. I make great last impressions",
-    "subtext": "I walk them out and wait until their car has left"
-  },
-  {
-    "id": 12,
-    "statement": "12. I use names to connect with guests",
-    "subtext": "When it feels right I introduce myself"
-  },
-  {
-    "id": 13,
-    "statement": "13. I scan every guest every time",
-    "subtext": "I dont look at a group but at each individual"
-  },
-  {
-    "id": 14,
-    "statement": "14. I am good at scanning",
-    "subtext": "I see what people need before they ask"
-  },
-  {
-    "id": 15,
-    "statement": "15. I create unique surprises for guests",
-    "subtext": "I do more than offering free things"
-  },
-  {
-    "id": 16,
-    "statement": "16. Music is an essential part of the vibe",
-    "subtext": "I listen to make sure we play the right music"
-  },
-  {
-    "id": 17,
-    "statement": "17. I tell guests they can use other BED facilities",
-    "subtext": "I offer downtown coffee, big pool or breakfast"
-  },
-  {
-    "id": 18,
-    "statement": "18. It's annoying when a room key doesn't work",
-    "subtext": "I go up to make sure the new key works"
-  },
-  {
-    "id": 19,
-    "statement": "19. I talk with guests because I am interested",
-    "subtext": "When I force myself it will not be real"
-  },
-  {
-    "id": 20,
-    "statement": "20. I often give my friends honest feedback",
-    "subtext": "Im happy to help them to grow"
-  },
-  {
-    "id": 21,
-    "statement": "21. My friends often give me honest feedback",
-    "subtext": "I'm happy they help me to grow"
-  },
-  {
-    "id": 22,
-    "statement": "22. I can answer most questions about BED",
-    "subtext": "I have visited the rooms in all our hotels"
-  },
-  {
-    "id": 23,
-    "statement": "23. I understand the meaning of showtime",
-    "subtext": "The magic happens from 0700-1000"
-  },
-  {
-    "id": 24,
-    "statement": "24. I have peeled my own onion",
-    "subtext": "I dont act. Usually I show my true self"
-  },
-  {
-    "id": 25,
-    "statement": "25. I use ChatGPT or Gemini",
-    "subtext": "I ask for help with e.g., guest messages"
-  },
-  {
-    "id": 26,
-    "statement": "26. I send messages that look like I wrote them",
-    "subtext": "I don't copy AI because guests will know"
-  },
-  {
-    "id": 27,
-    "statement": "27. I use ChatGPT or Gemini",
-    "subtext": "I ask help to analyze and solve problems"
-  },
-  {
-    "id": 28,
-    "statement": "28. I never gossip. I signed I Promise",
-    "subtext": "I dont talk badly when someones not here"
-  },
-  {
-    "id": 29,
-    "statement": "29. I really understand that rules can be flexible",
-    "subtext": "Without reasons many rules just disappear"
-  },
-  {
-    "id": 30,
-    "statement": "30. I am confident about my own judgment",
-    "subtext": "I make decisions without asking permission"
-  },
-  {
-    "id": 31,
-    "statement": "31. I look after the whole hotel, not only front",
-    "subtext": "I include rooms, maintenance and back areas"
-  },
-  {
-    "id": 32,
-    "statement": "32. I look around when I arrive at the hotel",
-    "subtext": "I share responsibility for the whole hotel"
-  },
-  {
-    "id": 33,
-    "statement": "33. I don't pass issues to others but act myself",
-    "subtext": "I follow up later to make sure it's fixed"
-  },
-  {
-    "id": 34,
-    "statement": "34. I am not afraid of the CEO or my coach",
-    "subtext": "I know I am allowed to make mistakes"
-  },
-  {
-    "id": 35,
-    "statement": "35. I have no manuals that show me what to do",
-    "subtext": "That means I cannot do anything wrong"
-  }
-]</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BED Hospitality 2.0 – Team Member Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f7f7f7; }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; background: #fff; }
+    h1 { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
+    h2 { font-size: 16px; margin-top: 20px; }
+    label { font-size: 14px; margin-bottom: 6px; display: block; }
+    input, .dropdown { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+    button { padding: 10px 20px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
+    .btn-primary { background: #1E90FF; color: #fff; }
+    .btn-secondary { background: #f1f1f1; }
+    .hidden { display: none; }
+    .progress { text-align: center; margin: 15px 0; }
+    .dot { height: 12px; width: 12px; margin: 0 4px; display: inline-block; border-radius: 50%; background-color: #ccc; }
+    .dot.active { background-color: red; }
+    .question { margin-bottom: 18px; }
+    .statement { font-size: 12px; font-weight: bold; margin-bottom: 4px; }
+    .subtext { font-size: 12px; margin-bottom: 6px; }
+    .options { display: flex; gap: 10px; }
+    .options label { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid #888; border-radius: 50%; font-size: 14px; cursor: pointer; }
+    .options input { display: none; }
+    .options input:checked + span { background: #1E90FF; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; }
+    .popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .popup { background: #fff; padding: 20px; border-radius: 8px; text-align: center; width: 280px; }
+    .popup h3 { margin-bottom: 15px; font-size: 16px; }
+    .btn-row { display: flex; justify-content: space-around; margin-top: 15px; }
+  </style>
 </head>
 <body>
-  <main class="container">
-    <h1 id="appTitle" tabindex="-1">BED HOSPITALITY 2.0</h1>
-    <p class="subheader">TEAM MEMBER FORM</p>
-    <div class="progress" id="progressHeader" aria-label="progress" role="progressbar" aria-valuemin="1" aria-valuemax="7" aria-valuenow="1">
-      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-      <span class="dot"></span>
+  <div class="container">
+    <h1>BED HOSPITALITY 2.0<br>TEAM MEMBER FORM</h1>
+
+    <!-- Page 1 -->
+    <div id="page1">
+      <h2>Your Information</h2>
+      <label>Your Name</label>
+      <input type="text" id="yourName">
+      <label>Your Email</label>
+      <input type="email" id="yourEmail">
+      <label>Your Location</label>
+      <select id="yourLocation" class="dropdown">
+        <option value="">Select Location</option>
+        <option>BED Changkian</option>
+        <option>BED Phrasingh</option>
+        <option>BED Nimman</option>
+        <option>BED Chiang Mai Gate</option>
+        <option>BED Flying Around</option>
+        <option>BED Support</option>
+      </select>
+
+      <h2>Peer Information</h2>
+      <label>Peer Name</label>
+      <input type="text" id="peerName">
+      <label>Peer Email</label>
+      <input type="email" id="peerEmail">
+      <label>Peer Location</label>
+      <select id="peerLocation" class="dropdown">
+        <option value="">Select Location</option>
+        <option>BED Changkian</option>
+        <option>BED Phrasingh</option>
+        <option>BED Nimman</option>
+        <option>BED Chiang Mai Gate</option>
+        <option>BED Flying Around</option>
+        <option>BED Support</option>
+      </select>
+      <button class="btn-primary" onclick="validatePeer()">Start</button>
     </div>
 
-    <section id="welcome" aria-labelledby="welcomeHead">
-      <h2 class="section-title" id="welcomeHead" tabindex="-1">Your Information</h2>
-      <div class="row"><label for="nick">your name</label><input id="nick" required></div>
-      <div class="row"><label for="email">your email</label><input id="email" type="email" required></div>
-      <div class="row"><label for="hotelBtn">your location</label>
-        <select id="hotel" style="display:none">
-          <option value="">select hotel</option>
-          <option>BED Changkian</option>
-          <option>BED Phrasingh</option>
-          <option>BED Nimman</option>
-          <option>BED Chiang Mai Gate</option>
-          <option>BED Flying Around</option>
-          <option>BED Support</option>
-        </select>
-        <button id="hotelBtn" type="button" class="picker-trigger" aria-haspopup="dialog" aria-expanded="false">
-          <span id="hotelLabel">select hotel</span><i class="caret"></i>
-        </button>
+    <!-- Popup -->
+    <div class="popup-overlay" id="popupOverlay">
+      <div class="popup">
+        <h3>Peer Eligibility</h3>
+        <p>Does your peer have at least 12 months of BED experience?</p>
+        <div class="btn-row">
+          <button class="btn-secondary" onclick="closePopup()">Cancel</button>
+          <button class="btn-primary" onclick="confirmPeer()">OK</button>
+        </div>
       </div>
+    </div>
 
-      <h2 class="section-title" tabindex="-1">Peer Information</h2>
-      <p class="intro">after you completed your self assessment one of your peers will review you. select one of your team members who worked in BED for at least 12 months</p>
-      <div class="row"><label for="peerName">name peer</label><input id="peerName" required></div>
-      <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email" required></div>
-      <div class="row"><label for="peerHotelBtn">peer location</label>
-        <select id="peerHotel" style="display:none">
-          <option value="">select hotel</option>
-          <option>BED Changkian</option>
-          <option>BED Phrasingh</option>
-          <option>BED Nimman</option>
-          <option>BED Chiang Mai Gate</option>
-          <option>BED Flying Around</option>
-          <option>BED Support</option>
-        </select>
-        <button id="peerHotelBtn" type="button" class="picker-trigger" aria-haspopup="dialog" aria-expanded="false">
-          <span id="peerHotelLabel">select hotel</span><i class="caret"></i>
-        </button>
-      </div>
+    <!-- Page 2 (Instructions) -->
+    <div id="page2" class="hidden">
+      <div class="progress"><span class="dot active"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <h2>HOW TO ASSESS YOURSELF</h2>
+      <p class="subtext">Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities.</p>
+      <h2>HOW TO SCORE YOURSELF</h2>
+      <div class="options"><label><input type="radio" disabled><span>1</span></label> <label><input type="radio" disabled><span>2</span></label> <label><input type="radio" disabled><span>3</span></label> <label><input type="radio" disabled><span>4</span></label> <label><input type="radio" disabled><span>5</span></label></div>
+      <button class="btn-primary" onclick="goToPage(3)">Next</button>
+    </div>
 
-      <div class="actions">
-        <button id="toInstructions">Start</button>
-      </div>
-    </section>
+    <!-- Question Pages -->
+    <div id="page3" class="hidden">
+      <div class="progress"><span class="dot active"></span><span class="dot active"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <h2>STATEMENTS PART 1</h2>
+      <div id="questions1"></div>
+      <button class="btn-secondary" onclick="goToPage(2)">Back</button>
+      <button class="btn-primary" id="nextBtn1" disabled onclick="goToPage(4)">Next</button>
+    </div>
 
-    <section id="instructions" style="display:none" aria-labelledby="instHead">
-      <h2 class="section-title" id="instHead" tabindex="-1">HOW TO ASSESS YOURSELF</h2>
-      <p class="intro">
-        Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities
-      </p>
-      <h2 class="section-title">HOW TO SCORE YOURSELF</h2>
-      <ul class="scale-list" style="list-style:none; padding:0; margin:10px 0">
-        <li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge pill" aria-hidden="true">1</span> <span>I am not good at this</span></li>
-        <li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge pill" aria-hidden="true">2</span> <span>I need to be better at this</span></li>
-        <li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge pill" aria-hidden="true">3</span> <span>I am average at this</span></li>
-        <li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge pill" aria-hidden="true">4</span> <span>I am good at this</span></li>
-        <li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge pill" aria-hidden="true">5</span> <span>I am very good at this</span></li>
-      </ul>
-      <div class="actions">
-        <button class="btn-secondary" id="backToWelcome">Back</button>
-        <button id="toQ1">Start</button>
-      </div>
-    </section>
-
-    <section id="q1" style="display:none" aria-labelledby="q1Head">
-      <h2 class="section-title" id="q1Head" tabindex="-1">STATEMENTS PART 1</h2>
-      <div id="list-q1"></div>
-      <div class="actions">
-        <button class="btn-secondary" id="backToInstructions">Back</button>
-        <button id="toQ2">Next</button>
-      </div>
-    </section>
-
-    <section id="q2" style="display:none" aria-labelledby="q2Head">
-      <h2 class="section-title" id="q2Head" tabindex="-1">STATEMENTS PART 2</h2>
-      <div id="list-q2"></div>
-      <div class="actions">
-        <button class="btn-secondary" id="backToQ1">Back</button>
-        <button id="submitAll">Next</button>
-      </div>
-    </section>
-
-    <section id="finish" style="display:none" aria-labelledby="scoreHead">
-      <h2 class="section-title" id="scoreHead" tabindex="-1">SELF-ASSESSMENT SCORE</h2>
-      <div class="score-kicker">your self assessment results</div>
-      <div id="scorePercent" class="score-big">YOUR SCORE IS —%</div>
-      <div class="gauge" id="gauge"></div>
-      <div class="rec-kicker">our suggestion and recommendation</div>
-      <div id="recText" class="rec-text">—</div>
-      <div class="actions">
-        <button class="btn-secondary" id="backToQ2">Back</button>
-        <button id="nextToPeer">Next</button>
-      </div>
-    </section>
-
-    <section id="peer" style="display:none" aria-labelledby="peerHead">
-      <h2 class="section-title" id="peerHead" tabindex="-1">PEER ASSESSMENT</h2>
-      <h3 class="section-title" style="margin-top:4px">FIND YOUR PEER REVIEWER</h3>
-      <p class="peer-lead">
-        You completed your self-assessment. The next step is peer review.
-        Ask anyone in your team who has been in BED for at least 24 months to assess you.
-        When they accept complete the information. When you click Done the review form is send to your peer
-      </p>
-
-      <div class="row"><label for="pNick">peer nick name</label><input id="pNick" required></div>
-      <div class="row"><label for="pEmail">peer email address</label><input id="pEmail" type="email" required></div>
-
-      <div class="peer-row" id="hotelChips" role="group" aria-label="Select peer location">
-        <span class="chip" tabindex="0" data-code="BCK">BCK</span>
-        <span class="chip" tabindex="0" data-code="BPS">BPS</span>
-        <span class="chip" tabindex="0" data-code="BNM">BNM</span>
-        <span class="chip" tabindex="0" data-code="BCG">BCG</span>
-        <span class="chip" tabindex="0" data-code="FLY">FLY</span>
-        <span class="chip" tabindex="0" data-code="BED">BED</span>
-      </div>
-
-      <label class="agree">
-        <input id="agree" type="checkbox" required/>
-        <span>I agree to share my self-assessment with my peer</span>
-      </label>
-
-      <div class="page-actions">
-        <button class="btn-secondary btn-wide" id="peerBack">Back</button>
-        <button class="btn-wide" id="peerDone">Done</button>
-      </div>
-    </section>
-
-    <section id="congrats" style="display:none" aria-labelledby="cgHead">
-      <h2 class="section-title" id="cgHead" tabindex="-1">SELF- ASSESSMENT COMPLETED</h2>
-      <div class="progress" id="congratsDots">
-        <span class="dot active"></span><span class="dot active"></span><span class="dot active"></span>
-        <span class="dot active"></span><span class="dot active"></span><span class="dot active"></span>
-        <span class="dot active"></span>
-      </div>
-      <div class="big-check" aria-hidden="true"></div>
-      <div class="center">
-        <h3 style="font-size:28px; margin:8px 0 6px 0">Congratulations</h3>
-        <p style="font-size:18px; color:#374151">To download your complete test results please click PDF</p>
-      </div>
-      <div class="page-actions">
-        <button class="btn-secondary btn-wide" id="congratsBack">Back</button>
-        <button class="btn-wide" id="congratsPdf">PDF</button>
-      </div>
-    </section>
-  </main>
-
-  <div id="modalBackdrop" class="modal-backdrop">
-    <div id="modalCard" class="modal" role="dialog" aria-modal="true"></div>
+    <div id="page4" class="hidden">
+      <div class="progress"><span class="dot active"></span><span class="dot active"></span><span class="dot active"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+      <h2>STATEMENTS PART 2</h2>
+      <div id="questions2"></div>
+      <button class="btn-secondary" onclick="goToPage(3)">Back</button>
+      <button class="btn-primary" id="submitBtn" disabled onclick="submitAnswers()">Submit</button>
+    </div>
   </div>
 
-<script>
-(function(){
-  const STEP = Object.freeze({ welcome:1, instructions:2, q1:3, q2:4, finish:5, peer:6, congrats:7 });
-
-  const S = {answers:{}, questions:[], selectedHotel:null};
-  try { S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }
-  catch(e) { S.questions = []; }
-
-  const el = id => document.getElementById(id);
-  const sections = ['welcome','instructions','q1','q2','finish','peer','congrats'];
-
-  function setProgress(n){
-    const dots = document.querySelectorAll('#progressHeader .dot');
-    dots.forEach((d,i)=>d.classList.toggle('active', i < n));
-    el('progressHeader').setAttribute('aria-valuenow', String(n));
-  }
-  function focusHeading(id){
-    const sec = el(id); const h = sec && sec.querySelector('[tabindex="-1"]'); if(h) h.focus({preventScroll:true}); window.scrollTo({top:0, behavior:'smooth'});
-  }
-  function show(id){
-    sections.forEach(s => (el(s).style.display = (s===id ? 'block' : 'none')));
-    setProgress(STEP[id] || 1); focusHeading(id);
-  }
-  setProgress(1);
-
-  const stripLeadingNumber = t => String(t||'').replace(/^\s*\d+\.\s*/, '');
-
-  function makeQ(q, ord){
-    const wrap = document.createElement('div'); wrap.className='q-item'; wrap.dataset.qid=q.id;
-    const num = document.createElement('div'); num.className='q-num'; num.textContent=ord + '.'; wrap.appendChild(num);
-    const body = document.createElement('div');
-    const title = document.createElement('span'); title.className='q-title'; title.textContent=stripLeadingNumber(q.statement||''); body.appendChild(title);
-    if(q.subtext){ const sub=document.createElement('span'); sub.className='q-sub'; sub.textContent=q.subtext; body.appendChild(sub);}
-    const group=document.createElement('div'); group.setAttribute('role','radiogroup'); group.setAttribute('aria-label','rating');
-    for(let v=1; v<=5; v++){ const p=document.createElement('span'); p.className='pill'; p.tabIndex=0; p.textContent=v; p.dataset.val=v; p.setAttribute('role','radio'); p.setAttribute('aria-checked','false'); group.appendChild(p);}
-    body.appendChild(group); wrap.appendChild(body); return wrap;
-  }
-  function buildLists(){
-    const a=(S.questions||[]); const firstCount=Math.min(18,a.length); const secondCount=Math.max(0, Math.min(17, a.length-firstCount));
-    const l1=el('list-q1'), l2=el('list-q2'); l1.innerHTML=''; l2.innerHTML='';
-    a.slice(0, firstCount).forEach((q,i)=>l1.appendChild(makeQ(q,i+1)));
-    a.slice(firstCount, firstCount+secondCount).forEach((q,i)=>l2.appendChild(makeQ(q, firstCount+i+1)));
-  }
-
-  const backdrop = el('modalBackdrop'); const card = el('modalCard');
-  const focusablesSel = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-
-  function openModal(contentBuilder){
-    card.innerHTML=''; card.appendChild(contentBuilder());
-    backdrop.style.display='flex';
-    const f = card.querySelector(focusablesSel); (f||card).focus();
-    backdrop.addEventListener('keydown', trapFocus);
-  }
-  function closeModal(){
-    backdrop.style.display='none'; card.innerHTML='';
-    backdrop.removeEventListener('keydown', trapFocus);
-  }
-  function trapFocus(e){
-    if(e.key!=='Tab') return;
-    const f = card.querySelectorAll(focusablesSel); if(!f.length) return;
-    const first=f[0], last=f[f.length-1];
-    if(e.shiftKey && document.activeElement===first){ last.focus(); e.preventDefault(); }
-    else if(!e.shiftKey && document.activeElement===last){ first.focus(); e.preventDefault(); }
-  }
-
-  const OPTIONS = ['BED Changkian','BED Phrasingh','BED Nimman','BED Chiang Mai Gate','BED Flying Around','BED Support'];
-  function pickerContent(title, selected, onSelect){
-    return () => {
-      const wrap = document.createElement('div');
-      const h = document.createElement('h3'); h.className='picker-title'; h.textContent=title; wrap.appendChild(h);
-      const ul=document.createElement('ul'); ul.className='picker-list';
-      OPTIONS.forEach(opt=>{
-        const li=document.createElement('li'); li.className='picker-item'; li.setAttribute('tabindex','0'); li.setAttribute('role','option');
-        li.setAttribute('aria-selected', String(opt===selected));
-        const span=document.createElement('span'); span.textContent=opt;
-        const dot=document.createElement('i'); dot.className='radio-dot';
-        li.appendChild(span); li.appendChild(dot);
-        li.addEventListener('click', ()=>{ onSelect(opt); closeModal(); });
-        li.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ' ){ e.preventDefault(); onSelect(opt); closeModal(); } });
-        ul.appendChild(li);
-      });
-      wrap.appendChild(ul);
-      const btns=document.createElement('div'); btns.className='row-btns'; const cancel=document.createElement('button'); cancel.className='btn-secondary'; cancel.textContent='Cancel';
-      cancel.addEventListener('click', ()=>{ closeModal(); });
-      btns.appendChild(cancel); wrap.appendChild(btns);
-      return wrap;
-    }
-  }
-
-  function bindPicker(triggerId, labelId, selectId, title){
-    const trigger = el(triggerId), label = el(labelId), select = el(selectId);
-    trigger.addEventListener('click', ()=>{
-      openModal(pickerContent(title, select.value, (opt)=>{ select.value = opt; label.textContent = opt; trigger.setAttribute('aria-expanded','false'); }));
-      trigger.setAttribute('aria-expanded','true');
-    });
-  }
-  bindPicker('hotelBtn', 'hotelLabel', 'hotel', 'Select Location');
-  bindPicker('peerHotelBtn', 'peerHotelLabel', 'peerHotel', 'Select Location');
-
-  function handlePillActivate(pill){
-    if(!pill) return;
-    const group=pill.parentElement; const wrap=pill.closest('.q-item'); const qid=wrap && wrap.dataset.qid; if(!qid) return;
-    group.querySelectorAll('.pill').forEach(x=>{ x.classList.remove('selected'); x.setAttribute('aria-checked','false'); });
-    pill.classList.add('selected'); pill.setAttribute('aria-checked','true'); S.answers[qid]=Number(pill.dataset.val);
-  }
-  document.addEventListener('click', (e)=>{
-    const pill=e.target.closest('.pill'); if(pill && pill.parentElement && pill.parentElement.getAttribute('role')==='radiogroup'){ handlePillActivate(pill); }
-    const chip=e.target.closest('.chip'); if(chip && chip.parentElement && chip.parentElement.id==='hotelChips'){ chip.parentElement.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); chip.classList.add('active'); S.selectedHotel=chip.dataset.code; }
-  });
-  document.addEventListener('keydown', (e)=>{
-    const tgt=document.activeElement;
-    if(tgt && tgt.classList.contains('pill')){
-      const group=tgt.parentElement; const pills=Array.from(group.querySelectorAll('.pill')); let idx=pills.indexOf(tgt);
-      if(e.key==='ArrowRight' || e.key==='ArrowDown'){ idx=Math.min(pills.length-1, idx+1); pills[idx].focus(); e.preventDefault(); }
-      if(e.key==='ArrowLeft' || e.key==='ArrowUp'){ idx=Math.max(0, idx-1); pills[idx].focus(); e.preventDefault(); }
-      if(/[1-5]/.test(e.key)){ const p=pills[Number(e.key)-1]; handlePillActivate(p); p.focus(); e.preventDefault(); }
-      if(e.key===' ' || e.key==='Enter'){ handlePillActivate(tgt); e.preventDefault(); }
-    }
-  });
-
-  el('toInstructions').onclick = () => {
-    const required = [
-      ['nick', v=>!!v],
-      ['email', v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)],
-      ['hotel', v=>!!v],
-      ['peerName', v=>!!v],
-      ['peerEmail', v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)],
-      ['peerHotel', v=>!!v],
-    ];
-    for(const [id, ok] of required){
-      const node = el(id);
-      const value = node ? node.value : '';
-      if(!ok(value)){
-        if(id==='hotel') el('hotelBtn').focus();
-        if(id==='peerHotel') el('peerHotelBtn').focus();
-        if(node && node.reportValidity) node.reportValidity();
+  <script>
+    function validatePeer() {
+      const peerName = document.getElementById("peerName").value;
+      const peerEmail = document.getElementById("peerEmail").value;
+      const peerLocation = document.getElementById("peerLocation").value;
+      if (!peerName || !peerEmail || !peerLocation) {
+        alert("Please fill out all peer fields.");
         return;
       }
+      document.getElementById("popupOverlay").style.display = "flex";
     }
-    openModal(()=>{
-      const wrap=document.createElement('div');
-      const h=document.createElement('h3'); h.textContent='Peer eligibility'; wrap.appendChild(h);
-      const p=document.createElement('p'); p.textContent='Does your peer have at least 12 months of BED experience?'; wrap.appendChild(p);
-      const btns=document.createElement('div'); btns.className='row-btns';
-      const cancel=document.createElement('button'); cancel.className='btn-secondary'; cancel.textContent='Cancel';
-      const ok=document.createElement('button'); ok.textContent='OK';
-      cancel.onclick=()=>closeModal();
-      ok.onclick=()=>{ closeModal(); show('instructions'); };
-      btns.appendChild(cancel); btns.appendChild(ok); wrap.appendChild(btns); return wrap;
-    });
-  };
 
-  el('backToWelcome').onclick = () => show('welcome');
-  el('toQ1').onclick = () => { buildLists(); show('q1'); };
-  el('backToInstructions').onclick = () => show('instructions');
-  el('toQ2').onclick = () => show('q2');
-  el('backToQ1').onclick = () => show('q1');
+    function closePopup() {
+      document.getElementById("popupOverlay").style.display = "none";
+    }
 
-  el('submitAll').onclick = () => {
-    const ids=(S.questions||[]).map(q=>q.id);
-    const answered=ids.filter(id=>S.answers[id]!=null);
-    const total=answered.reduce((sum,id)=>sum+Number(S.answers[id]||0),0);
-    const avg=answered.length? total/answered.length : 0;
-    const pct=answered.length? Math.round(((avg-1)/4)*100):0;
-    el('scorePercent').textContent='YOUR SCORE IS ' + pct + '%';
-    document.documentElement.style.setProperty('--score-marker', pct + '%');
-    let rec=''; if(pct<50) rec='Keep practicing!\nFocus on one habit at a time.'; else if(pct<70) rec='Good effort!\nPick two areas to improve next.'; else if(pct<85) rec='Great hospitality!\nKeep challenging yourself'; else rec='Excellent!\nBe a coach for your peers';
-    el('recText').innerHTML=rec.replace(/\n/g,'<br>');
-    show('finish');
-  };
+    function confirmPeer() {
+      document.getElementById("popupOverlay").style.display = "none";
+      goToPage(2);
+    }
 
-  el('backToQ2').onclick = () => show('q2');
-  el('nextToPeer').onclick = () => show('peer');
+    function goToPage(num) {
+      document.querySelectorAll(".container > div").forEach(div => div.classList.add("hidden"));
+      document.getElementById("page"+num).classList.remove("hidden");
+    }
 
-  el('peerBack').onclick = () => show('finish');
-  el('peerDone').onclick = () => {
-    if(!el('pNick').value){ alert('Please fill peer name'); return; }
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el('pEmail').value)){ alert('Please enter a valid email'); return; }
-    if(!S.selectedHotel){ alert('Please select a hotel.'); return; }
-    if(!el('agree').checked){ alert('Please agree to share your self-assessment.'); return; }
-    openModal(()=>{
-      const wrap=document.createElement('div');
-      const h=document.createElement('h3'); h.textContent='Peer eligibility'; wrap.appendChild(h);
-      const p=document.createElement('p'); p.textContent='Does your peer have at least 24 months of BED experience?'; wrap.appendChild(p);
-      const btns=document.createElement('div'); btns.className='row-btns';
-      const cancel=document.createElement('button'); cancel.className='btn-secondary'; cancel.textContent='Cancel';
-      const ok=document.createElement('button'); ok.textContent='OK';
-      cancel.onclick=()=>closeModal();
-      ok.onclick=()=>{ closeModal(); show('congrats'); };
-      btns.appendChild(cancel); btns.appendChild(ok); wrap.appendChild(btns); return wrap;
-    });
-  };
-
-  el('congratsBack').onclick = () => show('peer');
-  el('congratsPdf').onclick = () => window.print();
-})();</script>
+    function submitAnswers() {
+      alert("Answers submitted!");
+    }
+  </script>
 </body>
 </html>
