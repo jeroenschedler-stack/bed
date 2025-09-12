@@ -5,11 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>BED HOSPITALITY — Self Assessment</title>
 <style>
-  :root{
-    --pad:20px; --label-w:96px; --gap:6px;
-    --brand-blue:#1E90FF; --progress-red:#E11D48; --progress-gray:#f3f4f6;
-    --gray-300:#cfd4dc;
-  }
+  :root{--pad:20px; --label-w:96px; --gap:6px; --brand-blue:#1E90FF; --progress-red:#E11D48; --progress-gray:#f3f4f6; --gray-300:#cfd4dc;}
   *{box-sizing:border-box}
   body{font-family:system-ui, Arial, sans-serif; background:#F9FAFB; color:#111; margin:0}
   .container{width:100%; margin:0; padding:24px var(--pad)}
@@ -34,21 +30,12 @@
   button{padding:14px 24px; border:none; border-radius:14px; background:#1E90FF; color:#fff; font-size:14pt; cursor:pointer}
   .btn-secondary{background:#fff; color:#111; border:1px solid #e5e7eb}
 
-  /* ===== DO NOT CHANGE: QUESTION FORMATTING =====
-     - Statements bold, subtext normal
-     - Increased to 15px to match reference
-     - Number has its own column; statement & subtext align flush-left
-  */
+  /* ===== QUESTIONS LAYOUT ===== */
   .q-item{padding:12px 0; border-top:1px solid #e5e7eb; display:grid; grid-template-columns: 26px 1fr; column-gap:8px; align-items:start}
   .q-num{font-size:12px; line-height:1.2; text-align:right; padding-top:2px; color:#111}
   .q-body{display:block}
   .q-title{display:block; font-size:15px; font-weight:700; margin:0 0 3px 0; line-height:1.35}
   .q-sub{display:block; font-size:15px; font-weight:400; margin:0 0 8px 0; color:#444; line-height:1.35}
-
-  /* ===== DO NOT CHANGE: ANSWER PILL SIZE =====
-     - Keep pill circle 30px
-     - Reduce number to 16px for balance (smaller than circle)
-  */
   .pill{display:inline-block; width:30px; height:30px; line-height:30px; text-align:center; border:1px solid #cfcfcf; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none; font-size:16px}
   .pill.selected{background:#1E90FF; color:#fff}
 
@@ -60,14 +47,15 @@
   .rec-kicker{font-size:14px; color:#666; margin:24px 0 8px 0}
   .rec-text{font-size:28px; font-weight:800; line-height:1.2; margin:0 0 8px 0}
 
-  .peer-box{background:#fff; border:1px solid #e5e7eb; border-radius:12px; padding:16px; margin-top:8px}
-  .peer-box p{margin:0 0 10px 0; font-size:14px; color:#444}
+  /* ===== PEER PAGE (restored) ===== */
+  .peer-lead{font-size:12pt; line-height:1.7; color:#333; margin:8px 0 16px 0}
+  .peer-row{display:flex; flex-wrap:wrap; gap:12px; margin:8px 0 14px 0}
+  .chip{padding:10px 16px; border:1px solid #d1d5db; border-radius:12px; background:#fff; font-weight:700; letter-spacing:.5px}
+  .agree{display:flex; align-items:center; gap:10px; margin:10px 0 18px 0}
+  .page-actions{display:flex; justify-content:space-between; gap:14px; padding-left:0; margin-top:10px}
+  .btn-wide{flex:1 1 0%; border-radius:12px; padding:14px 0; font-size:16px}
 
-  @media (max-width:340px){
-    .row{grid-template-columns:1fr; row-gap:6px}
-    .actions{padding-left:0}
-    .q-item{grid-template-columns:20px 1fr}
-  }
+  @media (max-width:340px){ .row{grid-template-columns:1fr; row-gap:6px} .actions{padding-left:0} .q-item{grid-template-columns:20px 1fr} }
 </style>
 <script id="embeddedQuestions" type="application/json">[
   {
@@ -350,17 +338,36 @@
       </div>
     </section>
 
-    <!-- Peer Assessment Landing -->
+    <!-- Peer Assessment (RESTORED) -->
     <section id="peer" style="display:none">
       <h2 class="section-title">PEER ASSESSMENT</h2>
-      <div class="peer-box">
-        <p>Now it’s your peer’s turn. We’ll send the review to:</p>
-        <p><strong id="peerNameOut">—</strong> (<span id="peerEmailOut">—</span>) at <span id="peerHotelOut">—</span>.</p>
-        <p>Tap <strong>Start peer assessment</strong> to continue.</p>
+      <h3 class="section-title" style="margin-top:4px">FIND YOUR PEER REVIEWER</h3>
+      <p class="peer-lead">
+        You completed your self-assessment. The next step is peer review.
+        Ask anyone in your team who has been in BED for at least 24 months to assess you.
+        When they accept complete the information. When you click Done the review form is send to your peer
+      </p>
+
+      <div class="row"><label for="pNick">peer nick name</label><input id="pNick" placeholder=""></div>
+      <div class="row"><label for="pEmail">peer email address</label><input id="pEmail" type="email" placeholder=""></div>
+
+      <div class="peer-row">
+        <span class="chip">BCK</span>
+        <span class="chip">BPS</span>
+        <span class="chip">BNM</span>
+        <span class="chip">BCG</span>
+        <span class="chip">FLY</span>
+        <span class="chip">BED</span>
       </div>
-      <div class="actions">
-        <button class="btn-secondary" id="backToFinish">Back</button>
-        <button id="peerStart">Start peer assessment</button>
+
+      <label class="agree">
+        <input id="agree" type="checkbox"/>
+        <span>I agree to share my self-assessment with my peer</span>
+      </label>
+
+      <div class="page-actions">
+        <button class="btn-secondary btn-wide" id="peerBack">Back</button>
+        <button class="btn-wide" id="peerDone">Done</button>
       </div>
     </section>
   </main>
@@ -481,11 +488,6 @@
     else rec = 'Excellent!\nBe a coach for your peers';
     el('recText').innerHTML = rec.replace(/\n/g,'<br>');
 
-    // Prefill peer summary
-    el('peerNameOut').textContent = (document.getElementById('peerName').value || '—');
-    el('peerEmailOut').textContent = (document.getElementById('peerEmail').value || '—');
-    el('peerHotelOut').textContent = (document.getElementById('peerHotel').value || '—');
-
     show('finish');
   };
 
@@ -493,9 +495,12 @@
   el('backToQ2').onclick = () => show('q2');
   el('nextToPeer').onclick = () => show('peer');
 
-  // Peer page
-  el('backToFinish').onclick = () => show('finish');
-  el('peerStart').onclick = () => console.log('Peer assessment flow starts');
+  // Peer page actions
+  el('peerBack').onclick = () => show('finish');
+  el('peerDone').onclick = () => { 
+    if(!document.getElementById('agree').checked){ alert('Please agree to share your self-assessment.'); return; }
+    alert('Saved. Thank you!');
+  };
 })();
 </script>
 </body>
