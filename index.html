@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>BED HOSPITALITY — Self Assessment</title>
 <style>
-  /* === TOKENS === */
   :root{
     --pad:20px;
     --label-w:96px;
@@ -14,16 +13,15 @@
     --progress-red:#E11D48;
     --progress-gray:#f3f4f6;
     --gray-300:#cfd4dc;
-    --pill-size:30px;       /* radio look size */
-    --pill-font:16px;       /* number size */
-    --stmt-size:15px;       /* statement & subtext size */
-    --score-marker:50%;     /* gauge marker position 0-100% */
+    --pill-size:30px;
+    --pill-font:16px;
+    --stmt-size:15px;
+    --score-marker:50%;
   }
   *{box-sizing:border-box}
   body{font-family:system-ui, Arial, sans-serif; background:#F9FAFB; color:#111; margin:0}
   .container{width:100%; margin:0; padding:24px var(--pad)}
 
-  /* ===== PAGE 1 ===== */
   h1{font-size:20pt; margin:0 0 8px 0; line-height:1.2}
   .subheader{font-size:18pt; margin:0 0 12px 0; font-weight:500}
   .section-title{font-size:13pt; margin:16px 0 8px 0; line-height:1.25; font-weight:800; letter-spacing:.5px; text-transform:uppercase}
@@ -35,16 +33,18 @@
 
   .row{display:grid; grid-template-columns:minmax(84px, var(--label-w)) 1fr; column-gap:var(--gap); align-items:center; margin:10px 0}
   .row>label{font-size:10pt; font-weight:400; white-space:normal; word-break:break-word}
-  .row>input, .row>select{width:100%; padding:10px 12px; font-size:10pt; border:1px solid var(--gray-300); border-radius:10px; background:#fff; transition:box-shadow .15s, border-color .15s}
-  .row>input:focus, .row>select:focus{outline:none; border-color:rgba(30,144,255,.8); box-shadow:0 0 0 3px rgba(30,144,255,.18)}
-  select:invalid{color:#aaa}
+  .row>input{width:100%; padding:10px 12px; font-size:10pt; border:1px solid var(--gray-300); border-radius:10px; background:#fff; transition:box-shadow .15s, border-color .15s}
+  .row>input:focus{outline:none; border-color:rgba(30,144,255,.8); box-shadow:0 0 0 3px rgba(30,144,255,.18)}
+
+  .picker-trigger{display:flex; align-items:center; justify-content:space-between; width:100%; padding:10px 12px; font-size:10pt; border:1px solid var(--gray-300); border-radius:10px; background:#fff; cursor:pointer}
+  .picker-trigger:focus{outline:none; border-color:rgba(30,144,255,.8); box-shadow:0 0 0 3px rgba(30,144,255,.18)}
+  .caret{border:solid #555; border-width:0 2px 2px 0; display:inline-block; padding:3px; transform:rotate(45deg); margin-left:8px}
 
   .actions{padding-left:calc(var(--label-w) + var(--gap)); margin-top:14px; display:flex; gap:10px; justify-content:flex-end}
   button{padding:14px 24px; border:none; border-radius:14px; background:var(--brand-blue); color:#fff; font-size:14pt; cursor:pointer}
   .btn-secondary{background:#fff; color:#111; border:1px solid #e5e7eb}
   .btn-wide{flex:1 1 0%; border-radius:12px; padding:14px 0; font-size:16px}
 
-  /* ===== QUESTIONS ===== */
   .q-item{padding:12px 0; border-top:1px solid #e5e7eb; display:grid; grid-template-columns: 26px 1fr; column-gap:8px; align-items:start}
   .q-num{font-size:12px; line-height:1.2; text-align:right; padding-top:2px; color:#111}
   .q-title{display:block; font-size:var(--stmt-size); font-weight:700; margin:0 0 3px 0; line-height:1.35}
@@ -53,7 +53,6 @@
   .pill.selected{background:var(--brand-blue); color:#fff}
   .pill:focus-visible{box-shadow:0 0 0 3px rgba(30,144,255,.25)}
 
-  /* ===== SCORE ===== */
   .score-kicker{font-size:14px; color:#666; margin:12px 0 8px 0}
   .score-big{font-size:32px; font-weight:800; margin:0 0 24px 0}
   .gauge{position:relative; height:28px; border-radius:999px; background:linear-gradient(90deg,#ef4444 0%, #f59e0b 35%, #fbbf24 50%, #84cc16 70%, #22c55e 100%);}
@@ -61,7 +60,6 @@
   .rec-kicker{font-size:14px; color:#666; margin:24px 0 8px 0}
   .rec-text{font-size:28px; font-weight:800; line-height:1.2; margin:0 0 8px 0}
 
-  /* ===== PEER PAGE ===== */
   .peer-lead{font-size:12pt; line-height:1.7; color:#333; margin:8px 0 16px 0}
   .peer-row{display:flex; flex-wrap:wrap; gap:12px; margin:8px 0 14px 0}
   .chip{padding:10px 16px; border:1px solid #d1d5db; border-radius:12px; background:#fff; font-weight:700; letter-spacing:.5px; cursor:pointer; user-select:none}
@@ -69,14 +67,21 @@
   .agree{display:flex; align-items:center; gap:10px; margin:10px 0 18px 0}
   .page-actions{display:flex; justify-content:space-between; gap:14px; padding-left:0; margin-top:10px}
 
-  /* ===== Modal (Peer eligibility) ===== */
   .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:50}
   .modal{width:min(92vw,520px); background:#fff; border-radius:18px; padding:20px; box-shadow:0 20px 60px rgba(0,0,0,.25)}
   .modal h3{margin:0 0 10px 0; font-size:18px}
   .modal p{margin:0 0 18px 0; font-size:16px; line-height:1.5; color:#222}
   .modal .row-btns{display:flex; justify-content:flex-end; gap:10px}
 
-  /* ===== Congrats Page ===== */
+  .picker-title{font-weight:800; font-size:18px; margin:0 0 12px 0}
+  .picker-list{list-style:none; padding:0; margin:0; max-height:50vh; overflow:auto; border-top:1px solid #eee}
+  .picker-item{padding:14px 8px; border-bottom:1px solid #eee; cursor:pointer; display:flex; align-items:center; justify-content:space-between}
+  .picker-item:hover, .picker-item:focus{background:#f6f8fb; outline:none}
+  .radio-dot{width:18px; height:18px; border-radius:50%; border:2px solid #9aa4b2; display:inline-flex; align-items:center; justify-content:center}
+  .radio-dot::after{content:""; width:10px; height:10px; border-radius:50%; background:transparent}
+  .picker-item[aria-selected="true"] .radio-dot{border-color:var(--brand-blue)}
+  .picker-item[aria-selected="true"] .radio-dot::after{background:var(--brand-blue)}
+
   .big-check{width:120px; height:120px; border-radius:60px; background:var(--brand-blue); display:flex; align-items:center; justify-content:center; margin:16px auto}
   .big-check:after{content:'✔'; color:#fff; font-weight:800; font-size:54px}
   .center{text-align:center}
@@ -271,37 +276,42 @@
       <span class="dot"></span>
     </div>
 
-    <!-- ===== PAGE 1 ===== -->
     <section id="welcome" aria-labelledby="welcomeHead">
       <h2 class="section-title" id="welcomeHead" tabindex="-1">Your Information</h2>
       <div class="row"><label for="nick">your name</label><input id="nick" required></div>
       <div class="row"><label for="email">your email</label><input id="email" type="email" required></div>
-      <div class="row"><label for="hotel">your location</label>
-        <select id="hotel" required>
-          <option value="" disabled selected>select hotel</option>
+      <div class="row"><label for="hotelBtn">your location</label>
+        <select id="hotel" style="display:none">
+          <option value="">select hotel</option>
           <option>BED Changkian</option>
-          <option>BED Phrasing</option>
+          <option>BED Phrasingh</option>
           <option>BED Nimman</option>
-          <option>BED Chiangmai Gate</option>
-          <option>BED Flying</option>
+          <option>BED Chiang Mai Gate</option>
+          <option>BED Flying Around</option>
           <option>BED Support</option>
         </select>
+        <button id="hotelBtn" type="button" class="picker-trigger" aria-haspopup="dialog" aria-expanded="false">
+          <span id="hotelLabel">select hotel</span><i class="caret"></i>
+        </button>
       </div>
 
       <h2 class="section-title" tabindex="-1">Peer Information</h2>
       <p class="intro">after you completed your self assessment one of your peers will review you. select one of your team members who worked in BED for at least 12 months</p>
       <div class="row"><label for="peerName">name peer</label><input id="peerName" required></div>
       <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email" required></div>
-      <div class="row"><label for="peerHotel">peer location</label>
-        <select id="peerHotel" required>
-          <option value="" disabled selected>select hotel</option>
+      <div class="row"><label for="peerHotelBtn">peer location</label>
+        <select id="peerHotel" style="display:none">
+          <option value="">select hotel</option>
           <option>BED Changkian</option>
-          <option>BED Phrasing</option>
+          <option>BED Phrasingh</option>
           <option>BED Nimman</option>
-          <option>BED Chiangmai Gate</option>
-          <option>BED Flying</option>
+          <option>BED Chiang Mai Gate</option>
+          <option>BED Flying Around</option>
           <option>BED Support</option>
         </select>
+        <button id="peerHotelBtn" type="button" class="picker-trigger" aria-haspopup="dialog" aria-expanded="false">
+          <span id="peerHotelLabel">select hotel</span><i class="caret"></i>
+        </button>
       </div>
 
       <div class="actions">
@@ -309,7 +319,6 @@
       </div>
     </section>
 
-    <!-- ===== Instructions ===== -->
     <section id="instructions" style="display:none" aria-labelledby="instHead">
       <h2 class="section-title" id="instHead" tabindex="-1">HOW TO ASSESS YOURSELF</h2>
       <p class="intro">
@@ -329,7 +338,6 @@
       </div>
     </section>
 
-    <!-- ===== Questions 1 ===== -->
     <section id="q1" style="display:none" aria-labelledby="q1Head">
       <h2 class="section-title" id="q1Head" tabindex="-1">STATEMENTS PART 1</h2>
       <div id="list-q1"></div>
@@ -339,7 +347,6 @@
       </div>
     </section>
 
-    <!-- ===== Questions 2 ===== -->
     <section id="q2" style="display:none" aria-labelledby="q2Head">
       <h2 class="section-title" id="q2Head" tabindex="-1">STATEMENTS PART 2</h2>
       <div id="list-q2"></div>
@@ -349,7 +356,6 @@
       </div>
     </section>
 
-    <!-- ===== Score ===== -->
     <section id="finish" style="display:none" aria-labelledby="scoreHead">
       <h2 class="section-title" id="scoreHead" tabindex="-1">SELF-ASSESSMENT SCORE</h2>
       <div class="score-kicker">your self assessment results</div>
@@ -363,7 +369,6 @@
       </div>
     </section>
 
-    <!-- ===== Peer Assessment ===== -->
     <section id="peer" style="display:none" aria-labelledby="peerHead">
       <h2 class="section-title" id="peerHead" tabindex="-1">PEER ASSESSMENT</h2>
       <h3 class="section-title" style="margin-top:4px">FIND YOUR PEER REVIEWER</h3>
@@ -396,7 +401,6 @@
       </div>
     </section>
 
-    <!-- ===== Congratulations ===== -->
     <section id="congrats" style="display:none" aria-labelledby="cgHead">
       <h2 class="section-title" id="cgHead" tabindex="-1">SELF- ASSESSMENT COMPLETED</h2>
       <div class="progress" id="congratsDots">
@@ -416,139 +420,160 @@
     </section>
   </main>
 
-  <!-- Peer Eligibility Modal (reused) -->
-  <div id="eligBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="eligTitle" aria-describedby="eligText">
-    <div class="modal">
-      <h3 id="eligTitle">Peer eligibility</h3>
-      <p id="eligText">Does your peer have at least 24 months of BED experience?</p>
-      <div class="row-btns">
-        <button id="eligCancel" class="btn-secondary">Cancel</button>
-        <button id="eligOk">OK</button>
-      </div>
-    </div>
+  <div id="modalBackdrop" class="modal-backdrop">
+    <div id="modalCard" class="modal" role="dialog" aria-modal="true"></div>
   </div>
 
 <script>
 (function(){
-  // ---- Central step map ----
-  const STEP = Object.freeze({
-    welcome:1, instructions:2, q1:3, q2:4, finish:5, peer:6, congrats:7
-  });
+  const STEP = Object.freeze({ welcome:1, instructions:2, q1:3, q2:4, finish:5, peer:6, congrats:7 });
 
-  const S = {answers:{}, questions:[], selectedHotel:null, lastFocused:null};
+  const S = {answers:{}, questions:[], selectedHotel:null};
   try { S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }
   catch(e) { S.questions = []; }
 
   const el = id => document.getElementById(id);
   const sections = ['welcome','instructions','q1','q2','finish','peer','congrats'];
 
-  function focusHeading(id){
-    const sec = document.getElementById(id);
-    const h = sec && sec.querySelector('[tabindex="-1"]');
-    if(h) h.focus({preventScroll:true});
-    window.scrollTo({top:0, behavior:'smooth'});
-  }
-
   function setProgress(n){
     const dots = document.querySelectorAll('#progressHeader .dot');
     dots.forEach((d,i)=>d.classList.toggle('active', i < n));
-    const bar = document.getElementById('progressHeader');
-    bar.setAttribute('aria-valuenow', String(n));
+    el('progressHeader').setAttribute('aria-valuenow', String(n));
   }
-
+  function focusHeading(id){
+    const sec = el(id); const h = sec && sec.querySelector('[tabindex="-1"]'); if(h) h.focus({preventScroll:true}); window.scrollTo({top:0, behavior:'smooth'});
+  }
   function show(id){
-    sections.forEach(s => (document.getElementById(s).style.display = (s===id ? 'block' : 'none')));
-    setProgress(STEP[id] || 1);
-    focusHeading(id);
+    sections.forEach(s => (el(s).style.display = (s===id ? 'block' : 'none')));
+    setProgress(STEP[id] || 1); focusHeading(id);
   }
   setProgress(1);
 
-  // Strip duplicated leading numbers (e.g., "1. ...")
   const stripLeadingNumber = t => String(t||'').replace(/^\s*\d+\.\s*/, '');
 
-  // Build one question row
   function makeQ(q, ord){
-    const wrap = document.createElement('div');
-    wrap.className = 'q-item'; wrap.dataset.qid = q.id;
-    const num = document.createElement('div'); num.className = 'q-num'; num.textContent = ord + '.'; wrap.appendChild(num);
+    const wrap = document.createElement('div'); wrap.className='q-item'; wrap.dataset.qid=q.id;
+    const num = document.createElement('div'); num.className='q-num'; num.textContent=ord + '.'; wrap.appendChild(num);
     const body = document.createElement('div');
-    const title = document.createElement('span'); title.className='q-title'; title.textContent = stripLeadingNumber(q.statement||''); body.appendChild(title);
-    if(q.subtext){
-      const sub = document.createElement('span'); sub.className='q-sub'; sub.textContent = q.subtext; body.appendChild(sub);
-    }
-    // radio-like pills
-    const group = document.createElement('div'); group.setAttribute('role','radiogroup'); group.setAttribute('aria-label','rating');
-    for(let v=1; v<=5; v++){
-      const p=document.createElement('span'); p.className='pill'; p.tabIndex=0; p.textContent=v; p.dataset.val=v;
-      p.setAttribute('role','radio'); p.setAttribute('aria-checked','false');
-      group.appendChild(p);
-    }
-    body.appendChild(group); wrap.appendChild(body);
-    return wrap;
+    const title = document.createElement('span'); title.className='q-title'; title.textContent=stripLeadingNumber(q.statement||''); body.appendChild(title);
+    if(q.subtext){ const sub=document.createElement('span'); sub.className='q-sub'; sub.textContent=q.subtext; body.appendChild(sub);}
+    const group=document.createElement('div'); group.setAttribute('role','radiogroup'); group.setAttribute('aria-label','rating');
+    for(let v=1; v<=5; v++){ const p=document.createElement('span'); p.className='pill'; p.tabIndex=0; p.textContent=v; p.dataset.val=v; p.setAttribute('role','radio'); p.setAttribute('aria-checked','false'); group.appendChild(p);}
+    body.appendChild(group); wrap.appendChild(body); return wrap;
   }
-
-  // Safer slicing: tolerate different lengths
   function buildLists(){
-    const a = (S.questions||[]);
-    const firstCount = Math.min(18, a.length);
-    const secondCount = Math.max(0, Math.min(17, a.length - firstCount));
-    const l1 = el('list-q1'); const l2 = el('list-q2');
-    l1.innerHTML=''; l2.innerHTML='';
-    a.slice(0, firstCount).forEach((q,i)=>l1.appendChild(makeQ(q, i+1)));
-    a.slice(firstCount, firstCount+secondCount).forEach((q,i)=>l2.appendChild(makeQ(q, firstCount + i + 1)));
+    const a=(S.questions||[]); const firstCount=Math.min(18,a.length); const secondCount=Math.max(0, Math.min(17, a.length-firstCount));
+    const l1=el('list-q1'), l2=el('list-q2'); l1.innerHTML=''; l2.innerHTML='';
+    a.slice(0, firstCount).forEach((q,i)=>l1.appendChild(makeQ(q,i+1)));
+    a.slice(firstCount, firstCount+secondCount).forEach((q,i)=>l2.appendChild(makeQ(q, firstCount+i+1)));
   }
 
-  // --- Event delegation for number pills & chips ---
+  const backdrop = el('modalBackdrop'); const card = el('modalCard');
+  const focusablesSel = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+  function openModal(contentBuilder){
+    card.innerHTML=''; card.appendChild(contentBuilder());
+    backdrop.style.display='flex';
+    const f = card.querySelector(focusablesSel); (f||card).focus();
+    backdrop.addEventListener('keydown', trapFocus);
+  }
+  function closeModal(){
+    backdrop.style.display='none'; card.innerHTML='';
+    backdrop.removeEventListener('keydown', trapFocus);
+  }
+  function trapFocus(e){
+    if(e.key!=='Tab') return;
+    const f = card.querySelectorAll(focusablesSel); if(!f.length) return;
+    const first=f[0], last=f[f.length-1];
+    if(e.shiftKey && document.activeElement===first){ last.focus(); e.preventDefault(); }
+    else if(!e.shiftKey && document.activeElement===last){ first.focus(); e.preventDefault(); }
+  }
+
+  const OPTIONS = ['BED Changkian','BED Phrasingh','BED Nimman','BED Chiang Mai Gate','BED Flying Around','BED Support'];
+  function pickerContent(title, selected, onSelect){
+    return () => {
+      const wrap = document.createElement('div');
+      const h = document.createElement('h3'); h.className='picker-title'; h.textContent=title; wrap.appendChild(h);
+      const ul=document.createElement('ul'); ul.className='picker-list';
+      OPTIONS.forEach(opt=>{
+        const li=document.createElement('li'); li.className='picker-item'; li.setAttribute('tabindex','0'); li.setAttribute('role','option');
+        li.setAttribute('aria-selected', String(opt===selected));
+        const span=document.createElement('span'); span.textContent=opt;
+        const dot=document.createElement('i'); dot.className='radio-dot';
+        li.appendChild(span); li.appendChild(dot);
+        li.addEventListener('click', ()=>{ onSelect(opt); closeModal(); });
+        li.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ' ){ e.preventDefault(); onSelect(opt); closeModal(); } });
+        ul.appendChild(li);
+      });
+      wrap.appendChild(ul);
+      const btns=document.createElement('div'); btns.className='row-btns'; const cancel=document.createElement('button'); cancel.className='btn-secondary'; cancel.textContent='Cancel';
+      cancel.addEventListener('click', ()=>{ closeModal(); });
+      btns.appendChild(cancel); wrap.appendChild(btns);
+      return wrap;
+    }
+  }
+
+  function bindPicker(triggerId, labelId, selectId, title){
+    const trigger = el(triggerId), label = el(labelId), select = el(selectId);
+    trigger.addEventListener('click', ()=>{
+      openModal(pickerContent(title, select.value, (opt)=>{ select.value = opt; label.textContent = opt; trigger.setAttribute('aria-expanded','false'); }));
+      trigger.setAttribute('aria-expanded','true');
+    });
+  }
+  bindPicker('hotelBtn', 'hotelLabel', 'hotel', 'Select Location');
+  bindPicker('peerHotelBtn', 'peerHotelLabel', 'peerHotel', 'Select Location');
+
   function handlePillActivate(pill){
     if(!pill) return;
-    const group = pill.parentElement;
-    const wrap = pill.closest('.q-item');
-    const qid = wrap && wrap.dataset.qid;
-    if(!qid) return;
+    const group=pill.parentElement; const wrap=pill.closest('.q-item'); const qid=wrap && wrap.dataset.qid; if(!qid) return;
     group.querySelectorAll('.pill').forEach(x=>{ x.classList.remove('selected'); x.setAttribute('aria-checked','false'); });
-    pill.classList.add('selected'); pill.setAttribute('aria-checked','true');
-    S.answers[qid] = Number(pill.dataset.val);
+    pill.classList.add('selected'); pill.setAttribute('aria-checked','true'); S.answers[qid]=Number(pill.dataset.val);
   }
-
   document.addEventListener('click', (e)=>{
-    const pill = e.target.closest('.pill');
-    if(pill && pill.parentElement && pill.parentElement.getAttribute('role')==='radiogroup'){
-      handlePillActivate(pill);
-    }
-    const chip = e.target.closest('.chip');
-    if(chip && chip.parentElement && chip.parentElement.id==='hotelChips'){
-      chip.parentElement.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
-      chip.classList.add('active');
-      S.selectedHotel = chip.dataset.code;
-    }
+    const pill=e.target.closest('.pill'); if(pill && pill.parentElement && pill.parentElement.getAttribute('role')==='radiogroup'){ handlePillActivate(pill); }
+    const chip=e.target.closest('.chip'); if(chip && chip.parentElement && chip.parentElement.id==='hotelChips'){ chip.parentElement.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); chip.classList.add('active'); S.selectedHotel=chip.dataset.code; }
   });
-
-  // Keyboard: numbers 1–5 and arrows on focused pill; ESC closes modal
   document.addEventListener('keydown', (e)=>{
-    const tgt = document.activeElement;
+    const tgt=document.activeElement;
     if(tgt && tgt.classList.contains('pill')){
-      const group = tgt.parentElement;
-      const pills = Array.from(group.querySelectorAll('.pill'));
-      let idx = pills.indexOf(tgt);
-      if(e.key==='ArrowRight' || e.key==='ArrowDown'){ idx = Math.min(pills.length-1, idx+1); pills[idx].focus(); e.preventDefault(); }
-      if(e.key==='ArrowLeft' || e.key==='ArrowUp'){ idx = Math.max(0, idx-1); pills[idx].focus(); e.preventDefault(); }
-      if(/[1-5]/.test(e.key)){ const p = pills[Number(e.key)-1]; handlePillActivate(p); p.focus(); e.preventDefault(); }
+      const group=tgt.parentElement; const pills=Array.from(group.querySelectorAll('.pill')); let idx=pills.indexOf(tgt);
+      if(e.key==='ArrowRight' || e.key==='ArrowDown'){ idx=Math.min(pills.length-1, idx+1); pills[idx].focus(); e.preventDefault(); }
+      if(e.key==='ArrowLeft' || e.key==='ArrowUp'){ idx=Math.max(0, idx-1); pills[idx].focus(); e.preventDefault(); }
+      if(/[1-5]/.test(e.key)){ const p=pills[Number(e.key)-1]; handlePillActivate(p); p.focus(); e.preventDefault(); }
       if(e.key===' ' || e.key==='Enter'){ handlePillActivate(tgt); e.preventDefault(); }
     }
-    if(e.key==='Escape' && backdrop.style.display==='flex') closeModal();
   });
 
-  // Navigation (Welcome Start now validates + modal 12 months)
   el('toInstructions').onclick = () => {
-    const requiredIds = ['nick','email','hotel','peerName','peerEmail','peerHotel'];
-    for (const id of requiredIds){
+    const required = [
+      ['nick', v=>!!v],
+      ['email', v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)],
+      ['hotel', v=>!!v],
+      ['peerName', v=>!!v],
+      ['peerEmail', v=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)],
+      ['peerHotel', v=>!!v],
+    ];
+    for(const [id, ok] of required){
       const node = el(id);
-      if(!node || !node.checkValidity() || (node.tagName==='SELECT' && !node.value)){
-        node && node.reportValidity();
+      const value = node ? node.value : '';
+      if(!ok(value)){
+        if(id==='hotel') el('hotelBtn').focus();
+        if(id==='peerHotel') el('peerHotelBtn').focus();
+        if(node && node.reportValidity) node.reportValidity();
         return;
       }
     }
-    openModal({ message: 'Does your peer have at least 12 months of BED experience?', onOk: () => show('instructions') });
+    openModal(()=>{
+      const wrap=document.createElement('div');
+      const h=document.createElement('h3'); h.textContent='Peer eligibility'; wrap.appendChild(h);
+      const p=document.createElement('p'); p.textContent='Does your peer have at least 12 months of BED experience?'; wrap.appendChild(p);
+      const btns=document.createElement('div'); btns.className='row-btns';
+      const cancel=document.createElement('button'); cancel.className='btn-secondary'; cancel.textContent='Cancel';
+      const ok=document.createElement('button'); ok.textContent='OK';
+      cancel.onclick=()=>closeModal();
+      ok.onclick=()=>{ closeModal(); show('instructions'); };
+      btns.appendChild(cancel); btns.appendChild(ok); wrap.appendChild(btns); return wrap;
+    });
   };
 
   el('backToWelcome').onclick = () => show('welcome');
@@ -557,65 +582,41 @@
   el('toQ2').onclick = () => show('q2');
   el('backToQ1').onclick = () => show('q1');
 
-  // Submit + score
-  el('submitAll').onclick = () => { 
-    const ids = (S.questions||[]).map(q=>q.id);
-    const answered = ids.filter(id => S.answers[id] != null);
-    const total = answered.reduce((sum,id)=>sum + Number(S.answers[id]||0), 0);
-    const avg = answered.length ? total/answered.length : 0;
-    const pct = answered.length ? Math.round(((avg - 1) / 4) * 100) : 0;
-    el('scorePercent').textContent = 'YOUR SCORE IS ' + pct + '%';
+  el('submitAll').onclick = () => {
+    const ids=(S.questions||[]).map(q=>q.id);
+    const answered=ids.filter(id=>S.answers[id]!=null);
+    const total=answered.reduce((sum,id)=>sum+Number(S.answers[id]||0),0);
+    const avg=answered.length? total/answered.length : 0;
+    const pct=answered.length? Math.round(((avg-1)/4)*100):0;
+    el('scorePercent').textContent='YOUR SCORE IS ' + pct + '%';
     document.documentElement.style.setProperty('--score-marker', pct + '%');
     let rec=''; if(pct<50) rec='Keep practicing!\nFocus on one habit at a time.'; else if(pct<70) rec='Good effort!\nPick two areas to improve next.'; else if(pct<85) rec='Great hospitality!\nKeep challenging yourself'; else rec='Excellent!\nBe a coach for your peers';
-    el('recText').innerHTML = rec.replace(/\n/g,'<br>');
+    el('recText').innerHTML=rec.replace(/\n/g,'<br>');
     show('finish');
   };
 
-  // Score page buttons
   el('backToQ2').onclick = () => show('q2');
   el('nextToPeer').onclick = () => show('peer');
 
-  // Modal helpers with focus trap (message + onOk)
-  const backdrop = document.getElementById('eligBackdrop');
-  let trapPrev = null;
-  const focusablesSel = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-  let modalOkAction = null;
-
-  function openModal(opts){
-    const {message, onOk} = opts || {};
-    modalOkAction = typeof onOk === 'function' ? onOk : null;
-    document.getElementById('eligText').textContent = message || 'Does your peer have at least 24 months of BED experience?';
-    trapPrev = document.activeElement;
-    backdrop.style.display = 'flex';
-    const focusable = backdrop.querySelectorAll(focusablesSel);
-    (focusable[0]||backdrop).focus();
-    backdrop.addEventListener('keydown', trap);
-  }
-  function closeModal(){
-    backdrop.style.display = 'none';
-    backdrop.removeEventListener('keydown', trap);
-    if(trapPrev) trapPrev.focus();
-  }
-  function trap(e){
-    if(e.key!=='Tab') return;
-    const focusable = backdrop.querySelectorAll(focusablesSel);
-    const first = focusable[0]; const last = focusable[focusable.length-1];
-    if(e.shiftKey && document.activeElement===first){ last.focus(); e.preventDefault(); }
-    else if(!e.shiftKey && document.activeElement===last){ first.focus(); e.preventDefault(); }
-  }
-  document.getElementById('eligCancel').onclick = () => { closeModal(); modalOkAction=null; };
-  document.getElementById('eligOk').onclick = () => { closeModal(); if(modalOkAction) modalOkAction(); modalOkAction=null; };
-
-  // Peer page actions (keeps 24-month default, then to congrats)
   el('peerBack').onclick = () => show('finish');
-  el('peerDone').onclick = () => { 
-    if(!el('pNick').checkValidity() || !el('pEmail').checkValidity()){ alert('Please fill peer name and a valid email.'); return; }
+  el('peerDone').onclick = () => {
+    if(!el('pNick').value){ alert('Please fill peer name'); return; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el('pEmail').value)){ alert('Please enter a valid email'); return; }
     if(!S.selectedHotel){ alert('Please select a hotel.'); return; }
-    if(!document.getElementById('agree').checked){ alert('Please agree to share your self-assessment.'); return; }
-    openModal({ onOk: () => show('congrats') });
+    if(!el('agree').checked){ alert('Please agree to share your self-assessment.'); return; }
+    openModal(()=>{
+      const wrap=document.createElement('div');
+      const h=document.createElement('h3'); h.textContent='Peer eligibility'; wrap.appendChild(h);
+      const p=document.createElement('p'); p.textContent='Does your peer have at least 24 months of BED experience?'; wrap.appendChild(p);
+      const btns=document.createElement('div'); btns.className='row-btns';
+      const cancel=document.createElement('button'); cancel.className='btn-secondary'; cancel.textContent='Cancel';
+      const ok=document.createElement('button'); ok.textContent='OK';
+      cancel.onclick=()=>closeModal();
+      ok.onclick=()=>{ closeModal(); show('congrats'); };
+      btns.appendChild(cancel); btns.appendChild(ok); wrap.appendChild(btns); return wrap;
+    });
   };
 
-  // Congrats
   el('congratsBack').onclick = () => show('peer');
   el('congratsPdf').onclick = () => window.print();
 })();</script>
