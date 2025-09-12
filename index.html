@@ -370,9 +370,9 @@
 
 <script>
 (function(){
-  const S = {{answers:{{}}, questions:[]}};
-  try {{ S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }}
-  catch(e) {{ S.questions = []; }}
+  const S = {answers:{}, questions:[]};
+  try { S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }
+  catch(e) { S.questions = []; }
 
   const el = id => document.getElementById(id);
   const sections = ['welcome','instructions','q1','q2','finish','peer'];
@@ -429,10 +429,10 @@
       p.className = 'pill';
       p.textContent = v;
       p.dataset.val = v;
-      p.onclick = () => {{ 
+      p.onclick = () => { 
         S.answers[q.id] = v;
         wrap.querySelectorAll('.pill').forEach(x => x.classList.toggle('selected', x===p));
-      }};
+      };
       body.appendChild(p);
     }
 
@@ -443,21 +443,21 @@
   // Navigation
   el('toInstructions').onclick = () => show('instructions');
   el('backToWelcome').onclick = () => show('welcome');
-  el('toQ1').onclick = () => {{ 
+  el('toQ1').onclick = () => { 
     const l = el('list-q1'); l.innerHTML = '';
     (S.questions || []).slice(0,18).forEach((q,i)=> l.appendChild(makeQ(q, i+1)));
     show('q1');
-  }};
+  };
   el('backToInstructions').onclick = () => show('instructions');
-  el('toQ2').onclick = () => {{ 
+  el('toQ2').onclick = () => { 
     const l = el('list-q2'); l.innerHTML = '';
     (S.questions || []).slice(18,35).forEach((q,i)=> l.appendChild(makeQ(q, 19+i)));
     show('q2');
-  }};
+  };
   el('backToQ1').onclick = () => show('q1');
 
   // Submit + score (bands + marker)
-  el('submitAll').onclick = () => {{ 
+  el('submitAll').onclick = () => { 
     const ids = (S.questions || []).map(q => q.id);
     const answered = ids.filter(id => S.answers[id] != null);
     const total = answered.reduce((sum,id) => sum + Number(S.answers[id]||0), 0);
@@ -470,12 +470,12 @@
     gauge.style.setProperty('--marker', pct + '%');
     gauge.style.position = 'relative';
     let markerStyle = document.getElementById('markerStyle');
-    if(!markerStyle){{ 
+    if(!markerStyle){ 
       markerStyle = document.createElement('style');
       markerStyle.id = 'markerStyle';
       document.head.appendChild(markerStyle);
-    }}
-    markerStyle.textContent = '.gauge::after{{left: calc(var(--marker) - 5px);}}';
+    }
+    markerStyle.textContent = '.gauge::after{left: calc(var(--marker) - 5px);}';
 
     let rec = '';
     if(pct < 50) rec = 'Keep practicing!\nFocus on one habit at a time.';
@@ -490,7 +490,7 @@
     el('peerHotelOut').textContent = (document.getElementById('peerHotel').value || '—');
 
     show('finish');
-  }};
+  };
 
   // Score page buttons
   el('backToQ2').onclick = () => show('q2');
