@@ -466,15 +466,53 @@
       btns.appendChild(cancel); w.appendChild(btns); return w;
     }
   }
-  function bindPicker(triggerId, labelId, selectId, title){
-    const trigger=document.getElementById(triggerId),
-          label=document.getElementById(labelId),
-          select=document.getElementById(selectId);
+  
+function bindPicker(triggerId, labelId, selectId, title){
+  const trigger = document.getElementById(triggerId);
+  let label = document.getElementById(labelId);
+  const select = document.getElementById(selectId);
 
-    const syncLabel = () => {
-      const v = select && select.value ? String(select.value) : '';
-      if (v) { label.textContent = v; label.classList.remove('placeholder'); }
-      else { label.textContent = 'select hotel'; label.classList.add('placeholder'); }
+  // Ensure button has the expected content structure (span.value + caret)
+  const ensureMarkup = () => {
+    if (!trigger.querySelector('.value')) {
+      trigger.innerHTML = `<span id="${labelId}" class="value placeholder">select hotel</span><i class="caret"></i>`;
+      label = document.getElementById(labelId);
+    }
+  };
+
+  const syncLabel = () => {
+    ensureMarkup();
+    const v = select && select.value ? String(select.value) : '';
+    if (v) {
+      label.textContent = v;
+      label.classList.remove('placeholder');
+    } else {
+      label.textContent = 'select hotel';
+      label.classList.add('placeholder');
+    }
+    const txt = label.textContent;
+    trigger.setAttribute('aria-label', txt);
+    trigger.title = txt;
+  };
+
+  // Initial paint
+  ensureMarkup();
+  syncLabel();
+
+  // Open modal and handle pick
+  trigger.onclick = () => {
+    openModal(pickerContent(title, select.value, (opt) => {
+      select.value = opt;
+      const evt = new Event('change', { bubbles: true });
+      select.dispatchEvent(evt);
+      syncLabel();
+    }));
+  };
+
+  // Keep in sync with native select
+  select.addEventListener('change', syncLabel);
+}
+else { label.textContent = 'select hotel'; label.classList.add('placeholder'); }
     };
     syncLabel();
 
