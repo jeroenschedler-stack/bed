@@ -491,10 +491,7 @@
     let rows = '';
     order.forEach(name=>{
       const p = gp[name] ?? 0;
-      rows += '<div class="group-row" style="padding:8px 0;border-top:1px solid #eee">'
-        + '<div style="display:flex;justify-content:space-between;align-items:center">'
-        +   '<div style="font-weight:600">'+name+'</div>'
-        +   '<div style="font-weight:700">'+p+'%</div>'
+      rows += '<div class="group-row" style="padding:8px 0;border-top:1px solid #eee">'+'<div style="font-weight:600">'+name+' '+p+'%</div>'+'</div>'+'<div style="color:#666;margin-top:4px;font-size:.95em">'+(desc[name]||'')+'</div>';
         + '</div>'
         + '<div style="color:#666;margin-top:4px;font-size:.95em">'+(desc[name]||'')+'</div>'
         + '</div>';
