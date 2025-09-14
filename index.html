@@ -56,12 +56,19 @@
 
   @media (max-width:340px){ .row{grid-template-columns:1fr; row-gap:6px} .actions{padding-left:0} .q-item{grid-template-columns: 26px 1fr;} }
 
-  /* PRINT: Blue-branded template */
+  /* =========================
+     PRINT: Blue-branded template
+     Only edit inside @media print for PDF design changes.
+     ========================= */
   #pdfReport{display:none}
   @media print{
     body{background:#fff; color:#000}
     main, .modal-backdrop{display:none !important}
     #pdfReport{display:block; font-family:Arial, Helvetica, sans-serif; padding:18px 24px}
+
+    /* ====== CHANGE COLORS HERE (global brand blue) ====== */
+    /* Safe: adjust the brand blue for PDF only */
+    :root{ --blue:#1E90FF; }
 
     /* Title block */
     .pdf-top{display:grid; grid-template-columns: 1fr 220px; gap:16px; align-items:start; margin-bottom:10px}
@@ -70,13 +77,32 @@
     .pdf-date{font-size:14px; color:var(--blue); margin:2px 0 10px 0}
     .pdf-divider{height:1px; background:#cfd4dc; margin:8px 0 14px 0}
 
-    .score-box{background:var(--blue); color:#fff; border-radius:6px; padding:12px 14px; text-align:center}
+    /* ====== SCORE BOX (SAFE TO EDIT) ====== */
+    .score-box{
+      background:var(--blue) !important;     /* Safe: change to a hex if you want a different blue */
+      -webkit-print-color-adjust: exact;     /* Safari/Chrome */
+      print-color-adjust: exact;             /* Firefox */
+      color:#fff !important;                 /* Safe: change text color if needed */
+      border-radius:6px;
+      padding:12px 14px;
+      text-align:center;
+    }
     .score-box .label{font-size:12px; font-weight:700; letter-spacing:.5px}
     .score-box .pct{font-size:34px; font-weight:800; margin:6px 0 2px 0}
     .score-box .raw{font-size:12px; opacity:.95}
 
-    /* Section headers */
-    .sec-h{background:var(--blue); color:#fff; font-weight:800; text-transform:uppercase; padding:6px 10px; border-radius:4px; margin:16px 0 8px 0}
+    /* ====== SECTION HEADERS (SAFE TO EDIT) ====== */
+    .sec-h{
+      background:var(--blue) !important;     /* Safe: section band color */
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color:#fff !important;
+      font-weight:800;
+      text-transform:uppercase;
+      padding:6px 10px;
+      border-radius:4px;
+      margin:16px 0 8px 0
+    }
 
     /* Cards / fields */
     .info-grid{display:grid; grid-template-columns: 1fr 1fr; gap:14px}
@@ -85,9 +111,15 @@
     .fields{display:grid; grid-template-columns: 160px 1fr; column-gap:10px; row-gap:6px; font-size:12px}
     .fields label{font-weight:700}
 
-    /* Tables */
+    /* ====== TABLE HEADERS (SAFE TO EDIT) ====== */
     table{width:100%; border-collapse:collapse}
-    th{background:var(--blue); color:#fff; font-weight:800; text-transform:uppercase; font-size:12px; padding:8px}
+    th{
+      background:var(--blue) !important;     /* Safe: header row color */
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      color:#fff !important;
+      font-weight:800; text-transform:uppercase; font-size:12px; padding:8px
+    }
     td{border:1px solid #d1d5db; font-size:12px; padding:8px; vertical-align:top}
     .muted{color:#666; font-size:11px}
 
@@ -351,7 +383,6 @@
       S.questions = data.questions || [];
       S.groups = data.groups || [];
     }catch(e){
-      // Fallback minimal (shouldn't be needed if questions.json is present)
       S.questions = []; 
       S.groups = [
         {"name":"Hospitality Skills","description":"Basic service skills for daily tasks and guest care."},
@@ -492,17 +523,17 @@
   function buildPdfReport(){
     // Date + score box
     const totals = computeTotals();
-    el('pdfDate').textContent = 'Assessment Date ' + formatDate();
-    el('pdfTotalPct').textContent = (isFinite(totals.pct) ? totals.pct : '—') + '%';
-    el('pdfTotalRaw').textContent = (totals.raw||0) + ' OUT OF ' + ((S.questions||[]).length * 5 || 175);
+    document.getElementById('pdfDate').textContent = 'Assessment Date ' + formatDate();
+    document.getElementById('pdfTotalPct').textContent = (isFinite(totals.pct) ? totals.pct : '—') + '%';
+    document.getElementById('pdfTotalRaw').textContent = (totals.raw||0) + ' OUT OF ' + ((S.questions||[]).length * 5 || 175);
 
     // Info
-    el('pdfEmpName').textContent = el('nick').value || '';
-    el('pdfEmpEmail').textContent = el('email').value || '';
-    el('pdfEmpHotel').textContent = el('hotel').value || '';
-    el('pdfPeerName').textContent = el('peerName').value || '';
-    el('pdfPeerEmail').textContent = el('peerEmail').value || '';
-    el('pdfPeerHotel').textContent = el('peerHotel').value || '';
+    document.getElementById('pdfEmpName').textContent = document.getElementById('nick').value || '';
+    document.getElementById('pdfEmpEmail').textContent = document.getElementById('email').value || '';
+    document.getElementById('pdfEmpHotel').textContent = document.getElementById('hotel').value || '';
+    document.getElementById('pdfPeerName').textContent = document.getElementById('peerName').value || '';
+    document.getElementById('pdfPeerEmail').textContent = document.getElementById('peerEmail').value || '';
+    document.getElementById('pdfPeerHotel').textContent = document.getElementById('peerHotel').value || '';
 
     // Group rows
     const gp = computeGroupPercents();
@@ -512,7 +543,7 @@
     body.innerHTML='';
     order.forEach(name=>{
       const tr = document.createElement('tr');
-      const tdName = document.createElement('td'); tdName.textContent = 'Score ' + name.split(' ')[0]; // "Score Skills/Competencies..."
+      const tdName = document.createElement('td'); tdName.textContent = 'Score ' + name.split(' ')[0];
       const tdPct = document.createElement('td'); tdPct.textContent = (gp[name] != null ? gp[name] : '—') + '%';
       const tdDesc = document.createElement('td'); tdDesc.textContent = descMap[name] || '(add description)';
       tr.appendChild(tdName); tr.appendChild(tdPct); tr.appendChild(tdDesc);
@@ -535,7 +566,7 @@
     });
   }
 
-  el('congratsPdf').onclick = () => { buildPdfReport(); window.print(); };
+  document.getElementById('congratsPdf').onclick = () => { buildPdfReport(); window.print(); };
 
   // Init
   loadQuestions();
