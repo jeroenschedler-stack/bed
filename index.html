@@ -333,6 +333,12 @@
 <div class="gauge" id="gauge"></div>
 <div class="rec-kicker">our suggestion and recommendation</div>
 <div class="rec-text" id="recText">—</div>
+<div id="groupResultsContainer" style="margin-top:18px">
+<div class="group-summary">
+<div class="group-title" style="font-weight:700;margin-bottom:8px">Group Results</div>
+<div id="groupResults"></div>
+</div>
+</div>
 <div class="actions">
 <button class="btn-secondary" id="backToQ2">Back</button>
 <button id="nextToPeer">Next</button>
@@ -341,8 +347,6 @@
 <!-- ===== Peer Assessment ===== -->
 <!-- ===== Congratulations ===== -->
 <section id="congrats" style="display:none">
-
-
 <div class="big-check"></div>
 <div class="center">
 <h3 style="font-size:28px; margin:8px 0 6px 0">Congratulations</h3>
@@ -367,7 +371,7 @@
 </div>
 <script>
 (function(){
-  const S = {answers:{}, questions:[], selectedHotel:null};
+  const S = {answers:{}, questions:[], selectedHotel:null}; window.__S = S; window.__S = S;
   try { S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }
   catch(e) { S.questions = []; }
 
@@ -568,6 +572,395 @@ show = function(id) {
 
 
 })();
+</script>
+<script>
+// === Group Results renderer (score page) ===
+(function(){
+  function findScoreSection(){
+    var s = document.getElementById('score');
+    if (s) return s;
+    var secs = document.querySelectorAll('section');
+    for (var i=0;i<secs.length;i++){
+      if ((secs[i].innerText||'').toUpperCase().indexOf('YOUR SCORE IS')>-1) return secs[i];
+    }
+    return null;
+  }
+  var scoreSection = findScoreSection();
+  var holder = document.getElementById('groupResults');
+  if(!scoreSection || !holder) return;
+
+  function evenMapping(totalQ){
+    var names = ['Hospitality Skills','Hospitality Competencies','Taking Ownership','Collaboration'];
+    var groups = { 'Hospitality Skills':[], 'Hospitality Competencies':[], 'Taking Ownership':[], 'Collaboration':[] };
+    var idxs = Array.from({length: totalQ}, (_,i)=>i+1);
+    idxs.forEach(function(q,i){ groups[names[i % names.length]].push(q); });
+    return groups;
+  }
+  function pctFrom(vals){
+    if(!vals || !vals.length) return 0;
+    var avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+    return Math.round(25 + ((avg - 1) / 4) * 75);
+  }
+  var desc = {
+    "Hospitality Skills":"Basic service skills for daily tasks and guest care.",
+    "Hospitality Competencies":"Advanced ability to read people and situations.",
+    "Taking Ownership":"Acting independently and sharing responsibility.",
+    "Collaboration":"Building trust and helping across the BED community."
+  };
+  function render(){
+    try{
+      var ans = (window.__S && window.__S.answers) ? window.__S.answers : (typeof answers!=='undefined' ? answers : {});
+      var keys = Object.keys(ans||{});
+var totalQ = keys.length || 35;
+      var map = evenMapping(totalQ);
+      var rows = '';
+      Object.keys(map).forEach(function(name){
+        var vals = map[name].map(q=>ans[q]).filter(v=>typeof v==='number');
+        var p = pctFrom(vals);
+        rows += '<div class="group-row" style="padding:8px 0;border-top:1px solid #eee">'
+          + '<div style="display:flex;justify-content:space-between;align-items:center">'
+          + '<div style="font-weight:600">'+name+'</div>'
+          + '<div style="font-weight:700">'+p+'%</div>'
+          + '</div>'
+          + '<div style="color:#666;margin-top:4px;font-size:.95em">'+desc[name]+'</div>'
+          + '</div>';
+      });
+      holder.innerHTML = '<div style="border:1px solid #eee;border-radius:10px;padding:0 12px;background:#fff">'+rows+'</div>';
+      done = true;
+    }catch(e){}
+  }
+  var tries = 0, done = false;
+  var t = setInterval(function(){
+    if(done || tries>20){ clearInterval(t); return; }
+    tries++; render();
+  }, 200);
+})(); 
+// === End renderer ===
+</script>
+<script>
+(function(){
+  // Minimal, isolated enhancement: compute and show group % + descriptions on the scoring page.
+  if (window.__GR_ENHANCED__) return; window.__GR_ENHANCED__ = true;
+
+  function pctFromVals(vals){
+    if(!vals.length) return 0;
+    var avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+    var pct = Math.round(((avg - 1) / 4) * 100);
+    if (pct < 0) pct = 0; if (pct > 100) pct = 100;
+    return pct;
+  }
+
+  // Fallback mapping: split statements evenly into four groups by statement number
+  var GROUPS = [
+    {key:'skills', name:'Hospitality Skills',        desc:'Basic service skills for daily tasks and guest care.'},
+    {key:'competencies', name:'Hospitality Competencies', desc:'Advanced ability to read people and situations.'},
+    {key:'ownership', name:'Taking Ownership',       desc:'Acting independently and sharing responsibility.'},
+    {key:'collab', name:'Collaboration',             desc:'Building trust and helping across the BED community.'}
+  ];
+
+  function inferGroupsFromAnswers(ans){
+    // Extract numeric ids of answered questions
+    var ids = Object.keys(ans||{})
+      .map(k=>{ var m=(k+'').match(/(\d+)/); return m ? parseInt(m[1],10) : null; })
+      .filter(x=>x!=null)
+      .sort((a,b)=>a-b);
+    if (!ids.length) return {skills:[],competencies:[],ownership:[],collab:[]};
+
+    // Build quartile cut points based on unique ids
+    var uniq = Array.from(new Set(ids)).sort((a,b)=>a-b);
+    var n = uniq.length, q = Math.ceil(n/4);
+    var chunks = [uniq.slice(0,q), uniq.slice(q,2*q), uniq.slice(2*q,3*q), uniq.slice(3*q)];
+    return {skills:chunks[0], competencies:chunks[1], ownership:chunks[2], collab:chunks[3]};
+  }
+
+  function computeGroupPercents(ans){
+    var mapping = inferGroupsFromAnswers(ans);
+    var res = {};
+    Object.keys(mapping).forEach(function(gk){
+      var qids = mapping[gk];
+      var vals = qids.map(function(id){
+        // answers could be keyed 'q1', '1', etc.
+        var v = ans['q'+id]; if (v==null) v = ans[id];
+        // Some implementations store strings; coerce
+        v = parseInt(v,10); if (isNaN(v)) v = 0;
+        return v || 0;
+      }).filter(v=>v>0);
+      res[gk] = pctFromVals(vals);
+    });
+    return res;
+  }
+
+  function renderGroupResults(){
+    var container = document.querySelector('[data-group-results]');
+    if (!container) return;
+
+    // Pull answers from the exposed state (fallback empty object)
+    var ans = (window.__S && window.__S.answers) ? window.__S.answers : {};
+    var gp = computeGroupPercents(ans);
+
+    // Build rows (idempotent: replace innerHTML each time)
+    var html = '';
+    GROUPS.forEach(function(g){
+      var pct = (gp[g.key] != null ? gp[g.key] : 0);
+      html += '<div class="gr-row" style="padding:14px 12px;border-top:1px solid #ececec;">'
+           +  '<div style="display:flex;align-items:center;justify-content:space-between;">'
+           +    '<div style="font-weight:600">'+ g.name +'</div>'
+           +    '<div class="gr-pct-'+g.key+'" style="font-weight:700">'+ pct +'%</div>'
+           +  '</div>'
+           +  '<div style="color:#666;margin-top:4px;font-size:.95em">'+ g.desc +'</div>'
+           +'</div>';
+    });
+    container.innerHTML = html;
+  }
+
+  // Defer to allow base page JS to run, then render and keep it in sync once.
+  function kick(){
+    try{ renderGroupResults(); }catch(e){}
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(kick, 30);
+  });
+  // Also try once more after a short delay (answers may come a bit later)
+  setTimeout(kick, 200);
+})();
+</script>
+<script id="groupMap" type="application/json">
+[
+  {
+    "id": 1,
+    "group": "Hospitality Skills"
+  },
+  {
+    "id": 2,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 3,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 4,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 5,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 6,
+    "group": "Hospitality Skills"
+  },
+  {
+    "id": 7,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 8,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 9,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 10,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 11,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 12,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 13,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 14,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 15,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 16,
+    "group": "Hospitality Skills"
+  },
+  {
+    "id": 17,
+    "group": "Collaboration"
+  },
+  {
+    "id": 18,
+    "group": "Hospitality Skills"
+  },
+  {
+    "id": 19,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 20,
+    "group": "Collaboration"
+  },
+  {
+    "id": 21,
+    "group": "Collaboration"
+  },
+  {
+    "id": 22,
+    "group": "Hospitality Skills"
+  },
+  {
+    "id": 23,
+    "group": "Hospitality Skills"
+  },
+  {
+    "id": 24,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 25,
+    "group": "Hospitality Skills"
+  },
+  {
+    "id": 26,
+    "group": "Hospitality Competencies"
+  },
+  {
+    "id": 27,
+    "group": "Taking Ownership"
+  },
+  {
+    "id": 28,
+    "group": "Collaboration"
+  },
+  {
+    "id": 29,
+    "group": "Taking Ownership"
+  },
+  {
+    "id": 30,
+    "group": "Taking Ownership"
+  },
+  {
+    "id": 31,
+    "group": "Taking Ownership"
+  },
+  {
+    "id": 32,
+    "group": "Taking Ownership"
+  },
+  {
+    "id": 33,
+    "group": "Taking Ownership"
+  },
+  {
+    "id": 34,
+    "group": "Taking Ownership"
+  },
+  {
+    "id": 35,
+    "group": "Taking Ownership"
+  }
+]
+</script>
+<script>
+// === Group Results renderer using mapping ===
+(function(){
+  if (window.__GROUP_RENDER_MAPPED__) return; window.__GROUP_RENDER_MAPPED__ = true;
+
+  function getAnswers(){
+    try {
+      if (window.__S && window.__S.answers) return window.__S.answers;
+    } catch(e){}
+    return {}; // fallback
+  }
+
+  function getMapping(){
+    var tag = document.getElementById('groupMap');
+    if(!tag) return [];
+    try { return JSON.parse(tag.textContent || "[]"); } catch(e){ return []; }
+  }
+
+  var DESCRIPTIONS = {
+    "Hospitality Skills":"Basic service skills for daily tasks and guest care.",
+    "Hospitality Competencies":"Advanced ability to read people and situations.",
+    "Taking Ownership":"Acting independently and sharing responsibility.",
+    "Collaboration":"Building trust and helping across the BED community."
+  };
+
+  function pctFrom(vals){
+    if(!vals.length) return 0;
+    var avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+    // Use the same 25% floor as overall score
+    var pct = Math.round(25 + ((avg - 1) / 4) * 75);
+    if (pct < 0) pct = 0; if (pct > 100) pct = 100;
+    return pct;
+  }
+
+  function computeByGroup(ans, map){
+    var buckets = {"Hospitality Skills":[], "Hospitality Competencies":[], "Taking Ownership":[], "Collaboration":[]};
+    var byId = {};
+    map.forEach(function(it){ byId[it.id] = it.group; });
+    Object.keys(ans||{}).forEach(function(k){
+      var m = (k+'').match(/(\d+)/);
+      if(!m) return;
+      var id = parseInt(m[1],10);
+      var g = byId[id];
+      if(!g) return;
+      var v = parseInt(ans[k],10);
+      if(!isNaN(v) && v>0) buckets[g].push(v);
+    });
+    var results = [];
+    Object.keys(buckets).forEach(function(g){
+      results.push({name:g, pct:pctFrom(buckets[g])});
+    });
+    return results;
+  }
+
+  function render(){
+    var holder = document.getElementById('groupResults');
+    if(!holder) return;
+    var map = getMapping();
+    if(!map.length){
+      // If no map provided yet, do not change anything (leave any fallback UI)
+      return;
+    }
+    var ans = getAnswers();
+    var rows = computeByGroup(ans, map).map(function(r){
+      return '<div class="group-row" style="padding:8px 0;border-top:1px solid #eee">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center">'
+        +   '<div style="font-weight:600">'+r.name+'</div>'
+        +   '<div style="font-weight:700">'+r.pct+'%</div>'
+        + '</div>'
+        + '<div style="color:#666;margin-top:4px;font-size:.95em">'+DESCRIPTIONS[r.name]+'</div>'
+        + '</div>';
+    }).join('');
+    holder.innerHTML = '<div style="border:1px solid #eee;border-radius:10px;padding:0 12px;background:#fff">'+rows+'</div>';
+  }
+
+  // Try rendering after DOM ready + short delay (answers may fill a bit later)
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(render, 50);
+    setTimeout(render, 200);
+  });
+  // Re-render if hash changes to scoring/finish page
+  window.addEventListener('hashchange', render);
+})();
+// === End Group Results renderer ===
+</script>
+
+<script id="groupInfo" type="application/json">
+{
+  "Hospitality Skills": "Basic service skills for daily tasks and guest care.",
+  "Hospitality Competencies": "Advanced ability to read people and situations.",
+  "Taking Ownership": "Acting independently and sharing responsibility.",
+  "Collaboration": "Building trust and helping across the BED community."
+}
 </script>
 </body>
 </html>
