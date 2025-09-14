@@ -454,7 +454,9 @@ el('toInstructions').onclick = () => {
     let rec=''; if(pct<50) rec='Keep practicing!\nFocus on one habit at a time.'; else if(pct<70) rec='Good effort!\nPick two areas to improve next.'; else if(pct<85) rec='Great hospitality!\nKeep challenging yourself'; else rec='Excellent!\nBe a coach for your peers';
     el('recText').innerHTML = rec.replace(/\n/g,'<br>');
     show('finish');
-  };
+  
+    setTimeout(() => window.dispatchEvent(new Event('hashchange')), 0);
+};
 
   // Score page buttons
   el('backToQ2').onclick = () => show('q2');
@@ -483,7 +485,9 @@ chipWrap.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', ()
 
   // Congrats
   el('congratsBack').onclick = () => show('finish');
-  el('congratsPdf').onclick = () => window.print(); // simple export
+  
+    setTimeout(() => window.dispatchEvent(new Event('hashchange')), 0);
+el('congratsPdf').onclick = () => window.print(); // simple export
 
 
 // ===== Validation for Page 1 =====
