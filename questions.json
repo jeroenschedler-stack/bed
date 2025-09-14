@@ -1,212 +1,177 @@
 [
   {
-    "id": "q1",
-    "statement": "1. I answer very quickly to guest messages",
-    "subtext": "I often check and reply right away",
-    "weight": 1.0
+    "id": 1,
+    "statement": "1. Sample statement 1",
+    "subtext": "Subtext for statement 1"
   },
   {
-    "id": "q2",
-    "statement": "2. I make my replies warm and personal",
-    "subtext": "I use their name and add helpful information",
-    "weight": 1.0
+    "id": 2,
+    "statement": "2. Sample statement 2",
+    "subtext": "Subtext for statement 2"
   },
   {
-    "id": "q3",
-    "statement": "3. I make a great first impression",
-    "subtext": "I know it starts with the first message",
-    "weight": 0.5
+    "id": 3,
+    "statement": "3. Sample statement 3",
+    "subtext": "Subtext for statement 3"
   },
   {
-    "id": "q4",
-    "statement": "4. I can see if a guest is stressed or relaxed",
-    "subtext": "I adjust the way I check-in to the mood",
-    "weight": 2.0
+    "id": 4,
+    "statement": "4. Sample statement 4",
+    "subtext": "Subtext for statement 4"
   },
   {
-    "id": "q5",
-    "statement": "5. I ask questions before I ask passports",
-    "subtext": "I welcome guests like friends",
-    "weight": 2.0
+    "id": 5,
+    "statement": "5. Sample statement 5",
+    "subtext": "Subtext for statement 5"
   },
   {
-    "id": "q6",
-    "statement": "6. I can check-in a guest in 60 seconds",
-    "subtext": "I timed three standard check-ins",
-    "weight": 1.0
+    "id": 6,
+    "statement": "6. Sample statement 6",
+    "subtext": "Subtext for statement 6"
   },
   {
-    "id": "q7",
-    "statement": "7. I check in groups differently than FIT",
-    "subtext": "I usually check-in groups with the leader",
-    "weight": 0.5
+    "id": 7,
+    "statement": "7. Sample statement 7",
+    "subtext": "Subtext for statement 7"
   },
   {
-    "id": "q8",
-    "statement": "8. I don't say that check-in time is 14:00",
-    "subtext": "Guests can check-in when the room is ready",
-    "weight": 1.5
+    "id": 8,
+    "statement": "8. Sample statement 8",
+    "subtext": "Subtext for statement 8"
   },
   {
-    "id": "q9",
-    "statement": "9. I dont show stress when there is a problem",
-    "subtext": "I know that makes guests really worry",
-    "weight": 2.0
+    "id": 9,
+    "statement": "9. Sample statement 9",
+    "subtext": "Subtext for statement 9"
   },
   {
-    "id": "q10",
-    "statement": "10. I show genuine interest during check-out",
-    "subtext": "I ask about their stay or next destination",
-    "weight": 1.0
+    "id": 10,
+    "statement": "10. Sample statement 10",
+    "subtext": "Subtext for statement 10"
   },
   {
-    "id": "q11",
-    "statement": "11. I make great last impressions",
-    "subtext": "I walk them out and wait until their car has left",
-    "weight": 2.0
+    "id": 11,
+    "statement": "11. Sample statement 11",
+    "subtext": "Subtext for statement 11"
   },
   {
-    "id": "q12",
-    "statement": "12. I use names to connect with guests",
-    "subtext": "When it feels right I introduce myself",
-    "weight": 0.5
+    "id": 12,
+    "statement": "12. Sample statement 12",
+    "subtext": "Subtext for statement 12"
   },
   {
-    "id": "q13",
-    "statement": "13. I scan every guest every time",
-    "subtext": "I dont look at a group but at each individual",
-    "weight": 2.0
+    "id": 13,
+    "statement": "13. Sample statement 13",
+    "subtext": "Subtext for statement 13"
   },
   {
-    "id": "q14",
-    "statement": "14. I am good at scanning",
-    "subtext": "I see what people need before they ask",
-    "weight": 2.0
+    "id": 14,
+    "statement": "14. Sample statement 14",
+    "subtext": "Subtext for statement 14"
   },
   {
-    "id": "q15",
-    "statement": "15. I create unique surprises for guests",
-    "subtext": "I do more than offering free things",
-    "weight": 2.0
+    "id": 15,
+    "statement": "15. Sample statement 15",
+    "subtext": "Subtext for statement 15"
   },
   {
-    "id": "q16",
-    "statement": "16. Music is an essential part of the vibe",
-    "subtext": "I listen to make sure we play the right music",
-    "weight": 0.5
+    "id": 16,
+    "statement": "16. Sample statement 16",
+    "subtext": "Subtext for statement 16"
   },
   {
-    "id": "q17",
-    "statement": "17. I tell guests they can use other BED facilities",
-    "subtext": "I offer downtown coffee, big pool or breakfast",
-    "weight": 1.5
+    "id": 17,
+    "statement": "17. Sample statement 17",
+    "subtext": "Subtext for statement 17"
   },
   {
-    "id": "q18",
-    "statement": "18. It's annoying when a room key doesn't work",
-    "subtext": "I go up to make sure the new key works",
-    "weight": 2.0
+    "id": 18,
+    "statement": "18. Sample statement 18",
+    "subtext": "Subtext for statement 18"
   },
   {
-    "id": "q19",
-    "statement": "19. I talk with guests because I am interested",
-    "subtext": "When I force myself it will not be real",
-    "weight": 1.0
+    "id": 19,
+    "statement": "19. Sample statement 19",
+    "subtext": "Subtext for statement 19"
   },
   {
-    "id": "q20",
-    "statement": "20. I often give my friends honest feedback",
-    "subtext": "Im happy to help them to grow",
-    "weight": 1.5
+    "id": 20,
+    "statement": "20. Sample statement 20",
+    "subtext": "Subtext for statement 20"
   },
   {
-    "id": "q21",
-    "statement": "21. My friends often give me honest feedback",
-    "subtext": "I'm happy they help me to grow",
-    "weight": 1.0
+    "id": 21,
+    "statement": "21. Sample statement 21",
+    "subtext": "Subtext for statement 21"
   },
   {
-    "id": "q22",
-    "statement": "22. I can answer most questions about BED",
-    "subtext": "I have visited the rooms in all our hotels",
-    "weight": 0.5
+    "id": 22,
+    "statement": "22. Sample statement 22",
+    "subtext": "Subtext for statement 22"
   },
   {
-    "id": "q23",
-    "statement": "23. I understand the meaning of showtime",
-    "subtext": "The magic happens from 0700-1000",
-    "weight": 0.5
+    "id": 23,
+    "statement": "23. Sample statement 23",
+    "subtext": "Subtext for statement 23"
   },
   {
-    "id": "q24",
-    "statement": "24. I have peeled my own onion",
-    "subtext": "I dont act. Usually I show my true self",
-    "weight": 1.5
+    "id": 24,
+    "statement": "24. Sample statement 24",
+    "subtext": "Subtext for statement 24"
   },
   {
-    "id": "q25",
-    "statement": "25. I use ChatGPT or Gemini",
-    "subtext": "I ask for help with e.g., guest messages",
-    "weight": 0.5
+    "id": 25,
+    "statement": "25. Sample statement 25",
+    "subtext": "Subtext for statement 25"
   },
   {
-    "id": "q26",
-    "statement": "26. I send messages that look like I wrote them",
-    "subtext": "I don't copy AI because guests will know",
-    "weight": 1.5
+    "id": 26,
+    "statement": "26. Sample statement 26",
+    "subtext": "Subtext for statement 26"
   },
   {
-    "id": "q27",
-    "statement": "27. I use ChatGPT or Gemini",
-    "subtext": "I ask help to analyze and solve problems",
-    "weight": 1.5
+    "id": 27,
+    "statement": "27. Sample statement 27",
+    "subtext": "Subtext for statement 27"
   },
   {
-    "id": "q28",
-    "statement": "28. I never gossip. I signed I Promise",
-    "subtext": "I dont talk badly when someones not here",
-    "weight": 2.0
+    "id": 28,
+    "statement": "28. Sample statement 28",
+    "subtext": "Subtext for statement 28"
   },
   {
-    "id": "q29",
-    "statement": "29. I really understand that rules can be flexible",
-    "subtext": "Without reasons many rules just disappear",
-    "weight": 1.0
+    "id": 29,
+    "statement": "29. Sample statement 29",
+    "subtext": "Subtext for statement 29"
   },
   {
-    "id": "q30",
-    "statement": "30. I am confident about my own judgment",
-    "subtext": "I make decisions without asking permission",
-    "weight": 1.0
+    "id": 30,
+    "statement": "30. Sample statement 30",
+    "subtext": "Subtext for statement 30"
   },
   {
-    "id": "q31",
-    "statement": "31. I look after the whole hotel, not only front",
-    "subtext": "I include rooms, maintenance and back areas",
-    "weight": 2.0
+    "id": 31,
+    "statement": "31. Sample statement 31",
+    "subtext": "Subtext for statement 31"
   },
   {
-    "id": "q32",
-    "statement": "32. I look around when I arrive at the hotel",
-    "subtext": "I share responsibility for the whole hotel",
-    "weight": 0.5
+    "id": 32,
+    "statement": "32. Sample statement 32",
+    "subtext": "Subtext for statement 32"
   },
   {
-    "id": "q33",
-    "statement": "33. I don't pass issues to others but act myself",
-    "subtext": "I follow up later to make sure it's fixed",
-    "weight": 1.0
+    "id": 33,
+    "statement": "33. Sample statement 33",
+    "subtext": "Subtext for statement 33"
   },
   {
-    "id": "q34",
-    "statement": "34. I am not afraid of the CEO or my coach",
-    "subtext": "I know I am allowed to make mistakes",
-    "weight": 1.0
+    "id": 34,
+    "statement": "34. Sample statement 34",
+    "subtext": "Subtext for statement 34"
   },
   {
-    "id": "q35",
-    "statement": "35. I have no manuals that show me what to do",
-    "subtext": "That means I cannot do anything wrong",
-    "weight": 0.5
+    "id": 35,
+    "statement": "35. Sample statement 35",
+    "subtext": "Subtext for statement 35"
   }
 ]
