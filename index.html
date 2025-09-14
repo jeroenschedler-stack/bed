@@ -15,31 +15,31 @@
   body{font-family:system-ui, Arial, sans-serif; background:#F9FAFB; color:var(--text); margin:0}
   .container{width:100%; margin:0; padding:24px var(--pad)}
 
-  h1{font-size:24pt; margin:0 0 8px 0; line-height:1.2}
-  .subheader{font-size:18pt; margin:0 0 12px 0; font-weight:700}
+  h1{font-size:20pt; margin:0 0 8px 0; line-height:1.2}
+  .subheader{font-size:18pt; margin:0 0 12px 0; font-weight:500}
   .section-title{font-size:13pt; margin:16px 0 8px 0; line-height:1.25; font-weight:800; letter-spacing:.5px; text-transform:uppercase}
-  .intro{font-size:11pt; line-height:1.5; color:#4a4949; margin:4px 0 14px 0}
+  .intro{font-size:12pt; line-height:1.5; color:#333; margin:4px 0 14px 0}
 
   .progress{display:flex; gap:10px; margin:6px 0 16px 0}
   .dot{width:10px; height:10px; border-radius:50%; background:var(--progress-gray); border:1px solid #e5e7eb}
   .dot.active{background:var(--progress-red); border-color:var(--progress-red)}
 
   .row{display:grid; grid-template-columns:minmax(84px, var(--label-w)) 1fr; column-gap:var(--gap); align-items:center; margin:10px 0}
-  .row>label{font-size:11pt; font-weight:400; white-space:normal; word-break:break-word}
+  .row>label{font-size:10pt; font-weight:400; white-space:normal; word-break:break-word}
   .row>input, .row>select{width:100%; padding:10px 12px; font-size:10pt; border:1px solid var(--gray-300); border-radius:10px; background:#fff; transition:box-shadow .15s, border-color .15s}
   .row>input:focus, .row>select:focus{outline:none; border-color:rgba(30,144,255,.8); box-shadow:0 0 0 3px rgba(30,144,255,.18); background:#fff}
   select:invalid{color:#aaa}
 
   .actions{padding-left:calc(var(--label-w) + var(--gap)); margin-top:14px; display:flex; gap:10px; justify-content:flex-end}
-  button{padding:14px 24px; border:none; border-radius:14px; background:var(--blue); color:#fff; font-size:13pt; cursor:pointer}
+  button{padding:14px 24px; border:none; border-radius:14px; background:var(--blue); color:#fff; font-size:14pt; cursor:pointer}
   .btn-secondary{background:#fff; color:#111; border:1px solid #e5e7eb}
 
   /* QUESTIONS */
   .q-item{padding:12px 0; border-top:1px solid #e5e7eb; display:grid; grid-template-columns: 26px 1fr; column-gap:6px; align-items:baseline}
-  .q-num{font-size:12px; font-weight:00; line-height:1.35; text-align:right; padding-top:0; color:#4a4949}
+  .q-num{font-size:15px; font-weight:700; line-height:1.35; text-align:right; padding-top:0; color:#111}
   .q-body{display:block}
-  .q-title{display:block; font-size:15px; font-weight:500; margin:0 0 3px 0; line-height:1.35}
-  .q-sub{display:block; font-size:15px; font-weight:500; margin:0 0 8px 0; color:#4a4949; line-height:1.35}
+  .q-title{display:block; font-size:15px; font-weight:700; margin:0 0 3px 0; line-height:1.35}
+  .q-sub{display:block; font-size:14px; font-weight:400; margin:0 0 8px 0; color:#666; line-height:1.35}
   .pill{display:inline-block; width:30px; height:30px; line-height:30px; text-align:center; border:1px solid #cfcfcf; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none; font-size:16px}
   .pill.selected{background:var(--blue); color:#fff}
 
@@ -107,7 +107,7 @@
     /* Cards / fields */
     .info-grid{display:grid; grid-template-columns: 1fr 1fr; gap:14px}
     .card{border:1px solid #d1d5db; border-radius:6px; padding:10px 12px}
-    .sub-h{font-weight:800; color:#4a4949; margin:0 0 6px 0; text-transform:uppercase}
+    .sub-h{font-weight:800; color:#000; margin:0 0 6px 0; text-transform:uppercase}
     .fields{display:grid; grid-template-columns: 160px 1fr; column-gap:10px; row-gap:6px; font-size:12px}
     .fields label{font-weight:700}
 
@@ -151,7 +151,7 @@
       <select id="hotel" required>
         <option disabled selected value="">select hotel</option>
         <option>BED Changkian</option>
-        <option>BED Phrasingh</option>
+        <option>BED Phrasing</option>
         <option>BED Nimman</option>
         <option>BED Chiangmai Gate</option>
         <option>BED Flying</option>
@@ -184,9 +184,8 @@
   <section id="instructions" style="display:none">
     <h2 class="section-title">HOW TO ASSESS YOURSELF</h2>
     <p class="intro">
-      Read each statement and think how you normally act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities
+      Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities
     </p>
-    <br style="line-height:0.5;">
 
     <h2 class="section-title">HOW TO SCORE YOURSELF</h2>
     <ul class="scale-list" style="list-style:none; padding:0; margin:10px 0">
@@ -510,7 +509,6 @@
     if (id === 'q1') { subheaderEl.textContent = 'STATEMENTS PART 1'; } 
     else if (id === 'q2') { subheaderEl.textContent = 'STATEMENTS PART 2'; } 
     else if (id === 'congrats') { subheaderEl.textContent = 'ASSESSMENT COMPLETED'; } 
-else if (id === 'instructions') { subheaderEl.textContent = 'INSTRUCTIONS'; }
     else { subheaderEl.textContent = 'TEAM MEMBER FORM'; }
   };
 
