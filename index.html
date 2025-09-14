@@ -194,7 +194,7 @@
 
   .rec-text{font-size:16pt; font-weight:600; color:#333; margin-top:16px;}
 
-  .group-results-header {
+  .group-results-header{
     font-size:14pt;
     font-weight:500;
     color:#444;
@@ -290,7 +290,7 @@
 <div class="rec-text" id="recText">—</div>
 <div id="groupResultsContainer" style="margin-top:18px">
 <div class="group-summary">
-<div class="group-title group-results-header" style="font-weight:700;margin-bottom:8px">GROUP RESULTS</div>
+<div class="group-results-header group-title" style="font-weight:700;margin-bottom:8px">GROUP RESULTS</div>
 <div id="groupResults"></div>
 </div>
 </div>
@@ -500,6 +500,119 @@
         + '</div>';
     });
     holder.innerHTML = rows;
+  }
+
+  // Navigation + eligibility modal
+  const _eligOkBtn = document.getElementById('eligOk');
+  const _eligCancelBtn = document.getElementById('eligCancel');
+  function openModal(){ document.getElementById('eligBackdrop').style.display='flex'; }
+  function closeModal(){ document.getElementById('eligBackdrop').style.display='none'; }
+
+  el('toInstructions').onclick = () => {
+    openModal();
+    const oldOk = _eligOkBtn.onclick;
+    const oldCancel = _eligCancelBtn.onclick;
+    _eligOkBtn.onclick = () => { closeModal(); show('instructions'); _eligOkBtn.onclick = oldOk; _eligCancelBtn.onclick = oldCancel; };
+    _eligCancelBtn.onclick = () => { closeModal(); _eligOkBtn.onclick = oldOk; _eligCancelBtn.onclick = oldCancel; };
+  };
+  el('backToWelcome').onclick = () => show('welcome');
+  el('toQ1').onclick = () => { const l=el('list-q1'); l.innerHTML=''; (S.questions||[]).slice(0,18).forEach((q,i)=>l.appendChild(makeQ(q,i+1))); show('q1'); };
+  el('backToInstructions').onclick = () => show('instructions');
+  el('toQ2').onclick = () => { const l=el('list-q2'); l.innerHTML=''; (S.questions||[]).slice(18,35).forEach((q,i)=>l.appendChild(makeQ(q,19+i))); show('q2'); };
+  el('backToQ1').onclick = () => show('q1');
+
+  el('submitAll').onclick = () => {
+    const totals = computeTotals();
+    el('scorePercent').textContent = 'OVERALL SCORE ' + totals.pct + '%';
+    const gauge = el('gauge');
+    gauge.style.setProperty('--marker', totals.pct + '%'); 
+    gauge.style.position='relative';
+    let markerStyle = document.getElementById('markerStyle'); 
+    if(!markerStyle){ markerStyle=document.createElement('style'); markerStyle.id='markerStyle'; document.head.appendChild(markerStyle);}
+    markerStyle.textContent = '.gauge::after{left: calc(var(--marker) - 5px);}';
+    let rec=''; 
+    if(totals.pct<50) rec='Keep practicing!\\nFocus on one habit at a time.'; 
+    else if(totals.pct<70) rec='Good effort!\\nPick two areas to improve next.'; 
+    else if(totals.pct<85) rec='Great hospitality!\\nKeep challenging yourself'; 
+    else rec='Excellent!\\nBe a coach for your peers';
+    document.getElementById('recText').innerHTML = rec.replace(/\\n/g,'<br>');
+    renderGroupResults();
+    show('finish');
+  };
+
+  el('backToQ2').onclick = () => show('q2');
+  el('nextToPeer').onclick = () => show('congrats');
+
+  el('congratsBack').onclick = () => show('finish');
+
+  // Validation
+  ['nick','email','hotel','peerName','peerEmail','peerHotel'].forEach(id => {
+    el(id).addEventListener('input', validateWelcome);
+    el(id).addEventListener('change', validateWelcome);
+  });
+  validateWelcome();
+
+  // Subheader update
+  const subheaderEl = document.querySelector('p.subheader');
+  const _oldShow = show;
+  show = function(id) {
+    _oldShow(id);
+    if (!subheaderEl) return;
+    if (id === 'q1') { subheaderEl.textContent = 'STATEMENTS PART 1'; } 
+    else if (id === 'q2') { subheaderEl.textContent = 'STATEMENTS PART 2'; } 
+    else if (id === 'congrats') { subheaderEl.textContent = 'ASSESSMENT COMPLETED'; } 
+    else { subheaderEl.textContent = 'TEAM MEMBER FORM'; }
+  };
+
+  function formatDate(){
+    try{
+      const dt = new Date();
+      const opts = {day:'numeric', month:'short', year:'numeric'};
+      return dt.toLocaleDateString(undefined, opts);
+    }catch(_){ return ''; }
+  }
+
+  function buildPdfReport(){
+    // Date + score box
+    const totals = computeTotals();
+    document.getElementById('pdfDate').textContent = 'Assessment Date ' + formatDate();
+    document.getElementById('pdfTotalPct').textContent = (isFinite(totals.pct) ? totals.pct : '—') + '%';
+    document.getElementById('pdfTotalRaw').textContent = (totals.raw||0) + ' OUT OF ' + ((S.questions||[]).length * 5 || 175);
+
+    // Info
+    document.getElementById('pdfEmpName').textContent = document.getElementById('nick').value || '';
+    document.getElementById('pdfEmpEmail').textContent = document.getElementById('email').value || '';
+    document.getElementById('pdfEmpHotel').textContent = document.getElementById('hotel').value || '';
+    document.getElementById('pdfPeerName').textContent = document.getElementById('peerName').value || '';
+    document.getElementById('pdfPeerEmail').textContent = document.getElementById('peerEmail').value || '';
+    document.getElementById('pdfPeerHotel').textContent = document.getElementById('peerHotel').value || '';
+
+    // Group rows
+    const gp = computeGroupPercents();
+    const descMap = groupDescMap();
+    const order = ["Hospitality Skills","Hospitality Competencies","Taking Ownership","Collaboration"];
+    const body = document.getElementById('pdfGroupRows');
+    body.innerHTML='';
+    order.forEach(name=>{
+      const tr = document.createElement('tr');
+      const tdName = document.createElement('td'); tdName.textContent = 'Score ' + name.split(' ')[0];
+      const tdPct = document.createElement('td'); tdPct.textContent = (gp[name] != null ? gp[name] : '—') + '%';
+      const tdDesc = document.createElement('td'); tdDesc.textContent = descMap[name] || '(add description)';
+      tr.appendChild(tdName); tr.appendChild(tdPct); tr.appendChild(tdDesc);
+      body.appendChild(tr);
+    });
+
+    // Statements table
+    const tb = document.querySelector('#pdfStatements tbody');
+    tb.innerHTML = '';
+    (S.questions||[]).forEach((q, i)=>{
+      const tr = document.createElement('tr');
+      const tdNo = document.createElement('td'); tdNo.textContent = (i+1); tdNo.className='st-no';
+      const tdSt = document.createElement('td');
+      tdSt.innerHTML = '<div class="st-title">'+(stripLeadingNumber(q.statement||''))+'</div>'
+        + (q.subtext?('<div class="muted">'+q.subtext+'</div>'):''); 
+      const tdGp = document.createElement('td'); tdGp.textContent = q.group || '';
+      const tdRt = document.createElement('td'); tdRt.textContent = (S.answers[q.id] != null ? S.answers[q.id] : ''); tdRt.className='st-rating';
       tr.appendChild(tdNo); tr.appendChild(tdSt); tr.appendChild(tdGp); tr.appendChild(tdRt);
       tb.appendChild(tr);
     });
