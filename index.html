@@ -184,8 +184,9 @@
   <section id="instructions" style="display:none">
     <h2 class="section-title">HOW TO ASSESS YOURSELF</h2>
     <p class="intro">
-      Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities
+      Read each statement and think how you normally act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities
     </p>
+    <br>
 
     <h2 class="section-title">HOW TO SCORE YOURSELF</h2>
     <ul class="scale-list" style="list-style:none; padding:0; margin:10px 0">
@@ -509,6 +510,7 @@
     if (id === 'q1') { subheaderEl.textContent = 'STATEMENTS PART 1'; } 
     else if (id === 'q2') { subheaderEl.textContent = 'STATEMENTS PART 2'; } 
     else if (id === 'congrats') { subheaderEl.textContent = 'ASSESSMENT COMPLETED'; } 
+else if (id === 'instructions') { subheaderEl.textContent = 'INSTRUCTIONS'; }
     else { subheaderEl.textContent = 'TEAM MEMBER FORM'; }
   };
 
