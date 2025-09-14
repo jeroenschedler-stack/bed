@@ -442,7 +442,7 @@ el('toInstructions').onclick = () => {
     const answered = ids.filter(id => S.answers[id] != null);
     const total = answered.reduce((sum,id)=>sum + Number(S.answers[id]||0), 0);
     const avg = answered.length ? total/answered.length : 0;
-    const pct = answered.length ? Math.round(((avg - 1) / 4) * 100) : 0;
+    const pct = answered.length ? Math.round(25 + ((avg - 1) / 4) * 75) : 25;
     el('scorePercent').textContent = 'YOUR SCORE IS ' + pct + '%';
     const gauge = el('gauge'); gauge.style.setProperty('--marker', pct + '%'); gauge.style.position='relative';
     let markerStyle = document.getElementById('markerStyle'); if(!markerStyle){ markerStyle=document.createElement('style'); markerStyle.id='markerStyle'; document.head.appendChild(markerStyle);}
@@ -559,14 +559,8 @@ const _oldShow = show;
 show = function(id) {
   _oldShow(id);
   if (!subheaderEl) return;
-  if (id === 'q1') {
-    subheaderEl.textContent = 'STATEMENTS PART 1';
-  } else if (id === 'q2') {
-    subheaderEl.textContent = 'STATEMENTS PART 2';
-  } else if (id === 'congrats') {
-    subheaderEl.textContent = 'ASSESSMENT COMPLETED';
-  } else {
-    // For welcome, instructions, finish => keep Team Member Form
+  if (id === 'q1') { subheaderEl.textContent = 'STATEMENTS PART 1'; } else if (id === 'q2') { subheaderEl.textContent = 'STATEMENTS PART 2'; } else if (id === 'congrats') { subheaderEl.textContent = 'ASSESSMENT COMPLETED'; } else {
+    // For welcome, instructions, finish, peer, congrats => keep Team Member Form
     subheaderEl.textContent = 'TEAM MEMBER FORM';
   }
 };
