@@ -254,10 +254,7 @@
 <h1>BED HOSPITALITY 2.0</h1>
 <p class="subheader">TEAM MEMBER FORM</p>
 <div class="progress" id="progressHeader">
-<span class="dot"></span><span class="dot"></span><span class="dot"></span>
-<span class="dot"></span><span class="dot"></span><span class="dot"></span>
-<span class="dot"></span>
-</div>
+<span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
 <!-- ===== PAGE 1 ===== -->
 <section id="welcome">
 <h2 class="section-title">Your Information</h2>
@@ -314,7 +311,6 @@
 </section>
 <!-- ===== Questions 1 ===== -->
 <section id="q1" style="display:none">
-<h2 class="section-title">STATEMENTS PART 1</h2>
 <div id="list-q1"></div>
 <div class="actions">
 <button class="btn-secondary" id="backToInstructions">Back</button>
@@ -323,7 +319,6 @@
 </section>
 <!-- ===== Questions 2 ===== -->
 <section id="q2" style="display:none">
-<h2 class="section-title">STATEMENTS PART 2</h2>
 <div id="list-q2"></div>
 <div class="actions">
 <button class="btn-secondary" id="backToQ1">Back</button>
@@ -344,41 +339,10 @@
 </div>
 </section>
 <!-- ===== Peer Assessment ===== -->
-<section id="peer" style="display:none">
-<h2 class="section-title">PEER ASSESSMENT</h2>
-<h3 class="section-title" style="margin-top:4px">FIND YOUR PEER REVIEWER</h3>
-<p class="peer-lead">
-        You completed your self-assessment. The next step is peer review.
-        Ask anyone in your team who has been in BED for at least 24 months to assess you.
-        When they accept complete the information. When you click Done the review form is send to your peer
-      </p>
-<div class="row"><label for="pNick">peer nick name</label><input id="pNick" placeholder=""/></div>
-<div class="row"><label for="pEmail">peer email address</label><input id="pEmail" placeholder="" type="email"/></div>
-<div class="peer-row" id="hotelChips">
-<span class="chip" data-code="BCK">BCK</span>
-<span class="chip" data-code="BPS">BPS</span>
-<span class="chip" data-code="BNM">BNM</span>
-<span class="chip" data-code="BCG">BCG</span>
-<span class="chip" data-code="FLY">FLY</span>
-<span class="chip" data-code="BED">BED</span>
-</div>
-<label class="agree">
-<input id="agree" type="checkbox"/>
-<span>I agree to share my self-assessment with my peer</span>
-</label>
-<div class="page-actions">
-<button class="btn-secondary btn-wide" id="peerBack">Back</button>
-<button class="btn-wide" id="peerDone">Done</button>
-</div>
-</section>
 <!-- ===== Congratulations ===== -->
 <section id="congrats" style="display:none">
-<h2 class="section-title">SELF- ASSESSMENT COMPLETED</h2>
-<div class="progress" id="congratsDots">
-<span class="dot active"></span><span class="dot active"></span><span class="dot active"></span>
-<span class="dot active"></span><span class="dot active"></span><span class="dot active"></span>
-<span class="dot active"></span>
-</div>
+
+
 <div class="big-check"></div>
 <div class="center">
 <h3 style="font-size:28px; margin:8px 0 6px 0">Congratulations</h3>
@@ -408,7 +372,7 @@
   catch(e) { S.questions = []; }
 
   const el = id => document.getElementById(id);
-  const sections = ['welcome','instructions','q1','q2','finish','peer','congrats'];
+  const sections = ['welcome','instructions','q1','q2','finish','congrats'];
 
   function show(id){
     sections.forEach(s => (document.getElementById(s).style.display = (s===id ? 'block' : 'none')));
@@ -417,8 +381,7 @@
     else if(id==='q1') n = 3;
     else if(id==='q2') n = 4;
     else if(id==='finish') n = 5;
-    else if(id==='peer') n = 6;
-    else if(id==='congrats') n = 7;
+    else if(id==='congrats') n = 6;
     setProgress(n);
     window.scrollTo({top:0, behavior:'smooth'});
   }
@@ -491,16 +454,17 @@ el('toInstructions').onclick = () => {
 
   // Score page buttons
   el('backToQ2').onclick = () => show('q2');
-  el('nextToPeer').onclick = () => show('peer');
+  el('nextToPeer').onclick = () => show('congrats');
 
   // Chip selection
   const chipWrap = document.getElementById('hotelChips');
-  chipWrap.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => { 
+  if (chipWrap) {
+chipWrap.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => { 
     chipWrap.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
     ch.classList.add('active');
     S.selectedHotel = ch.dataset.code;
   }));
-
+  }
   // Modal helpers
   const backdrop = document.getElementById('eligBackdrop');
   const openModal = () => (backdrop.style.display = 'flex');
@@ -510,16 +474,11 @@ el('toInstructions').onclick = () => {
   document.getElementById('eligOk').onclick = () => { closeModal(); show('congrats'); };
 
   // Peer page actions
-  el('peerBack').onclick = () => show('finish');
-  el('peerDone').onclick = () => { 
-    // Require chip + checkbox
-    if(!S.selectedHotel){ alert('Please select a hotel.'); return; }
-    if(!document.getElementById('agree').checked){ alert('Please agree to share your self-assessment.'); return; }
-    openModal(); // show eligibility confirmation modal
-  };
+  
+  
 
   // Congrats
-  el('congratsBack').onclick = () => show('peer');
+  el('congratsBack').onclick = () => show('finish');
   el('congratsPdf').onclick = () => window.print(); // simple export
 
 
@@ -604,8 +563,10 @@ show = function(id) {
     subheaderEl.textContent = 'STATEMENTS PART 1';
   } else if (id === 'q2') {
     subheaderEl.textContent = 'STATEMENTS PART 2';
+  } else if (id === 'congrats') {
+    subheaderEl.textContent = 'ASSESSMENT COMPLETED';
   } else {
-    // For welcome, instructions, finish, peer, congrats => keep Team Member Form
+    // For welcome, instructions, finish => keep Team Member Form
     subheaderEl.textContent = 'TEAM MEMBER FORM';
   }
 };
