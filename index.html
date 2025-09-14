@@ -283,7 +283,7 @@
   <!-- Score -->
   <section id="finish" style="display:none">
     <div class="score-kicker">your self assessment results</div>
-    <div class="score-big" id="scorePercent">YOUR SCORE IS —%</div>
+    <div class="score-big" id="scorePercent">OVERALL SCORE —%</div>
     <div class="gauge" id="gauge"></div>
     <div class="rec-kicker">our suggestion and recommendation</div>
     <div class="rec-text" id="recText">—</div>
@@ -531,7 +531,7 @@
 
   el('submitAll').onclick = () => {
     const totals = computeTotals();
-    el('scorePercent').textContent = 'YOUR SCORE IS ' + totals.pct + '%';
+    el('scorePercent').textContent = 'OVERALL SCORE ' + totals.pct + '%';
     const gauge = el('gauge');
     gauge.style.setProperty('--marker', totals.pct + '%'); 
     gauge.style.position='relative';
