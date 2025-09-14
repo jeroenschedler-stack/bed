@@ -1,17 +1,20 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>BED HOSPITALITY — Self Assessment</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>BED HOSPITALITY — Self-Assessment</title>
 <style>
-  :root{--pad:20px; --label-w:96px; --gap:6px; --brand-blue:#1E90FF; --progress-red:#E11D48; --progress-gray:#f3f4f6; --gray-300:#cfd4dc;}
+  :root{
+    --pad:20px; --label-w:96px; --gap:6px;
+    --brand-blue:#1E90FF; --blue:#1E90FF;
+    --progress-red:#E11D48; --progress-gray:#f3f4f6; --gray-300:#cfd4dc;
+    --text:#111; --muted:#555; --line:#e5e7eb;
+  }
   *{box-sizing:border-box}
-  body{font-family:system-ui, Arial, sans-serif; background:#F9FAFB; color:#111; margin:0}
+  body{font-family:system-ui, Arial, sans-serif; background:#F9FAFB; color:var(--text); margin:0}
   .container{width:100%; margin:0; padding:24px var(--pad)}
 
-  /* ===== PAGE 1 ===== */
   h1{font-size:20pt; margin:0 0 8px 0; line-height:1.2}
   .subheader{font-size:18pt; margin:0 0 12px 0; font-weight:500}
   .section-title{font-size:13pt; margin:16px 0 8px 0; line-height:1.25; font-weight:800; letter-spacing:.5px; text-transform:uppercase}
@@ -28,353 +31,283 @@
   select:invalid{color:#aaa}
 
   .actions{padding-left:calc(var(--label-w) + var(--gap)); margin-top:14px; display:flex; gap:10px; justify-content:flex-end}
-  button{padding:14px 24px; border:none; border-radius:14px; background:#1E90FF; color:#fff; font-size:14pt; cursor:pointer}
+  button{padding:14px 24px; border:none; border-radius:14px; background:var(--blue); color:#fff; font-size:14pt; cursor:pointer}
   .btn-secondary{background:#fff; color:#111; border:1px solid #e5e7eb}
 
-  /* ===== QUESTIONS ===== */
+  /* QUESTIONS */
   .q-item{padding:12px 0; border-top:1px solid #e5e7eb; display:grid; grid-template-columns: 26px 1fr; column-gap:6px; align-items:baseline}
   .q-num{font-size:15px; font-weight:700; line-height:1.35; text-align:right; padding-top:0; color:#111}
   .q-body{display:block}
   .q-title{display:block; font-size:15px; font-weight:700; margin:0 0 3px 0; line-height:1.35}
-  .q-sub{display:block; font-size:15px; font-weight:400; margin:0 0 8px 0; color:#444; line-height:1.35}
+  .q-sub{display:block; font-size:14px; font-weight:400; margin:0 0 8px 0; color:#666; line-height:1.35}
   .pill{display:inline-block; width:30px; height:30px; line-height:30px; text-align:center; border:1px solid #cfcfcf; border-radius:50%; margin-right:6px; cursor:pointer; user-select:none; font-size:16px}
-  .pill.selected{background:#1E90FF; color:#fff}
+  .pill.selected{background:var(--blue); color:#fff}
 
-  /* ===== SCORE ===== */
+  /* SCORE */
   .score-kicker{font-size:14px; color:#666; margin:12px 0 8px 0}
   .score-big{font-size:32px; font-weight:800; margin:0 0 24px 0}
   .gauge{position:relative; height:28px; border-radius:999px; background:linear-gradient(90deg,#ef4444 0%, #f59e0b 35%, #fbbf24 50%, #84cc16 70%, #22c55e 100%);}
   .gauge::after{content:""; position:absolute; top:-8px; bottom:-8px; width:10px; border-radius:6px; background:#333}
-  .rec-kicker{font-size:14px; color:#666; margin:24px 0 8px 0}
-  .rec-text{font-size:28px; font-weight:800; line-height:1.2; margin:0 0 8px 0}
 
-  /* ===== PEER PAGE ===== */
-  .peer-lead{font-size:12pt; line-height:1.7; color:#333; margin:8px 0 16px 0}
-  .peer-row{display:flex; flex-wrap:wrap; gap:12px; margin:8px 0 14px 0}
-  .chip{padding:10px 16px; border:1px solid #d1d5db; border-radius:12px; background:#fff; font-weight:700; letter-spacing:.5px; cursor:pointer; user-select:none}
-  .chip.active{background:#1E90FF; color:#fff; border-color:#1E90FF}
-  .agree{display:flex; align-items:center; gap:10px; margin:10px 0 18px 0}
-  .page-actions{display:flex; justify-content:space-between; gap:14px; padding-left:0; margin-top:10px}
-  .btn-wide{flex:1 1 0%; border-radius:12px; padding:14px 0; font-size:16px}
-
-  /* ===== Modal (Peer eligibility) ===== */
-  .modal-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:50}
-  .modal{width:min(92vw,520px); background:#fff; border-radius:18px; padding:20px; box-shadow:0 20px 60px rgba(0,0,0,.25)}
-  .modal h3{margin:0 0 10px 0; font-size:18px}
-  .modal p{margin:0 0 18px 0; font-size:16px; line-height:1.5; color:#222}
-  .modal .row-btns{display:flex; justify-content:flex-end; gap:10px}
-
-  /* ===== Congrats Page ===== */
-  .big-check{width:120px; height:120px; border-radius:60px; background:#1E90FF; display:flex; align-items:center; justify-content:center; margin:16px auto}
+  /* Congrats */
+  .big-check{width:120px; height:120px; border-radius:60px; background:var(--blue); display:flex; align-items:center; justify-content:center; margin:16px auto}
   .big-check:after{content:'✔'; color:#fff; font-weight:800; font-size:54px}
   .center{text-align:center}
 
-  @media (max-width:340px){ .row{grid-template-columns:1fr; row-gap:6px} .actions{padding-left:0} .q-item{padding:12px 0; border-top:1px solid #e5e7eb; display:grid; grid-template-columns: 26px 1fr; column-gap:6px; align-items:baseline} }
-</style>
-<script id="embeddedQuestions" type="application/json">[
-  {
-    "id": 1,
-    "statement": "1. I answer very quickly to guest messages",
-    "subtext": "I often check and reply right away"
-  },
-  {
-    "id": 2,
-    "statement": "2. I make my replies warm and personal",
-    "subtext": "I use their name and add helpful information"
-  },
-  {
-    "id": 3,
-    "statement": "3. I make a great first impression",
-    "subtext": "I know it starts with the first message"
-  },
-  {
-    "id": 4,
-    "statement": "4. I can see if a guest is stressed or relaxed",
-    "subtext": "I adjust the way I check-in to the mood"
-  },
-  {
-    "id": 5,
-    "statement": "5. I ask questions before I ask passports",
-    "subtext": "I welcome guests like friends"
-  },
-  {
-    "id": 6,
-    "statement": "6. I can check-in a guest in 60 seconds",
-    "subtext": "I timed three standard check-ins"
-  },
-  {
-    "id": 7,
-    "statement": "7. I check in groups differently than FIT",
-    "subtext": "I usually check-in groups with the leader"
-  },
-  {
-    "id": 8,
-    "statement": "8. I don't say that check-in time is 14:00",
-    "subtext": "Guests can check-in when the room is ready"
-  },
-  {
-    "id": 9,
-    "statement": "9. I dont show stress when there is a problem",
-    "subtext": "I know that makes guests really worry"
-  },
-  {
-    "id": 10,
-    "statement": "10. I show genuine interest during check-out",
-    "subtext": "I ask about their stay or next destination"
-  },
-  {
-    "id": 11,
-    "statement": "11. I make great last impressions",
-    "subtext": "I walk them out and wait until their car has left"
-  },
-  {
-    "id": 12,
-    "statement": "12. I use names to connect with guests",
-    "subtext": "When it feels right I introduce myself"
-  },
-  {
-    "id": 13,
-    "statement": "13. I scan every guest every time",
-    "subtext": "I dont look at a group but at each individual"
-  },
-  {
-    "id": 14,
-    "statement": "14. I am good at scanning",
-    "subtext": "I see what people need before they ask"
-  },
-  {
-    "id": 15,
-    "statement": "15. I create unique surprises for guests",
-    "subtext": "I do more than offering free things"
-  },
-  {
-    "id": 16,
-    "statement": "16. Music is an essential part of the vibe",
-    "subtext": "I listen to make sure we play the right music"
-  },
-  {
-    "id": 17,
-    "statement": "17. I tell guests they can use other BED facilities",
-    "subtext": "I offer downtown coffee, big pool or breakfast"
-  },
-  {
-    "id": 18,
-    "statement": "18. It's annoying when a room key doesn't work",
-    "subtext": "I go up to make sure the new key works"
-  },
-  {
-    "id": 19,
-    "statement": "19. I talk with guests because I am interested",
-    "subtext": "When I force myself it will not be real"
-  },
-  {
-    "id": 20,
-    "statement": "20. I often give my friends honest feedback",
-    "subtext": "Im happy to help them to grow"
-  },
-  {
-    "id": 21,
-    "statement": "21. My friends often give me honest feedback",
-    "subtext": "I'm happy they help me to grow"
-  },
-  {
-    "id": 22,
-    "statement": "22. I can answer most questions about BED",
-    "subtext": "I have visited the rooms in all our hotels"
-  },
-  {
-    "id": 23,
-    "statement": "23. I understand the meaning of showtime",
-    "subtext": "The magic happens from 0700-1000"
-  },
-  {
-    "id": 24,
-    "statement": "24. I have peeled my own onion",
-    "subtext": "I dont act. Usually I show my true self"
-  },
-  {
-    "id": 25,
-    "statement": "25. I use ChatGPT or Gemini",
-    "subtext": "I ask for help with e.g., guest messages"
-  },
-  {
-    "id": 26,
-    "statement": "26. I send messages that look like I wrote them",
-    "subtext": "I don't copy AI because guests will know"
-  },
-  {
-    "id": 27,
-    "statement": "27. I use ChatGPT or Gemini",
-    "subtext": "I ask help to analyze and solve problems"
-  },
-  {
-    "id": 28,
-    "statement": "28. I never gossip. I signed I Promise",
-    "subtext": "I dont talk badly when someones not here"
-  },
-  {
-    "id": 29,
-    "statement": "29. I really understand that rules can be flexible",
-    "subtext": "Without reasons many rules just disappear"
-  },
-  {
-    "id": 30,
-    "statement": "30. I am confident about my own judgment",
-    "subtext": "I make decisions without asking permission"
-  },
-  {
-    "id": 31,
-    "statement": "31. I look after the whole hotel, not only front",
-    "subtext": "I include rooms, maintenance and back areas"
-  },
-  {
-    "id": 32,
-    "statement": "32. I look around when I arrive at the hotel",
-    "subtext": "I share responsibility for the whole hotel"
-  },
-  {
-    "id": 33,
-    "statement": "33. I don't pass issues to others but act myself",
-    "subtext": "I follow up later to make sure it's fixed"
-  },
-  {
-    "id": 34,
-    "statement": "34. I am not afraid of the CEO or my coach",
-    "subtext": "I know I am allowed to make mistakes"
-  },
-  {
-    "id": 35,
-    "statement": "35. I have no manuals that show me what to do",
-    "subtext": "That means I cannot do anything wrong"
+  @media (max-width:340px){ .row{grid-template-columns:1fr; row-gap:6px} .actions{padding-left:0} .q-item{grid-template-columns: 26px 1fr;} }
+
+  /* PRINT: Blue-branded template */
+  #pdfReport{display:none}
+  @media print{
+    body{background:#fff; color:#000}
+    main, .modal-backdrop{display:none !important}
+    #pdfReport{display:block; font-family:Arial, Helvetica, sans-serif; padding:18px 24px}
+
+    /* Title block */
+    .pdf-top{display:grid; grid-template-columns: 1fr 220px; gap:16px; align-items:start; margin-bottom:10px}
+    .pdf-title{font-size:26px; font-weight:800; color:var(--blue); margin:0}
+    .pdf-sub{font-size:20px; font-weight:700; color:var(--blue); margin:2px 0 2px 0}
+    .pdf-date{font-size:14px; color:var(--blue); margin:2px 0 10px 0}
+    .pdf-divider{height:1px; background:#cfd4dc; margin:8px 0 14px 0}
+
+    .score-box{background:var(--blue); color:#fff; border-radius:6px; padding:12px 14px; text-align:center}
+    .score-box .label{font-size:12px; font-weight:700; letter-spacing:.5px}
+    .score-box .pct{font-size:34px; font-weight:800; margin:6px 0 2px 0}
+    .score-box .raw{font-size:12px; opacity:.95}
+
+    /* Section headers */
+    .sec-h{background:var(--blue); color:#fff; font-weight:800; text-transform:uppercase; padding:6px 10px; border-radius:4px; margin:16px 0 8px 0}
+
+    /* Cards / fields */
+    .info-grid{display:grid; grid-template-columns: 1fr 1fr; gap:14px}
+    .card{border:1px solid #d1d5db; border-radius:6px; padding:10px 12px}
+    .sub-h{font-weight:800; color:#000; margin:0 0 6px 0; text-transform:uppercase}
+    .fields{display:grid; grid-template-columns: 160px 1fr; column-gap:10px; row-gap:6px; font-size:12px}
+    .fields label{font-weight:700}
+
+    /* Tables */
+    table{width:100%; border-collapse:collapse}
+    th{background:var(--blue); color:#fff; font-weight:800; text-transform:uppercase; font-size:12px; padding:8px}
+    td{border:1px solid #d1d5db; font-size:12px; padding:8px; vertical-align:top}
+    .muted{color:#666; font-size:11px}
+
+    /* Statements specifics */
+    .st-no{width:6%}
+    .st-group{width:18%}
+    .st-rating{width:12%}
+    .st-title{font-weight:800}
   }
-]</script>
+</style>
+
+<script id="embeddedQuestions" type="application/json">[]</script>
 </head>
 <body>
 <main class="container">
-<h1>BED HOSPITALITY 2.0</h1>
-<p class="subheader">TEAM MEMBER FORM</p>
-<div class="progress" id="progressHeader">
-<span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
-<!-- ===== PAGE 1 ===== -->
-<section id="welcome">
-<h2 class="section-title">Your Information</h2>
-<div class="row"><label for="nick">your name</label><input id="nick"/></div>
-<div class="row"><label for="email">your email</label><input id="email" type="email"/></div>
-<div class="row"><label for="hotel">your location</label>
-<select id="hotel" required="">
-<option disabled="" selected="" value="">select hotel</option>
-<option>BED Changkian</option>
-<option>BED Phrasing</option>
-<option>BED Nimman</option>
-<option>BED Chiangmai Gate</option>
-<option>BED Flying</option>
-<option>BED Support</option>
-</select>
-</div>
-<h2 class="section-title">Peer Information</h2>
-<p class="intro">after you completed your self assessment one of your peers will review you. select one of your team members who worked in BED for at least 12 months</p>
-<div class="row"><label for="peerName">name peer</label><input id="peerName"/></div>
-<div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email"/></div>
-<div class="row"><label for="peerHotel">peer location</label>
-<select id="peerHotel" required="">
-<option disabled="" selected="" value="">select hotel</option>
-<option>BED Changkian</option>
-<option>BED Phrasing</option>
-<option>BED Nimman</option>
-<option>BED Chiangmai Gate</option>
-<option>BED Flying</option>
-<option>BED Support</option>
-</select>
-</div>
-<div class="actions">
-<button disabled="" id="toInstructions">Start</button>
-</div>
-</section>
-<!-- ===== Instructions ===== -->
-<section id="instructions" style="display:none">
-<h2 class="section-title">HOW TO ASSESS YOURSELF</h2>
-<p class="intro">
-        Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities
-      </p>
-<h2 class="section-title">HOW TO SCORE YOURSELF</h2>
-<ul class="scale-list" style="list-style:none; padding:0; margin:10px 0">
-<li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge" style="width:28px; height:28px; border-radius:50%; background:#1E90FF; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700">1</span> <span>I am not good at this</span></li>
-<li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge" style="width:28px; height:28px; border-radius:50%; background:#1E90FF; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700">2</span> <span>I need to be better at this</span></li>
-<li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge" style="width:28px; height:28px; border-radius:50%; background:#1E90FF; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700">3</span> <span>I am average at this</span></li>
-<li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge" style="width:28px; height:28px; border-radius:50%; background:#1E90FF; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700">4</span> <span>I am good at this</span></li>
-<li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge" style="width:28px; height:28px; border-radius:50%; background:#1E90FF; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700">5</span> <span>I am very good at this</span></li>
-</ul>
-<div class="actions">
-<button class="btn-secondary" id="backToWelcome">Back</button>
-<button id="toQ1">Start</button>
-</div>
-</section>
-<!-- ===== Questions 1 ===== -->
-<section id="q1" style="display:none">
-<div id="list-q1"></div>
-<div class="actions">
-<button class="btn-secondary" id="backToInstructions">Back</button>
-<button id="toQ2">Next</button>
-</div>
-</section>
-<!-- ===== Questions 2 ===== -->
-<section id="q2" style="display:none">
-<div id="list-q2"></div>
-<div class="actions">
-<button class="btn-secondary" id="backToQ1">Back</button>
-<button id="submitAll">Next</button>
-</div>
-</section>
-<!-- ===== Score ===== -->
-<section id="finish" style="display:none">
-<h2 class="section-title">SELF-ASSESSMENT SCORE</h2>
-<div class="score-kicker">your self assessment results</div>
-<div class="score-big" id="scorePercent">YOUR SCORE IS —%</div>
-<div class="gauge" id="gauge"></div>
-<div class="rec-kicker">our suggestion and recommendation</div>
-<div class="rec-text" id="recText">—</div>
-<div id="groupResultsContainer" style="margin-top:18px">
-<div class="group-summary">
-<div class="group-title" style="font-weight:700;margin-bottom:8px">Group Results</div>
-<div id="groupResults"></div>
-</div>
-</div>
-<div class="actions">
-<button class="btn-secondary" id="backToQ2">Back</button>
-<button id="nextToPeer">Next</button>
-</div>
-</section>
-<!-- ===== Peer Assessment ===== -->
-<!-- ===== Congratulations ===== -->
-<section id="congrats" style="display:none">
-<div class="big-check"></div>
-<div class="center">
-<h3 style="font-size:28px; margin:8px 0 6px 0">Congratulations</h3>
-<p style="font-size:18px; color:#374151">To download your complete test results please click PDF</p>
-</div>
-<div class="page-actions">
-<button class="btn-secondary btn-wide" id="congratsBack">Back</button>
-<button class="btn-wide" id="congratsPdf">PDF</button>
-</div>
-</section>
+  <h1>BED HOSPITALITY 2.0</h1>
+  <p class="subheader">TEAM MEMBER FORM</p>
+  <div class="progress" id="progressHeader">
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+  </div>
+
+  <!-- PAGE 1 -->
+  <section id="welcome">
+    <h2 class="section-title">Your Information</h2>
+    <div class="row"><label for="nick">your name</label><input id="nick"/></div>
+    <div class="row"><label for="email">your email</label><input id="email" type="email"/></div>
+    <div class="row"><label for="hotel">your location</label>
+      <select id="hotel" required>
+        <option disabled selected value="">select hotel</option>
+        <option>BED Changkian</option>
+        <option>BED Phrasing</option>
+        <option>BED Nimman</option>
+        <option>BED Chiangmai Gate</option>
+        <option>BED Flying</option>
+        <option>BED Support</option>
+      </select>
+    </div>
+
+    <h2 class="section-title">Peer Information</h2>
+    <p class="intro">after you completed your self assessment one of your peers will review you. select one of your team members who worked in BED for at least 12 months</p>
+    <div class="row"><label for="peerName">name peer</label><input id="peerName"/></div>
+    <div class="row"><label for="peerEmail">email peer</label><input id="peerEmail" type="email"/></div>
+    <div class="row"><label for="peerHotel">peer location</label>
+      <select id="peerHotel" required>
+        <option disabled selected value="">select hotel</option>
+        <option>BED Changkian</option>
+        <option>BED Phrasing</option>
+        <option>BED Nimman</option>
+        <option>BED Chiangmai Gate</option>
+        <option>BED Flying</option>
+        <option>BED Support</option>
+      </select>
+    </div>
+
+    <div class="actions">
+      <button id="toInstructions" disabled>Start</button>
+    </div>
+  </section>
+
+  <!-- Instructions -->
+  <section id="instructions" style="display:none">
+    <h2 class="section-title">HOW TO ASSESS YOURSELF</h2>
+    <p class="intro">
+      Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know your own strengths and opportunities
+    </p>
+
+    <h2 class="section-title">HOW TO SCORE YOURSELF</h2>
+    <ul class="scale-list" style="list-style:none; padding:0; margin:10px 0">
+      <li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge" style="width:28px; height:28px; border-radius:50%; background:var(--blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700">1</span> <span>I am not good at this</span></li>
+      <li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge" style="width:28px; height:28px; border-radius:50%; background:var(--blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700">2</span> <span>I need to be better at this</span></li>
+      <li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge" style="width:28px; height:28px; border-radius:50%; background:var(--blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700">3</span> <span>I am average at this</span></li>
+      <li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge" style="width:28px; height:28px; border-radius:50%; background:var(--blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700">4</span> <span>I am good at this</span></li>
+      <li class="scale-item" style="display:flex; align-items:center; gap:10px; margin:8px 0; font-size:12pt"><span class="badge" style="width:28px; height:28px; border-radius:50%; background:var(--blue); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-weight:700">5</span> <span>I am very good at this</span></li>
+    </ul>
+    <div class="actions">
+      <button class="btn-secondary" id="backToWelcome">Back</button>
+      <button id="toQ1">Start</button>
+    </div>
+  </section>
+
+  <!-- Q1 -->
+  <section id="q1" style="display:none">
+    <div id="list-q1"></div>
+    <div class="actions">
+      <button class="btn-secondary" id="backToInstructions">Back</button>
+      <button id="toQ2">Next</button>
+    </div>
+  </section>
+
+  <!-- Q2 -->
+  <section id="q2" style="display:none">
+    <div id="list-q2"></div>
+    <div class="actions">
+      <button class="btn-secondary" id="backToQ1">Back</button>
+      <button id="submitAll">Next</button>
+    </div>
+  </section>
+
+  <!-- Score -->
+  <section id="finish" style="display:none">
+    <h2 class="section-title">SELF-ASSESSMENT SCORE</h2>
+    <div class="score-kicker">your self assessment results</div>
+    <div class="score-big" id="scorePercent">YOUR SCORE IS —%</div>
+    <div class="gauge" id="gauge"></div>
+    <div class="rec-kicker">our suggestion and recommendation</div>
+    <div class="rec-text" id="recText">—</div>
+
+    <div id="groupResultsContainer" style="margin-top:18px">
+      <div class="group-summary">
+        <div class="group-title" style="font-weight:700;margin-bottom:8px">Group Results</div>
+        <div id="groupResults"></div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn-secondary" id="backToQ2">Back</button>
+      <button id="nextToPeer">Next</button>
+    </div>
+  </section>
+
+  <!-- Congrats -->
+  <section id="congrats" style="display:none">
+    <div class="big-check"></div>
+    <div class="center">
+      <h3 style="font-size:28px; margin:8px 0 6px 0">Congratulations</h3>
+      <p style="font-size:18px; color:#374151">To download your complete test results please click PDF</p>
+    </div>
+    <div class="page-actions" style="display:flex; gap:14px; justify-content:space-between; padding-left:0; margin-top:10px">
+      <button class="btn-secondary btn-wide" id="congratsBack">Back</button>
+      <button class="btn-wide" id="congratsPdf">PDF</button>
+    </div>
+  </section>
 </main>
-<!-- Peer Eligibility Modal -->
-<div class="modal-backdrop" id="eligBackdrop">
-<div class="modal">
-<h3>Peer eligibility</h3>
-<p>Does your peer have at least 24 months of BED experience?</p>
-<div class="row-btns">
-<button class="btn-secondary" id="eligCancel">Cancel</button>
-<button id="eligOk">OK</button>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="eligBackdrop" style="position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:50">
+  <div class="modal" style="width:min(92vw,520px); background:#fff; border-radius:18px; padding:20px; box-shadow:0 20px 60px rgba(0,0,0,.25)">
+    <h3 style="margin:0 0 10px 0; font-size:18px">Peer eligibility</h3>
+    <p style="margin:0 0 18px 0; font-size:16px; line-height:1.5; color:#222">Does your peer have at least 24 months of BED experience?</p>
+    <div class="row-btns" style="display:flex; justify-content:flex-end; gap:10px">
+      <button class="btn-secondary" id="eligCancel">Cancel</button>
+      <button id="eligOk">OK</button>
+    </div>
+  </div>
 </div>
-</div>
-</div>
+
+<!-- PRINT REPORT (Blue-branded) -->
+<section id="pdfReport" aria-hidden="true">
+  <div class="pdf-top">
+    <div>
+      <div class="pdf-title">BED HOSPITALITY 2.0</div>
+      <div class="pdf-sub">Self-Assessment Report</div>
+      <div class="pdf-date" id="pdfDate">Assessment Date —</div>
+    </div>
+    <div class="score-box">
+      <div class="label">TOTAL SCORE</div>
+      <div class="pct" id="pdfTotalPct">—%</div>
+      <div class="raw" id="pdfTotalRaw">— OUT OF 175</div>
+    </div>
+  </div>
+  <div class="pdf-divider"></div>
+
+  <div class="sec-h">INFORMATION</div>
+  <div class="info-grid">
+    <div>
+      <div class="sub-h">PERSONAL INFORMATION</div>
+      <div class="card fields">
+        <label>Employee name</label><div id="pdfEmpName"></div>
+        <label>Email address</label><div id="pdfEmpEmail"></div>
+        <label>Location</label><div id="pdfEmpHotel"></div>
+      </div>
+    </div>
+    <div>
+      <div class="sub-h">PEER INFORMATION</div>
+      <div class="card fields">
+        <label>Peer name</label><div id="pdfPeerName"></div>
+        <label>Email address</label><div id="pdfPeerEmail"></div>
+        <label>Location</label><div id="pdfPeerHotel"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-h">ASSESSMENT</div>
+  <div class="card" style="padding:0">
+    <table>
+      <thead>
+        <tr>
+          <th>RESULTS BY GROUP</th>
+          <th>%</th>
+          <th>DESCRIPTION</th>
+        </tr>
+      </thead>
+      <tbody id="pdfGroupRows">
+        <!-- rows injected -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sec-h">STATEMENTS</div>
+  <div class="card" style="padding:0">
+    <table id="pdfStatements">
+      <thead>
+        <tr>
+          <th class="st-no">NO.</th>
+          <th>STATEMENT</th>
+          <th class="st-group">GROUP</th>
+          <th class="st-rating">RATING</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- rows injected -->
+      </tbody>
+    </table>
+  </div>
+</section>
+
 <script>
 (function(){
-  const S = {answers:{}, questions:[], selectedHotel:null}; window.__S = S; window.__S = S;
-  try { S.questions = JSON.parse(document.getElementById('embeddedQuestions').textContent) || []; }
-  catch(e) { S.questions = []; }
-
+  const S = {answers:{}, questions:[], groups:[]}; window.__S = S;
   const el = id => document.getElementById(id);
   const sections = ['welcome','instructions','q1','q2','finish','congrats'];
 
@@ -389,14 +322,13 @@
     setProgress(n);
     window.scrollTo({top:0, behavior:'smooth'});
   }
-
   function setProgress(n){
     const dots = document.querySelectorAll('#progressHeader .dot');
     dots.forEach((d,i)=>d.classList.toggle('active', i < n));
   }
   setProgress(1);
 
-  function stripLeadingNumber(t){ return String(t).replace(/^\s*\d+\.\s*/, ''); }
+  function stripLeadingNumber(t){ return String(t||'').replace(/^\\s*\\d+\\.\\s*/, ''); }
 
   function makeQ(q, ord){
     const wrap = document.createElement('div');
@@ -411,560 +343,203 @@
     return wrap;
   }
 
-  // Navigation
-  
-// Show 12‑month eligibility modal before entering instructions
-const _eligOkBtn = document.getElementById('eligOk');
-const _eligCancelBtn = document.getElementById('eligCancel');
-const _oldEligOkHandler = _eligOkBtn.onclick;
+  async function loadQuestions(){
+    try{
+      const res = await fetch('questions.json', {cache:'no-store'});
+      if(!res.ok) throw new Error('fetch failed');
+      const data = await res.json();
+      S.questions = data.questions || [];
+      S.groups = data.groups || [];
+    }catch(e){
+      // Fallback minimal (shouldn't be needed if questions.json is present)
+      S.questions = []; 
+      S.groups = [
+        {"name":"Hospitality Skills","description":"Basic service skills for daily tasks and guest care."},
+        {"name":"Hospitality Competencies","description":"Advanced ability to read people and situations."},
+        {"name":"Taking Ownership","description":"Acting independently and sharing responsibility."},
+        {"name":"Collaboration","description":"Building trust and helping across the BED community."}
+      ];
+    }
+  }
 
-el('toInstructions').onclick = () => {
-  openModal();
-  // Temporarily reroute OK to proceed to Instructions, then restore original
-  _eligOkBtn.onclick = () => { 
-    closeModal(); 
-    show('instructions'); 
-    _eligOkBtn.onclick = _oldEligOkHandler; 
-  };
-  // On cancel, close and restore original handler as well
-  _eligCancelBtn.onclick = () => { 
-    closeModal(); 
-    _eligCancelBtn.onclick = closeModal; 
-    _eligOkBtn.onclick = _oldEligOkHandler; 
-  };
-};
+  function validateWelcome() {
+    const allFilled = ['nick','email','hotel','peerName','peerEmail','peerHotel'].every(id => el(id).value && el(id).value.trim()!=='');
+    el('toInstructions').disabled = !allFilled;
+  }
 
+  function computeTotals(){
+    const ids = (S.questions||[]).map(q=>q.id);
+    const answered = ids.filter(id => S.answers[id] != null);
+    const raw = answered.reduce((sum,id)=> sum + (Number(S.answers[id]||0)||0), 0);
+    const max = (S.questions||[]).length * 5;
+    const avg = answered.length ? raw/answered.length : 0;
+    const pct = answered.length ? Math.round(25 + ((avg - 1) / 4) * 75) : 25;
+    return {raw, max, pct};
+  }
+
+  function computeGroupPercents(){
+    const byGroup = {};
+    (S.groups||[]).forEach(g=>byGroup[g.name]=[]);
+    (S.questions||[]).forEach(q=>{
+      const g = q.group;
+      const v = parseInt(S.answers[q.id],10);
+      if(g && !isNaN(v) && v>0) byGroup[g].push(v);
+    });
+    const res = {};
+    Object.keys(byGroup).forEach(g=>{
+      const vals = byGroup[g];
+      if(!vals.length){ res[g]=0; return; }
+      const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+      res[g] = Math.round(25 + ((avg - 1) / 4) * 75);
+    });
+    return res;
+  }
+
+  function groupDescMap(){
+    const m = {}; (S.groups||[]).forEach(g=>m[g.name]=g.description||''); return m;
+  }
+
+  function renderGroupResults(){
+    const holder = document.getElementById('groupResults');
+    if(!holder) return;
+    const gp = computeGroupPercents();
+    const desc = groupDescMap();
+    const order = ["Hospitality Skills","Hospitality Competencies","Taking Ownership","Collaboration"];
+    let rows = '';
+    order.forEach(name=>{
+      const p = gp[name] ?? 0;
+      rows += '<div class="group-row" style="padding:8px 0;border-top:1px solid #eee">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center">'
+        +   '<div style="font-weight:600">'+name+'</div>'
+        +   '<div style="font-weight:700">'+p+'%</div>'
+        + '</div>'
+        + '<div style="color:#666;margin-top:4px;font-size:.95em">'+(desc[name]||'')+'</div>'
+        + '</div>';
+    });
+    holder.innerHTML = '<div style="border:1px solid #eee;border-radius:10px;padding:0 12px;background:#fff">'+rows+'</div>';
+  }
+
+  // Navigation + eligibility modal
+  const _eligOkBtn = document.getElementById('eligOk');
+  const _eligCancelBtn = document.getElementById('eligCancel');
+  function openModal(){ document.getElementById('eligBackdrop').style.display='flex'; }
+  function closeModal(){ document.getElementById('eligBackdrop').style.display='none'; }
+
+  el('toInstructions').onclick = () => {
+    openModal();
+    const oldOk = _eligOkBtn.onclick;
+    const oldCancel = _eligCancelBtn.onclick;
+    _eligOkBtn.onclick = () => { closeModal(); show('instructions'); _eligOkBtn.onclick = oldOk; _eligCancelBtn.onclick = oldCancel; };
+    _eligCancelBtn.onclick = () => { closeModal(); _eligOkBtn.onclick = oldOk; _eligCancelBtn.onclick = oldCancel; };
+  };
   el('backToWelcome').onclick = () => show('welcome');
   el('toQ1').onclick = () => { const l=el('list-q1'); l.innerHTML=''; (S.questions||[]).slice(0,18).forEach((q,i)=>l.appendChild(makeQ(q,i+1))); show('q1'); };
   el('backToInstructions').onclick = () => show('instructions');
   el('toQ2').onclick = () => { const l=el('list-q2'); l.innerHTML=''; (S.questions||[]).slice(18,35).forEach((q,i)=>l.appendChild(makeQ(q,19+i))); show('q2'); };
   el('backToQ1').onclick = () => show('q1');
 
-  // Submit + score
-  el('submitAll').onclick = () => { 
-    const ids = (S.questions||[]).map(q=>q.id);
-    const answered = ids.filter(id => S.answers[id] != null);
-    const total = answered.reduce((sum,id)=>sum + Number(S.answers[id]||0), 0);
-    const avg = answered.length ? total/answered.length : 0;
-    const pct = answered.length ? Math.round(25 + ((avg - 1) / 4) * 75) : 25;
-    el('scorePercent').textContent = 'YOUR SCORE IS ' + pct + '%';
-    const gauge = el('gauge'); gauge.style.setProperty('--marker', pct + '%'); gauge.style.position='relative';
-    let markerStyle = document.getElementById('markerStyle'); if(!markerStyle){ markerStyle=document.createElement('style'); markerStyle.id='markerStyle'; document.head.appendChild(markerStyle);}
+  el('submitAll').onclick = () => {
+    const totals = computeTotals();
+    el('scorePercent').textContent = 'YOUR SCORE IS ' + totals.pct + '%';
+    const gauge = el('gauge');
+    gauge.style.setProperty('--marker', totals.pct + '%'); 
+    gauge.style.position='relative';
+    let markerStyle = document.getElementById('markerStyle'); 
+    if(!markerStyle){ markerStyle=document.createElement('style'); markerStyle.id='markerStyle'; document.head.appendChild(markerStyle);}
     markerStyle.textContent = '.gauge::after{left: calc(var(--marker) - 5px);}';
-    let rec=''; if(pct<50) rec='Keep practicing!\nFocus on one habit at a time.'; else if(pct<70) rec='Good effort!\nPick two areas to improve next.'; else if(pct<85) rec='Great hospitality!\nKeep challenging yourself'; else rec='Excellent!\nBe a coach for your peers';
-    el('recText').innerHTML = rec.replace(/\n/g,'<br>');
+    let rec=''; 
+    if(totals.pct<50) rec='Keep practicing!\\nFocus on one habit at a time.'; 
+    else if(totals.pct<70) rec='Good effort!\\nPick two areas to improve next.'; 
+    else if(totals.pct<85) rec='Great hospitality!\\nKeep challenging yourself'; 
+    else rec='Excellent!\\nBe a coach for your peers';
+    document.getElementById('recText').innerHTML = rec.replace(/\\n/g,'<br>');
+    renderGroupResults();
     show('finish');
-  
-    setTimeout(() => window.dispatchEvent(new Event('hashchange')), 0);
-};
+  };
 
-  // Score page buttons
   el('backToQ2').onclick = () => show('q2');
   el('nextToPeer').onclick = () => show('congrats');
 
-  // Chip selection
-  const chipWrap = document.getElementById('hotelChips');
-  if (chipWrap) {
-chipWrap.querySelectorAll('.chip').forEach(ch => ch.addEventListener('click', () => { 
-    chipWrap.querySelectorAll('.chip').forEach(x => x.classList.remove('active'));
-    ch.classList.add('active');
-    S.selectedHotel = ch.dataset.code;
-  }));
-  }
-  // Modal helpers
-  const backdrop = document.getElementById('eligBackdrop');
-  const openModal = () => (backdrop.style.display = 'flex');
-  const closeModal = () => (backdrop.style.display = 'none');
-
-  document.getElementById('eligCancel').onclick = closeModal;
-  document.getElementById('eligOk').onclick = () => { closeModal(); show('congrats'); };
-
-  // Peer page actions
-  
-  
-
-  // Congrats
   el('congratsBack').onclick = () => show('finish');
-  
-    setTimeout(() => window.dispatchEvent(new Event('hashchange')), 0);
-el('congratsPdf').onclick = () => window.print(); // simple export
 
-
-// ===== Validation for Page 1 =====
-function validateWelcome() {
-  const name = el('nick').value.trim();
-  const email = el('email').value.trim();
-  const hotel = el('hotel').value;
-  const peerName = el('peerName').value.trim();
-  const peerEmail = el('peerEmail').value.trim();
-  const peerHotel = el('peerHotel').value;
-
-  const allFilled = name && email && hotel && peerName && peerEmail && peerHotel;
-  el('toInstructions').disabled = !allFilled;
-}
-
-// Attach listeners
-['nick','email','hotel','peerName','peerEmail','peerHotel'].forEach(id => {
-  el(id).addEventListener('input', validateWelcome);
-  el(id).addEventListener('change', validateWelcome);
-});
-
-// Initial check
-validateWelcome();
-
-
-
-// ===== Validation for Question Pages =====
-
-// Check if all questions on a given section are answered
-function validateQuestions(sectionId, btnId) {
-  const section = document.getElementById(sectionId);
-  if (!section) return;
-
-  const items = section.querySelectorAll('.q-item');
-  let allAnswered = true;
-  items.forEach(item => {
-    const selected = item.querySelector('.pill.selected');
-    if (!selected) { allAnswered = false; }
+  // Validation
+  ['nick','email','hotel','peerName','peerEmail','peerHotel'].forEach(id => {
+    el(id).addEventListener('input', validateWelcome);
+    el(id).addEventListener('change', validateWelcome);
   });
+  validateWelcome();
 
-  const btn = document.getElementById(btnId);
-  if (btn) btn.disabled = !allAnswered;
-}
-
-// Attach listeners to dynamically created questions
-function attachQuestionListeners(sectionId, btnId) {
-  const section = document.getElementById(sectionId);
-  if (!section) return;
-
-  section.addEventListener('click', () => validateQuestions(sectionId, btnId));
-}
-
-// Hook into Q1 and Q2 load functions
-const oldToQ1 = el('toQ1').onclick;
-el('toQ1').onclick = () => {
-  oldToQ1();
-  attachQuestionListeners('q1','toQ2');
-  validateQuestions('q1','toQ2');
-};
-
-const oldToQ2 = el('toQ2').onclick;
-el('toQ2').onclick = () => {
-  oldToQ2();
-  attachQuestionListeners('q2','submitAll');
-  validateQuestions('q2','submitAll');
-};
-
-
-
-
-
-
-
-// Update subheader dynamically when navigating
-const subheaderEl = document.querySelector('p.subheader');
-const _oldShow = show;
-show = function(id) {
-  _oldShow(id);
-  if (!subheaderEl) return;
-  if (id === 'q1') { subheaderEl.textContent = 'STATEMENTS PART 1'; } else if (id === 'q2') { subheaderEl.textContent = 'STATEMENTS PART 2'; } else if (id === 'congrats') { subheaderEl.textContent = 'ASSESSMENT COMPLETED'; } else {
-    // For welcome, instructions, finish, peer, congrats => keep Team Member Form
-    subheaderEl.textContent = 'TEAM MEMBER FORM';
-  }
-};
-
-
-
-})();
-</script>
-<script>
-// === Group Results renderer (score page) ===
-(function(){
-  function findScoreSection(){
-    var s = document.getElementById('score');
-    if (s) return s;
-    var secs = document.querySelectorAll('section');
-    for (var i=0;i<secs.length;i++){
-      if ((secs[i].innerText||'').toUpperCase().indexOf('YOUR SCORE IS')>-1) return secs[i];
-    }
-    return null;
-  }
-  var scoreSection = findScoreSection();
-  var holder = document.getElementById('groupResults');
-  if(!scoreSection || !holder) return;
-
-  function evenMapping(totalQ){
-    var names = ['Hospitality Skills','Hospitality Competencies','Taking Ownership','Collaboration'];
-    var groups = { 'Hospitality Skills':[], 'Hospitality Competencies':[], 'Taking Ownership':[], 'Collaboration':[] };
-    var idxs = Array.from({length: totalQ}, (_,i)=>i+1);
-    idxs.forEach(function(q,i){ groups[names[i % names.length]].push(q); });
-    return groups;
-  }
-  function pctFrom(vals){
-    if(!vals || !vals.length) return 0;
-    var avg = vals.reduce((a,b)=>a+b,0)/vals.length;
-    return Math.round(25 + ((avg - 1) / 4) * 75);
-  }
-  var desc = {
-    "Hospitality Skills":"Basic service skills for daily tasks and guest care.",
-    "Hospitality Competencies":"Advanced ability to read people and situations.",
-    "Taking Ownership":"Acting independently and sharing responsibility.",
-    "Collaboration":"Building trust and helping across the BED community."
+  // Subheader update
+  const subheaderEl = document.querySelector('p.subheader');
+  const _oldShow = show;
+  show = function(id) {
+    _oldShow(id);
+    if (!subheaderEl) return;
+    if (id === 'q1') { subheaderEl.textContent = 'STATEMENTS PART 1'; } 
+    else if (id === 'q2') { subheaderEl.textContent = 'STATEMENTS PART 2'; } 
+    else if (id === 'congrats') { subheaderEl.textContent = 'ASSESSMENT COMPLETED'; } 
+    else { subheaderEl.textContent = 'TEAM MEMBER FORM'; }
   };
-  function render(){
+
+  function formatDate(){
     try{
-      var ans = (window.__S && window.__S.answers) ? window.__S.answers : (typeof answers!=='undefined' ? answers : {});
-      var keys = Object.keys(ans||{});
-var totalQ = keys.length || 35;
-      var map = evenMapping(totalQ);
-      var rows = '';
-      Object.keys(map).forEach(function(name){
-        var vals = map[name].map(q=>ans[q]).filter(v=>typeof v==='number');
-        var p = pctFrom(vals);
-        rows += '<div class="group-row" style="padding:8px 0;border-top:1px solid #eee">'
-          + '<div style="display:flex;justify-content:space-between;align-items:center">'
-          + '<div style="font-weight:600">'+name+'</div>'
-          + '<div style="font-weight:700">'+p+'%</div>'
-          + '</div>'
-          + '<div style="color:#666;margin-top:4px;font-size:.95em">'+desc[name]+'</div>'
-          + '</div>';
-      });
-      holder.innerHTML = '<div style="border:1px solid #eee;border-radius:10px;padding:0 12px;background:#fff">'+rows+'</div>';
-      done = true;
-    }catch(e){}
+      const dt = new Date();
+      const opts = {day:'numeric', month:'short', year:'numeric'};
+      return dt.toLocaleDateString(undefined, opts);
+    }catch(_){ return ''; }
   }
-  var tries = 0, done = false;
-  var t = setInterval(function(){
-    if(done || tries>20){ clearInterval(t); return; }
-    tries++; render();
-  }, 200);
+
+  function buildPdfReport(){
+    // Date + score box
+    const totals = computeTotals();
+    el('pdfDate').textContent = 'Assessment Date ' + formatDate();
+    el('pdfTotalPct').textContent = (isFinite(totals.pct) ? totals.pct : '—') + '%';
+    el('pdfTotalRaw').textContent = (totals.raw||0) + ' OUT OF ' + ((S.questions||[]).length * 5 || 175);
+
+    // Info
+    el('pdfEmpName').textContent = el('nick').value || '';
+    el('pdfEmpEmail').textContent = el('email').value || '';
+    el('pdfEmpHotel').textContent = el('hotel').value || '';
+    el('pdfPeerName').textContent = el('peerName').value || '';
+    el('pdfPeerEmail').textContent = el('peerEmail').value || '';
+    el('pdfPeerHotel').textContent = el('peerHotel').value || '';
+
+    // Group rows
+    const gp = computeGroupPercents();
+    const descMap = groupDescMap();
+    const order = ["Hospitality Skills","Hospitality Competencies","Taking Ownership","Collaboration"];
+    const body = document.getElementById('pdfGroupRows');
+    body.innerHTML='';
+    order.forEach(name=>{
+      const tr = document.createElement('tr');
+      const tdName = document.createElement('td'); tdName.textContent = 'Score ' + name.split(' ')[0]; // "Score Skills/Competencies..."
+      const tdPct = document.createElement('td'); tdPct.textContent = (gp[name] != null ? gp[name] : '—') + '%';
+      const tdDesc = document.createElement('td'); tdDesc.textContent = descMap[name] || '(add description)';
+      tr.appendChild(tdName); tr.appendChild(tdPct); tr.appendChild(tdDesc);
+      body.appendChild(tr);
+    });
+
+    // Statements table
+    const tb = document.querySelector('#pdfStatements tbody');
+    tb.innerHTML = '';
+    (S.questions||[]).forEach((q, i)=>{
+      const tr = document.createElement('tr');
+      const tdNo = document.createElement('td'); tdNo.textContent = (i+1); tdNo.className='st-no';
+      const tdSt = document.createElement('td');
+      tdSt.innerHTML = '<div class="st-title">'+(stripLeadingNumber(q.statement||''))+'</div>'
+        + (q.subtext?('<div class="muted">'+q.subtext+'</div>'):''); 
+      const tdGp = document.createElement('td'); tdGp.textContent = q.group || '';
+      const tdRt = document.createElement('td'); tdRt.textContent = (S.answers[q.id] != null ? S.answers[q.id] : ''); tdRt.className='st-rating';
+      tr.appendChild(tdNo); tr.appendChild(tdSt); tr.appendChild(tdGp); tr.appendChild(tdRt);
+      tb.appendChild(tr);
+    });
+  }
+
+  el('congratsPdf').onclick = () => { buildPdfReport(); window.print(); };
+
+  // Init
+  loadQuestions();
 })(); 
-// === End renderer ===
-</script>
-<script>
-(function(){
-  // Minimal, isolated enhancement: compute and show group % + descriptions on the scoring page.
-  if (window.__GR_ENHANCED__) return; window.__GR_ENHANCED__ = true;
-
-  function pctFromVals(vals){
-    if(!vals.length) return 0;
-    var avg = vals.reduce((a,b)=>a+b,0)/vals.length;
-    var pct = Math.round(((avg - 1) / 4) * 100);
-    if (pct < 0) pct = 0; if (pct > 100) pct = 100;
-    return pct;
-  }
-
-  // Fallback mapping: split statements evenly into four groups by statement number
-  var GROUPS = [
-    {key:'skills', name:'Hospitality Skills',        desc:'Basic service skills for daily tasks and guest care.'},
-    {key:'competencies', name:'Hospitality Competencies', desc:'Advanced ability to read people and situations.'},
-    {key:'ownership', name:'Taking Ownership',       desc:'Acting independently and sharing responsibility.'},
-    {key:'collab', name:'Collaboration',             desc:'Building trust and helping across the BED community.'}
-  ];
-
-  function inferGroupsFromAnswers(ans){
-    // Extract numeric ids of answered questions
-    var ids = Object.keys(ans||{})
-      .map(k=>{ var m=(k+'').match(/(\d+)/); return m ? parseInt(m[1],10) : null; })
-      .filter(x=>x!=null)
-      .sort((a,b)=>a-b);
-    if (!ids.length) return {skills:[],competencies:[],ownership:[],collab:[]};
-
-    // Build quartile cut points based on unique ids
-    var uniq = Array.from(new Set(ids)).sort((a,b)=>a-b);
-    var n = uniq.length, q = Math.ceil(n/4);
-    var chunks = [uniq.slice(0,q), uniq.slice(q,2*q), uniq.slice(2*q,3*q), uniq.slice(3*q)];
-    return {skills:chunks[0], competencies:chunks[1], ownership:chunks[2], collab:chunks[3]};
-  }
-
-  function computeGroupPercents(ans){
-    var mapping = inferGroupsFromAnswers(ans);
-    var res = {};
-    Object.keys(mapping).forEach(function(gk){
-      var qids = mapping[gk];
-      var vals = qids.map(function(id){
-        // answers could be keyed 'q1', '1', etc.
-        var v = ans['q'+id]; if (v==null) v = ans[id];
-        // Some implementations store strings; coerce
-        v = parseInt(v,10); if (isNaN(v)) v = 0;
-        return v || 0;
-      }).filter(v=>v>0);
-      res[gk] = pctFromVals(vals);
-    });
-    return res;
-  }
-
-  function renderGroupResults(){
-    var container = document.querySelector('[data-group-results]');
-    if (!container) return;
-
-    // Pull answers from the exposed state (fallback empty object)
-    var ans = (window.__S && window.__S.answers) ? window.__S.answers : {};
-    var gp = computeGroupPercents(ans);
-
-    // Build rows (idempotent: replace innerHTML each time)
-    var html = '';
-    GROUPS.forEach(function(g){
-      var pct = (gp[g.key] != null ? gp[g.key] : 0);
-      html += '<div class="gr-row" style="padding:14px 12px;border-top:1px solid #ececec;">'
-           +  '<div style="display:flex;align-items:center;justify-content:space-between;">'
-           +    '<div style="font-weight:600">'+ g.name +'</div>'
-           +    '<div class="gr-pct-'+g.key+'" style="font-weight:700">'+ pct +'%</div>'
-           +  '</div>'
-           +  '<div style="color:#666;margin-top:4px;font-size:.95em">'+ g.desc +'</div>'
-           +'</div>';
-    });
-    container.innerHTML = html;
-  }
-
-  // Defer to allow base page JS to run, then render and keep it in sync once.
-  function kick(){
-    try{ renderGroupResults(); }catch(e){}
-  }
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(kick, 30);
-  });
-  // Also try once more after a short delay (answers may come a bit later)
-  setTimeout(kick, 200);
-})();
-</script>
-<script id="groupMap" type="application/json">
-[
-  {
-    "id": 1,
-    "group": "Hospitality Skills"
-  },
-  {
-    "id": 2,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 3,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 4,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 5,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 6,
-    "group": "Hospitality Skills"
-  },
-  {
-    "id": 7,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 8,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 9,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 10,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 11,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 12,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 13,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 14,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 15,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 16,
-    "group": "Hospitality Skills"
-  },
-  {
-    "id": 17,
-    "group": "Collaboration"
-  },
-  {
-    "id": 18,
-    "group": "Hospitality Skills"
-  },
-  {
-    "id": 19,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 20,
-    "group": "Collaboration"
-  },
-  {
-    "id": 21,
-    "group": "Collaboration"
-  },
-  {
-    "id": 22,
-    "group": "Hospitality Skills"
-  },
-  {
-    "id": 23,
-    "group": "Hospitality Skills"
-  },
-  {
-    "id": 24,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 25,
-    "group": "Hospitality Skills"
-  },
-  {
-    "id": 26,
-    "group": "Hospitality Competencies"
-  },
-  {
-    "id": 27,
-    "group": "Taking Ownership"
-  },
-  {
-    "id": 28,
-    "group": "Collaboration"
-  },
-  {
-    "id": 29,
-    "group": "Taking Ownership"
-  },
-  {
-    "id": 30,
-    "group": "Taking Ownership"
-  },
-  {
-    "id": 31,
-    "group": "Taking Ownership"
-  },
-  {
-    "id": 32,
-    "group": "Taking Ownership"
-  },
-  {
-    "id": 33,
-    "group": "Taking Ownership"
-  },
-  {
-    "id": 34,
-    "group": "Taking Ownership"
-  },
-  {
-    "id": 35,
-    "group": "Taking Ownership"
-  }
-]
-</script>
-<script>
-// === Group Results renderer using mapping ===
-(function(){
-  if (window.__GROUP_RENDER_MAPPED__) return; window.__GROUP_RENDER_MAPPED__ = true;
-
-  function getAnswers(){
-    try {
-      if (window.__S && window.__S.answers) return window.__S.answers;
-    } catch(e){}
-    return {}; // fallback
-  }
-
-  function getMapping(){
-    var tag = document.getElementById('groupMap');
-    if(!tag) return [];
-    try { return JSON.parse(tag.textContent || "[]"); } catch(e){ return []; }
-  }
-
-  var DESCRIPTIONS = {
-    "Hospitality Skills":"Basic service skills for daily tasks and guest care.",
-    "Hospitality Competencies":"Advanced ability to read people and situations.",
-    "Taking Ownership":"Acting independently and sharing responsibility.",
-    "Collaboration":"Building trust and helping across the BED community."
-  };
-
-  function pctFrom(vals){
-    if(!vals.length) return 0;
-    var avg = vals.reduce((a,b)=>a+b,0)/vals.length;
-    // Use the same 25% floor as overall score
-    var pct = Math.round(25 + ((avg - 1) / 4) * 75);
-    if (pct < 0) pct = 0; if (pct > 100) pct = 100;
-    return pct;
-  }
-
-  function computeByGroup(ans, map){
-    var buckets = {"Hospitality Skills":[], "Hospitality Competencies":[], "Taking Ownership":[], "Collaboration":[]};
-    var byId = {};
-    map.forEach(function(it){ byId[it.id] = it.group; });
-    Object.keys(ans||{}).forEach(function(k){
-      var m = (k+'').match(/(\d+)/);
-      if(!m) return;
-      var id = parseInt(m[1],10);
-      var g = byId[id];
-      if(!g) return;
-      var v = parseInt(ans[k],10);
-      if(!isNaN(v) && v>0) buckets[g].push(v);
-    });
-    var results = [];
-    Object.keys(buckets).forEach(function(g){
-      results.push({name:g, pct:pctFrom(buckets[g])});
-    });
-    return results;
-  }
-
-  function render(){
-    var holder = document.getElementById('groupResults');
-    if(!holder) return;
-    var map = getMapping();
-    if(!map.length){
-      // If no map provided yet, do not change anything (leave any fallback UI)
-      return;
-    }
-    var ans = getAnswers();
-    var rows = computeByGroup(ans, map).map(function(r){
-      return '<div class="group-row" style="padding:8px 0;border-top:1px solid #eee">'
-        + '<div style="display:flex;justify-content:space-between;align-items:center">'
-        +   '<div style="font-weight:600">'+r.name+'</div>'
-        +   '<div style="font-weight:700">'+r.pct+'%</div>'
-        + '</div>'
-        + '<div style="color:#666;margin-top:4px;font-size:.95em">'+DESCRIPTIONS[r.name]+'</div>'
-        + '</div>';
-    }).join('');
-    holder.innerHTML = '<div style="border:1px solid #eee;border-radius:10px;padding:0 12px;background:#fff">'+rows+'</div>';
-  }
-
-  // Try rendering after DOM ready + short delay (answers may fill a bit later)
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(render, 50);
-    setTimeout(render, 200);
-  });
-  // Re-render if hash changes to scoring/finish page
-  window.addEventListener('hashchange', render);
-})();
-// === End Group Results renderer ===
-</script>
-
-<script id="groupInfo" type="application/json">
-{
-  "Hospitality Skills": "Basic service skills for daily tasks and guest care.",
-  "Hospitality Competencies": "Advanced ability to read people and situations.",
-  "Taking Ownership": "Acting independently and sharing responsibility.",
-  "Collaboration": "Building trust and helping across the BED community."
-}
 </script>
 </body>
 </html>
