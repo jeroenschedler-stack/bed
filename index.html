@@ -70,6 +70,8 @@
   button{width:120px; height:42px; font-size:12pt; border:none; border-radius:14px; text-align:center;}
 button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
 button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
+button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
+button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   .btn-secondary{width:120px; height:42px; font-size:12pt;}
 
   /* QUESTIONS */
@@ -200,11 +202,11 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 
   .rec-kicker{font-size:10pt; font-weight:400; color:#999999; margin:12px 0 8px 0}
 
-  .group-desc{line-height:1.3; margin-top:2px; margin-bottom:20px;}
+  .group-desc{line-height:1.35; margin-top:2px; margin-bottom:20px; color:#666; font-size:.95em;}
 
   .score-section{margin-top:40px;}
 
-  .group-row{margin-bottom:2px;}
+  .group-row{padding:4px 0; border-top:1px solid #eee; margin-bottom:0;}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
@@ -492,10 +494,10 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
     let rows = '';
     order.forEach(name=>{
       const p = gp[name] ?? 0;
-      rows += '<div class="group-row" style="padding:8px 0;border-top:1px solid #eee">'+'<div style="font-weight:600">'+name+' '+p+'%</div>'+'</div>'+'<div style="color:#666;margin-top:4px;font-size:.95em">'+(desc[name]||'')+'</div>';
-        + '</div>'
-        + '<div style="color:#666;margin-top:4px;font-size:.95em">'+(desc[name]||'')+'</div>'
-        + '</div>';
+      rows += '<div class="group-row">'
+           +    '<div style="font-weight:600">'+name+' '+p+'%</div>'
+           +  '</div>'
+           +  '<div class="group-desc">'+(desc[name]||'')+'</div>';
     });
     holder.innerHTML = rows;
   }
