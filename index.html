@@ -67,8 +67,10 @@
   select:invalid{color:#aaa}
 
   .actions{padding-left:calc(var(--label-w) + var(--gap)); margin-top:14px; display:flex; gap:10px; justify-content:flex-end}
-  button{width:140px; height:48px; font-size:13pt; border:none; border-radius:14px; background:var(--blue); color:#fff; cursor:pointer; text-align:center;}
-  .btn-secondary{width:140px; height:48px; font-size:13pt;}
+  button{width:120px; height:42px; font-size:12pt; border:none; border-radius:14px; text-align:center;}
+button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
+button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
+  .btn-secondary{width:120px; height:42px; font-size:12pt;}
 
   /* QUESTIONS */
   .q-item{padding:12px 0; border-top:1px solid #e5e7eb; display:grid; grid-template-columns: 26px 1fr; column-gap:6px; align-items:baseline}
