@@ -12,6 +12,11 @@
     --progress-red:#E11D48; --progress-gray:#f3f4f6; --gray-300:#cfd4dc;
     --text:#111; --muted:#555; --line:#e5e7eb;
   }
+
+button{width:120px; height:42px; font-size:12pt; border:none; border-radius:14px; text-align:center;}
+button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
+button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
+.btn-secondary{width:120px; height:42px; font-size:12pt;}
   *{box-sizing:border-box}
   body{font-family:system-ui, Arial, sans-serif; background:#F9FAFB; color:var(--text); margin:0}
   .container{width:100%; margin:0; padding:24px var(--pad)}
@@ -67,15 +72,6 @@
   select:invalid{color:#aaa}
 
   .actions{padding-left:calc(var(--label-w) + var(--gap)); margin-top:14px; display:flex; gap:10px; justify-content:flex-end}
-  button{width:120px; height:42px; font-size:12pt; border:none; border-radius:14px; text-align:center;}
-button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
-button:disabled{background:#d0e6f9; color:#666; cursor:not-allowed;}
-button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
-button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
-button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
-button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
-  .btn-secondary{width:120px; height:42px; font-size:12pt;}
-
   /* QUESTIONS */
   .q-item{padding:12px 0;  display:grid; grid-template-columns: 26px 1fr; column-gap:6px; align-items:baseline}
   .q-num{
