@@ -198,7 +198,11 @@
 
   .rec-kicker{font-size:10pt; font-weight:400; color:#999999; margin:12px 0 8px 0}
 
-  .group-desc{line-height:1.3;}
+  .group-desc{line-height:1.3; margin-bottom:18px;}
+
+  .score-section{margin-top:40px;}
+
+  .group-row{margin-bottom:2px;}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
@@ -277,16 +281,12 @@
 <div id="list-q2"></div>
 <div class="actions">
 <button class="btn-secondary" id="backToQ1">Back</button>
-<button id="submitAll">Next</button>
+<button id="submitAll">Submit</button>
 </div>
 </section>
 <!-- Score -->
-<section id="finish" style="display:none">
-<div class="score-kicker">your self assessment results</div>
-<div class="score-big" id="scorePercent">OVERALL SCORE —%</div>
-<div class="gauge" id="gauge"></div>
-<div class="rec-kicker"></div>
-<br/><div class="rec-text" id="recText">—</div>
+<section id="finish" style="display:none"><div class="score-section"><div class="score-kicker">your self assessment results</div><div class="score-big" id="scorePercent">OVERALL SCORE —%</div><div class="gauge" id="gauge"></div><div class="rec-kicker"></div><div class="rec-text" id="recText">—</div></div>
+<br/>
 <div id="groupResultsContainer" style="margin-top:18px">
 <div class="group-summary">
 <div class="group-results-header group-title" style="font-weight:700;margin-bottom:8px">GROUP RESULTS</div>
