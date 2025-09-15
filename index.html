@@ -67,6 +67,13 @@
   select:invalid{color:#aaa}
 
   .actions{padding-left:calc(var(--label-w) + var(--gap)); margin-top:14px; display:flex; gap:10px; justify-content:flex-end}
+  button{width:120px; height:42px; font-size:12pt; border:none; border-radius:14px; text-align:center;}
+button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
+button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
+button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
+button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
+  .btn-secondary{width:120px; height:42px; font-size:12pt;}
+
   /* QUESTIONS */
   .q-item{padding:12px 0;  display:grid; grid-template-columns: 26px 1fr; column-gap:6px; align-items:baseline}
   .q-num{
@@ -195,16 +202,11 @@
 
   .rec-kicker{font-size:10pt; font-weight:400; color:#999999; margin:12px 0 8px 0}
 
-  .group-desc{line-height:1.35; margin-top:2px; margin-bottom:20px; color:#666; font-size:.95em;}
+  .group-desc{line-height:1.35; margin-top:2px; margin-bottom:14px; color:#666; font-size:.95em;}
 
   .score-section{margin-top:40px;}
 
-  .group-row{padding:4px 0; border-top:1px solid #eee; margin-bottom:0;}
-
-button{width:120px; height:42px; font-size:12pt; border:none; border-radius:14px; text-align:center;}
-button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
-button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
-.btn-secondary{width:120px; height:42px; font-size:12pt;}
+  .group-row{padding:2px 0; margin-bottom:0;}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
@@ -413,10 +415,6 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   }
   setProgress(1);
 
-  try { if (el('toQ2')) el('toQ2').disabled = true; } catch(_){}
-  try { if (el('submitAll')) el('submitAll').disabled = true; } catch(_){}
-
-
   function stripLeadingNumber(t){ return String(t||'').replace(/^\\s*\\d+\\.\\s*/, ''); }
 
   function makeQ(q, ord){
@@ -466,32 +464,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   }
 
   function computeGroupPercents(){
-    const byGroup = {}
-  // === Global page validation for Q1 / Q2 ===
-  function answeredCount(ids){
-    return ids.filter(id => S.answers[id] != null && S.answers[id] !== '' && !isNaN(parseInt(S.answers[id],10))).length;
-  }
-  function qIds(rangeStart, rangeEnd){
-    // returns question ids for the given slice [start, endInclusive]
-    const arr = (S.questions||[]).slice(rangeStart, rangeEnd+1).map(q=>q.id);
-    return arr;
-  }
-  function updateQ1Button(){
-    const ids = qIds(0, Math.min(17, (S.questions||[]).length-1));
-    const done = answeredCount(ids) === ids.length && ids.length>0;
-    const btn = el('toQ2');
-    if(btn) btn.disabled = !done;
-  }
-  function updateQ2Button(){
-    const start = 18;
-    const end = Math.min(34, (S.questions||[]).length-1);
-    const ids = qIds(start, end);
-    const done = answeredCount(ids) === ids.length && ids.length>0;
-    const btn = el('submitAll');
-    if(btn) btn.disabled = !done;
-  }
-
-;
+    const byGroup = {};
     (S.groups||[]).forEach(g=>byGroup[g.name]=[]);
     (S.questions||[]).forEach(q=>{
       const g = q.group;
@@ -513,21 +486,19 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   }
 
   function renderGroupResults(){
-  const holder = document.getElementById('groupResults');
-  if(!holder) return;
-  const gp = computeGroupPercents();
-  const desc = groupDescMap();
-  const order = ["Hospitality Skills","Hospitality Competencies","Taking Ownership","Collaboration"];
-  let rows = '';
-  order.forEach(name=>{
-    const p = gp[name] ?? 0;
-    rows += '<div class="group-row">'
-         +    '<div style="font-weight:600">'+name+' '+p+'%</div>'
-         +  '</div>'
-         +  '<div class="group-desc">'+(desc[name]||'')+'</div>';
-  });
-  holder.innerHTML = rows;
-});
+    const holder = document.getElementById('groupResults');
+    if(!holder) return;
+    const gp = computeGroupPercents();
+    const desc = groupDescMap();
+    const order = ["Hospitality Skills","Hospitality Competencies","Taking Ownership","Collaboration"];
+    let rows = '';
+    order.forEach(name=>{
+      const p = gp[name] ?? 0;
+      rows += '<div class="group-row">'
+           +    '<div style="font-weight:600">'+name+' '+p+'%</div>'
+           +  '</div>'
+           +  '<div class="group-desc">'+(desc[name]||'')+'</div>';
+    });
     holder.innerHTML = rows;
   }
 
@@ -545,9 +516,9 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
     _eligCancelBtn.onclick = () => { closeModal(); _eligOkBtn.onclick = oldOk; _eligCancelBtn.onclick = oldCancel; };
   };
   el('backToWelcome').onclick = () => show('welcome');
-  el('toQ1').onclick = () => {  const l=el('list-q1'); l.innerHTML=''; (S.questions||[]).slice(0,18).forEach((q,i)=>l.appendChild(makeQ(q,i+1)));  show('q1'); try{ el('toQ2').disabled = true; updateQ1Button(); }catch(_){} };
+  el('toQ1').onclick = () => { const l=el('list-q1'); l.innerHTML=''; (S.questions||[]).slice(0,18).forEach((q,i)=>l.appendChild(makeQ(q,i+1))); show('q1'); };
   el('backToInstructions').onclick = () => show('instructions');
-  el('toQ2').onclick = () => {  const l=el('list-q2'); l.innerHTML=''; (S.questions||[]).slice(18,35).forEach((q,i)=>l.appendChild(makeQ(q,19+i)));  show('q2'); try{ el('submitAll').disabled = true; updateQ2Button(); }catch(_){} };
+  el('toQ2').onclick = () => { const l=el('list-q2'); l.innerHTML=''; (S.questions||[]).slice(18,35).forEach((q,i)=>l.appendChild(makeQ(q,19+i))); show('q2'); };
   el('backToQ1').onclick = () => show('q1');
 
   el('submitAll').onclick = () => {
