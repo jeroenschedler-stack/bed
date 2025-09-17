@@ -1078,5 +1078,38 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
 // === End patch v4 ===
 </script>
 
+
+<script>
+(function(){
+  function removeStatementHeaderDupes(){
+    var tbl = document.querySelector('#pdfReport .statements-table');
+    if(!tbl) return;
+    // Remove thead entirely if present
+    var thead = tbl.querySelector('thead'); if (thead) thead.remove();
+    // Remove any first row that looks like NO/STATEMENT/GROUP/(RATING|SCORE|SCORING)
+    var rows = tbl.querySelectorAll('tr');
+    for (var i=0;i<rows.length;i++){
+      var tr = rows[i];
+      var txt = (tr.textContent||'').replace(/\s+/g,' ').trim().toUpperCase();
+      if (/^NO\.?\s+STATEMENT\s+GROUP\s+(RATING|SCORE|SCORING)$/.test(txt)){
+        tr.remove();
+        break;
+      }
+    }
+  }
+  // Wrap buildPdfReport so cleanup runs after data is populated
+  try{
+    var orig = window.buildPdfReport || (typeof buildPdfReport==='function' ? buildPdfReport : null);
+    if (orig && !orig.__headerCleanupWrapped){
+      var wrapped = function(){ try{ orig(); } finally { try{ removeStatementHeaderDupes(); }catch(e){} } };
+      wrapped.__headerCleanupWrapped = true;
+      window.buildPdfReport = wrapped;
+    }
+  }catch(e){}
+  // Also run once on DOM ready (no harm if table isn't there yet)
+  document.addEventListener('DOMContentLoaded', function(){ try{ removeStatementHeaderDupes(); }catch(e){} });
+})();
+</script>
+
 </body>
 </html>
