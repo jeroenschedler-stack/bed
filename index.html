@@ -290,6 +290,32 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 #pdfReport #pdfStatements td:nth-child(1){ width: 60%; }
 #pdfReport #pdfStatements td:nth-child(2){ width: 20%; }
 #pdfReport #pdfStatements td:nth-child(3){ width: 20%; text-align:right; }
+
+/* PDF table border adjustments */
+#pdfReport table, 
+#pdfReport table td, 
+#pdfReport table th {
+  border: none !important; /* remove all borders first */
+}
+
+#pdfReport table td {
+  border-bottom: 1px solid #1E90FF !important; /* thin blue horizontal line */
+}
+
+/* remove border from last row */
+#pdfReport table tr:last-child td {
+  border-bottom: none !important;
+}
+
+/* Ensure proper print layout for PDF button */
+@media print{
+  /* Show only the PDF report on print */
+  body > * { display: none !important; }
+  #pdfReport { display: block !important; }
+  #pdfReport * { visibility: visible !important; }
+  /* Optional: avoid page margins clipping */
+  @page { margin: 12mm; }
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
