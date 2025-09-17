@@ -412,6 +412,46 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   #pdfReport .statements-table td:nth-child(3) { text-align: left; }   /* GROUP values */
   #pdfReport .statements-table td:nth-child(4) { text-align: center; } /* SCORE values */
 }
+
+/* PDF: Fine-tune Statements section header alignment and hide duplicate header rows */
+@media print {
+  /* Normalize padding for the header bar to align with table columns */
+  #pdfReport .statements-bar {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  #pdfReport .statements-bar span {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Reaffirm grid alignment */
+  #pdfReport .statements-bar {
+    display: grid;
+    grid-template-columns: 10% 45% 30% 15%;
+    align-items: center;
+  }
+  #pdfReport .statements-bar .lbl-stmt { grid-column: 1; text-align: left; }
+  #pdfReport .statements-bar .lbl-group { grid-column: 3; text-align: left; }
+  #pdfReport .statements-bar .lbl-score { grid-column: 4; text-align: center; }
+
+  /* Body cells alignment */
+  #pdfReport .statements-table td:nth-child(1) { text-align: left; }
+  #pdfReport .statements-table td:nth-child(2) { text-align: left; }
+  #pdfReport .statements-table td:nth-child(3) { text-align: left; }
+  #pdfReport .statements-table td:nth-child(4) { text-align: center; }
+
+  /* Hide any residual header row (NO/STATEMENT/GROUP/RATING) */
+  #pdfReport .statements-table thead,
+  #pdfReport .statements-table tr:first-child th {
+    display: none !important;
+  }
+  #pdfReport .statements-table tr:first-child td {
+    display: none !important;
+  }
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
