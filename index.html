@@ -260,13 +260,10 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   #pdfReport .info-bar {
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
-  #pdfReport .info-bar span {
-    flex: 1;
-  }
-  #pdfReport .info-bar .peer-label {
-    text-align: right;
-  }
+  #pdfReport .info-bar span { flex: 1; }
+  #pdfReport .info-bar .peer-label { text-align: right; }
 }
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
@@ -402,7 +399,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 </div>
 <div class="pdf-divider"></div>
-<div class="sec-h">INFORMATION</div>
+<div class="sec-h info-bar"><span>PERSONAL INFORMATION</span><span class="peer-label">PEER INFORMATION</span></div>
 <div class="info-grid">
 <div>
 <div class="sub-h">PERSONAL INFORMATION</div>
