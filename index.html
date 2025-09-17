@@ -506,6 +506,36 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 /* === FINAL fixes v69: Information section row alignment + unbold labels (screen + print) === */
 #pdfReport .info-grid .fields { align-items: center !important; }
 #pdfReport .info-grid .fields label { font-weight: 400 !important; }
+</style><style>
+/* === FINAL fixes v70: Blue section header alignment (screen + print) === */
+#pdfReport .statements-bar {
+  display: grid !important;
+  grid-template-columns: 10% 45% 30% 15% !important; /* NO. | STATEMENT | GROUP | SCORE */
+  column-gap: 0 !important;
+  align-items: center !important;
+}
+/* 1) "STATEMENTS" label aligns from the very left of the number column (No.) */
+#pdfReport .statements-bar .lbl-stmt {
+  grid-column: 1 / span 2 !important; /* occupy No. + Statement columns so left edge aligns with numbers */
+  justify-self: start !important;
+  text-align: left !important;
+}
+/* 2) "GROUP" left-aligned with its data column */
+#pdfReport .statements-bar .lbl-group {
+  grid-column: 3 !important;
+  justify-self: start !important;
+  text-align: left !important;
+}
+/* 3) Entire SCORE column centered */
+#pdfReport .statements-bar .lbl-score {
+  grid-column: 4 !important;
+  justify-self: center !important;
+  text-align: center !important;
+}
+#pdfReport #pdfStatements td:nth-child(4),
+#pdfReport #pdfStatements th:nth-child(4) {
+  text-align: center !important;
+}
 </style></head>
 <body>
 <main class="container">
@@ -1104,5 +1134,22 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
 })();
 // === End patch v4 ===
 </script>
-</body>
+<script>
+(function(){
+  var bar = document.querySelector('#pdfReport .statements-bar');
+  if(!bar) return;
+  var labelStmt = bar.querySelector('.lbl-stmt');
+  if(labelStmt){
+    labelStmt.textContent = 'STATEMENTS';
+  }
+  var labelGroup = bar.querySelector('.lbl-group');
+  if(labelGroup){
+    labelGroup.textContent = 'GROUP';
+  }
+  var labelScore = bar.querySelector('.lbl-score');
+  if(labelScore){
+    labelScore.textContent = 'SCORE';
+  }
+})();
+</script></body>
 </html>
