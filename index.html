@@ -246,6 +246,28 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   #pdfReport td { border-bottom: 0.5px solid #87CEFA !important; }
   #pdfReport tr:last-child td { border-bottom: none !important; }
 }
+
+/* Phase A — Set default print page size to A4 */
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+}
+
+/* PDF: dual header for personal/peer information */
+@media print {
+  #pdfReport .info-bar {
+    display: flex;
+    justify-content: space-between;
+  }
+  #pdfReport .info-bar span {
+    flex: 1;
+  }
+  #pdfReport .info-bar .peer-label {
+    text-align: right;
+  }
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
