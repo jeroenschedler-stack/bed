@@ -473,7 +473,36 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 }
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
-</head>
+<style>
+/* === FINAL fixes v68: Statements duplicate header removal + header alignment (print only) === */
+@media print {
+  /* Lock one set of column widths for statements table */
+  #pdfReport #pdfStatements { table-layout: fixed; width: 100%; }
+  #pdfReport #pdfStatements col:nth-child(1) { width: 10% !important; }
+  #pdfReport #pdfStatements col:nth-child(2) { width: 45% !important; }
+  #pdfReport #pdfStatements col:nth-child(3) { width: 30% !important; }
+  #pdfReport #pdfStatements col:nth-child(4) { width: 15% !important; }
+
+  /* Align blue header bar labels with table columns */
+  #pdfReport .statements-bar {
+    display: grid !important;
+    grid-template-columns: 10% 45% 30% 15% !important; /* NO / STATEMENT / GROUP / RATING */
+    column-gap: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  #pdfReport .statements-bar .lbl-stmt { grid-column: 2 !important; text-align: left !important; }
+  #pdfReport .statements-bar .lbl-group { grid-column: 3 !important; text-align: left !important; }
+  #pdfReport .statements-bar .lbl-score { grid-column: 4 !important; text-align: center !important; }
+
+  /* Hide the table's header row to avoid duplication under the blue bar */
+  #pdfReport #pdfStatements thead,
+  #pdfReport #pdfStatements thead tr,
+  #pdfReport #pdfStatements thead th {
+    display: none !important;
+  }
+}
+</style></head>
 <body>
 <main class="container">
 <h1>BED HOSPITALITY 2.0</h1>
@@ -627,7 +656,6 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <div class="sec-h assess-bar"><span class="lbl-group">SCORE BY GROUP</span><span class="lbl-pct">%</span><span class="lbl-desc">DESCRIPTION</span></div>
 <div class="card" style="padding:0">
 <table>
-
 <tbody id="pdfGroupRows">
 <!-- rows injected -->
 </tbody>
@@ -882,7 +910,6 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
   loadQuestions();
 })(); 
 </script>
-
 <script>
 // === Validation patch v2 (uses window.__S) ===
 (function(){
@@ -941,8 +968,6 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
 })();
 // === End patch ===
 </script>
-
-
 <script>
 // === Validation patch v3: robust state sync for Next/Submit ===
 (function(){
@@ -1020,8 +1045,6 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
 })();
 // === End patch v3 ===
 </script>
-
-
 <script>
 // === Validation patch v4: DOM-based completion (resilient) ===
 (function(){
@@ -1077,39 +1100,5 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
 })();
 // === End patch v4 ===
 </script>
-
-
-<script>
-(function(){
-  function removeStatementHeaderDupes(){
-    var tbl = document.querySelector('#pdfReport .statements-table');
-    if(!tbl) return;
-    // Remove thead entirely if present
-    var thead = tbl.querySelector('thead'); if (thead) thead.remove();
-    // Remove any first row that looks like NO/STATEMENT/GROUP/(RATING|SCORE|SCORING)
-    var rows = tbl.querySelectorAll('tr');
-    for (var i=0;i<rows.length;i++){
-      var tr = rows[i];
-      var txt = (tr.textContent||'').replace(/\s+/g,' ').trim().toUpperCase();
-      if (/^NO\.?\s+STATEMENT\s+GROUP\s+(RATING|SCORE|SCORING)$/.test(txt)){
-        tr.remove();
-        break;
-      }
-    }
-  }
-  // Wrap buildPdfReport so cleanup runs after data is populated
-  try{
-    var orig = window.buildPdfReport || (typeof buildPdfReport==='function' ? buildPdfReport : null);
-    if (orig && !orig.__headerCleanupWrapped){
-      var wrapped = function(){ try{ orig(); } finally { try{ removeStatementHeaderDupes(); }catch(e){} } };
-      wrapped.__headerCleanupWrapped = true;
-      window.buildPdfReport = wrapped;
-    }
-  }catch(e){}
-  // Also run once on DOM ready (no harm if table isn't there yet)
-  document.addEventListener('DOMContentLoaded', function(){ try{ removeStatementHeaderDupes(); }catch(e){} });
-})();
-</script>
-
 </body>
 </html>
