@@ -207,101 +207,6 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   .score-section{margin-top:40px;}
 
   .group-row{padding:2px 0; margin-bottom:0;}
-
-/* Congrats page layout improvements */
-#congrats {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 80vh;
-}
-#congrats .checkmark {
-  margin-top: 40px; /* extra space above icon */
-  margin-bottom: 20px;
-}
-#congrats h2 {
-  margin: 0;
-  padding: 0;
-}
-#congrats p {
-  margin-top: 10px;
-  margin-bottom: 40px; /* extra space before buttons */
-}
-
-/* Congrats page: center content block; more space above checkmark; buttons aligned right */
-#congrats {
-  min-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center; /* center as one group */
-}
-#congrats .big-check {
-  margin-top: 64px;   /* more whitespace above checkmark */
-  margin-bottom: 20px;
-}
-#congrats .center h3 { margin: 0 0 8px 0; }
-#congrats .center p  { margin: 0 0 32px 0; } /* extra space before buttons */
-#congrats .page-actions {
-  width: 100%;
-  display: flex !important;
-  flex-direction: row;
-  justify-content: flex-end; /* align to right side */
-  gap: 14px;
-  padding-left: 0;
-  margin-top: 10px;
-}
-
-/* PDF unified bars */
-
-/* Info bar: 2 columns */
-
-/* Results by Group: 3 columns matching table widths */
-
-/* Statements: 3 columns matching table widths (no NO. col) */
-
-
-/* Hide duplicate sub-headers inside the PDF section */
-
-/* Hide any remaining thead in PDF tables (safety) */
-
-
-/* Align table columns to match bars */
-
-#pdfReport .card table td { padding:8px 12px; vertical-align:top; }
-
-
-
-
-/* Statements table specific widths (after removing NO.) */
-#pdfReport #pdfStatements td:nth-child(1){ width: 60%; }
-#pdfReport #pdfStatements td:nth-child(2){ width: 20%; }
-#pdfReport #pdfStatements td:nth-child(3){ width: 20%; text-align:right; }
-
-/* PDF table border adjustments */
-
-
-
-
-/* remove border from last row */
-
-
-/* Ensure proper print layout for PDF button */
-@media print{
-  /* Show only the PDF report on print */
-  body > * { display: none !important; }
-  #pdfReport { display: block !important; }
-  #pdfReport * { visibility: visible !important; }
-  /* Optional: avoid page margins clipping */
-  @page { margin: 12mm; }
-}
-
-/* Strengthened print targeting */
-@media print{
-  html.printing-pdf body > * { display: none !important; }
-  html.printing-pdf #pdfReport { display: block !important; }
-}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
@@ -702,15 +607,16 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
     tb.innerHTML = '';
     (S.questions||[]).forEach((q, i)=>{
       const tr = document.createElement('tr');
+      const tdNo = document.createElement('td'); tdNo.textContent = (i+1); tdNo.className='st-no';
       const tdSt = document.createElement('td');
       tdSt.innerHTML = '<div class="st-title">'+(stripLeadingNumber(q.statement||''))+'</div>'
-        + (q.subtext?('<div class="muted">'+q.subtext+'</div>'):'');
+        + (q.subtext?('<div class="muted">'+q.subtext+'</div>'):''); 
       const tdGp = document.createElement('td'); tdGp.textContent = q.group || '';
-      const tdRt = document.createElement('td'); tdRt.textContent = (S.answers && S.answers[q.id] != null ? S.answers[q.id] : ''); tdRt.className='st-rating';
-      tr.appendChild(tdSt); tr.appendChild(tdGp); tr.appendChild(tdRt);
+      const tdRt = document.createElement('td'); tdRt.textContent = (S.answers[q.id] != null ? S.answers[q.id] : ''); tdRt.className='st-rating';
+      tr.appendChild(tdNo); tr.appendChild(tdSt); tr.appendChild(tdGp); tr.appendChild(tdRt);
       tb.appendChild(tr);
     });
-}
+  }
 
   document.getElementById('congratsPdf').onclick = () => { buildPdfReport(); window.print(); };
 
@@ -912,43 +818,6 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
   setTimeout(sync, 50);
 })();
 // === End patch v4 ===
-</script>
-
-
-
-<script>
-// --- Clean print handler for PDF (v38) ---
-(function(){
-  function ensurePdfVisibleForPrint(){
-    var el = document.getElementById('pdfReport');
-    if(el){ el.style.display = 'block'; }
-    document.documentElement.classList.add('printing-pdf');
-  }
-  function cleanupAfterPrint(){
-    var el = document.getElementById('pdfReport');
-    if(el){ el.style.display = ''; }
-    document.documentElement.classList.remove('printing-pdf');
-    window.onafterprint = null;
-  }
-  function callBuild(){
-    try{
-      var fn = window.buildPdfReport || (typeof buildPdfReport === 'function' ? buildPdfReport : null);
-      if(fn) fn();
-    }catch(e){ /* no-op */ }
-  }
-  window.printPdfReport = function(){
-    callBuild();
-    ensurePdfVisibleForPrint();
-    setTimeout(function(){
-      window.onafterprint = cleanupAfterPrint;
-      window.print();
-    }, 200);
-  };
-  // Wire button
-  var btn = document.getElementById('congratsPdf');
-  if(btn){ btn.onclick = window.printPdfReport; }
-})();
-// --- End clean print handler for PDF ---
 </script>
 
 </body>
