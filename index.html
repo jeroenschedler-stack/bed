@@ -452,6 +452,25 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
     display: none !important;
   }
 }
+
+/* PDF: Information section row vertical centering and remove bold labels */
+@media print {
+  /* Vertically center each row in the Personal/Peer cards */
+  #pdfReport .info-grid .card > * {
+    display: flex !important;
+    align-items: center !important;
+    line-height: 1.3;
+  }
+  /* Remove bold from labels in Information section */
+  #pdfReport .info-grid .card .label,
+  #pdfReport .info-grid .card .kv-label,
+  #pdfReport .info-grid .card .label b,
+  #pdfReport .info-grid .card .label strong,
+  #pdfReport .info-grid .card .kv-label b,
+  #pdfReport .info-grid .card .kv-label strong {
+    font-weight: 400 !important;
+  }
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
