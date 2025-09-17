@@ -208,15 +208,15 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 
   .group-row{padding:2px 0; margin-bottom:0;}
 
-/* Phase A, Step 1 refined — PDF table borders */
+/* Phase A, Step 1 final refinement — only horizontal light blue lines */
 @media print {
   #pdfReport table, 
   #pdfReport th, 
   #pdfReport td {
-    border: none !important; /* remove all borders */
+    border: none !important; /* remove all borders completely */
   }
   #pdfReport td {
-    border-bottom: 0.5px solid #87CEFA !important; /* thin light blue horizontal line */
+    border-bottom: 0.5px solid #87CEFA !important; /* thin light blue horizontal line only */
   }
   #pdfReport tr:last-child td {
     border-bottom: none !important;
