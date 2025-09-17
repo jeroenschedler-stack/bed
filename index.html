@@ -322,6 +322,9 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   html.printing-pdf body > * { display: none !important; }
   html.printing-pdf #pdfReport { display: block !important; }
 }
+
+/* Hide legacy section headers inside PDF report */
+#pdfReport .sec-h { display: none !important; }
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
