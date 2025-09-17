@@ -660,5 +660,63 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
   loadQuestions();
 })(); 
 </script>
+
+<script>
+// === Non-destructive validation patch (Next/Submit gating) ===
+(function(){
+  // Helper: check completion of Q1 and Q2 based on S.answers
+  function qIdsFor(range){ 
+    if(!window.S || !Array.isArray(S.questions)) return [];
+    return S.questions.slice(range[0], range[1]).map(q => q.id);
+  }
+  function allAnswered(ids){
+    return ids.length>0 && ids.every(id => S.answers && S.answers[id] != null);
+  }
+  function isQ1Complete(){ return allAnswered(qIdsFor([0,18])); }
+  function isQ2Complete(){ return allAnswered(qIdsFor([18,35])); }
+
+  // Re-validate buttons when user selects a score
+  document.addEventListener('click', function(ev){
+    var t = ev.target;
+    if(t && t.classList && t.classList.contains('pill')){
+      var b1 = document.getElementById('toQ2');
+      if(b1) b1.disabled = !isQ1Complete();
+      var b2 = document.getElementById('submitAll');
+      if(b2) b2.disabled = !isQ2Complete();
+    }
+  }, true);
+
+  // After building Q1 or Q2, initialize the disabled state
+  var _toQ1 = document.getElementById('toQ1');
+  if(_toQ1){
+    var old = _toQ1.onclick;
+    _toQ1.onclick = function(){
+      if(typeof old === 'function') old();
+      var b1 = document.getElementById('toQ2');
+      if(b1) b1.disabled = !isQ1Complete();
+    };
+  }
+
+  var _toQ2 = document.getElementById('toQ2');
+  if(_toQ2){
+    var old2 = _toQ2.onclick;
+    // Wrap only once; if old2 exists, we keep it and post-run set disabled state for submit button
+    document.getElementById('toQ2').onclick = function(){
+      if(typeof old2 === 'function') old2();
+      var sub = document.getElementById('submitAll');
+      if(sub) sub.disabled = !isQ2Complete();
+    };
+  }
+
+  // Also guard direct clicks (just in case): prevent navigation if not complete
+  document.addEventListener('click', function(ev){
+    var id = ev.target && ev.target.id;
+    if(id === 'toQ2' && !isQ1Complete()){ ev.preventDefault(); ev.stopPropagation(); }
+    if(id === 'submitAll' && !isQ2Complete()){ ev.preventDefault(); ev.stopPropagation(); }
+  }, true);
+})();
+// === End patch ===
+</script>
+
 </body>
 </html>
