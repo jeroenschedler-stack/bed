@@ -207,10 +207,46 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   .score-section{margin-top:40px;}
 
   .group-row{padding:2px 0; margin-bottom:0;}
+
+/* Front page styles */
+#frontpage {
+  display: none;
+  text-align: center;
+  padding-top: 15%;
+}
+#frontpage img {
+  max-width: 200px;
+  margin-bottom: 20px;
+}
+#frontpage h1 {
+  font-size: 24pt;
+  font-weight: 700;
+  color: #444;
+}
 </style>
-<script id="embeddedQuestions" type="application/json">[]</script>
+<script id="embeddedQuestions" type="application/json">[]
+// Patch: include frontpage as page 0
+(function(){
+  var oldShowPage = showPage;
+  showPage = function(n){
+    if(n===0){
+      document.querySelectorAll('section').forEach(s=>s.style.display='none');
+      document.getElementById('frontpage').style.display='block';
+      return;
+    }
+    oldShowPage(n);
+  };
+})();
+</script>
 </head>
 <body>
+
+<section id="frontpage">
+  <img src="A_logo_image_features_a_circular_emblem_with_the_c.png" alt="BED Logo">
+  <h1>Self-Assessment Form</h1>
+  <button onclick="showPage(1)">Start</button>
+</section>
+
 <main class="container">
 <h1>BED HOSPITALITY 2.0</h1>
 <p class="subheader">TEAM MEMBER FORM</p>
