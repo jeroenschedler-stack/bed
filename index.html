@@ -956,13 +956,14 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
   }
   window.printPdfReport = function(){
     try{
-      if(typeof buildPdfReport === 'function') buildPdfReport();
+      var _fn = window.buildPdfReport || (typeof buildPdfReport === 'function' ? buildPdfReport : null);
+      if(_fn) _fn();
       ensurePdfVisibleForPrint();
       // Some browsers need a tick to layout before printing
       setTimeout(function(){
         window.onafterprint = cleanupAfterPrint;
         window.print();
-      }, 0);
+      }, 250);
     }catch(e){
       // Fallback: open a minimal window with the report content
       try{
