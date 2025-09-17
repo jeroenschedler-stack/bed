@@ -265,6 +265,24 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   #pdfReport .info-bar span { flex: 1; }
   #pdfReport .info-bar .peer-label { text-align: right; }
 }
+
+/* PDF: align PERSONAL/PEER headers exactly over their columns */
+@media print {
+  #pdfReport .info-bar {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr; /* two equal columns to match info grid */
+    justify-content: initial !important;
+    align-items: center;
+  }
+  #pdfReport .info-bar span {
+    text-align: left !important;
+  }
+  #pdfReport .info-bar .peer-label {
+    justify-self: start; /* left-align in its grid cell */
+    margin-left: 0;
+    padding-left: 0;
+  }
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
