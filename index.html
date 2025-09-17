@@ -283,6 +283,14 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
     padding-left: 0;
   }
 }
+
+/* PDF: remove duplicated sub-headers beneath the PERSONAL/PEER blue bar */
+@media print {
+  /* Hide the small 'Personal Information' / 'Peer Information' labels inside the cards */
+  #pdfReport .info-grid .sub-h { display: none !important; }
+  /* Optional: tighten spacing now that sub-headers are gone */
+  #pdfReport .info-grid .card { padding-top: 8px; }
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
