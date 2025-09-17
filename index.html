@@ -536,6 +536,20 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 #pdfReport #pdfStatements th:nth-child(4) {
   text-align: center !important;
 }
+</style><style>
+/* === FINAL fixes v71: Match blue header height for STATEMENTS to other bars (print) === */
+@media print {
+  #pdfReport .statements-bar {
+    padding: 6px 10px !important; /* same as .sec-h default */
+    margin: 16px 0 8px 0 !important; /* restore standard sec-h margins for visual consistency */
+  }
+}
+</style><style>
+/* === FINAL fixes v72: Match blue header height for STATEMENTS to other bars (screen + print) === */
+#pdfReport .statements-bar {
+  padding: 6px 10px !important; /* same as .sec-h default */
+  margin: 16px 0 8px 0 !important;
+}
 </style></head>
 <body>
 <main class="container">
