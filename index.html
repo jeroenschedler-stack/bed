@@ -763,5 +763,62 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
 // === End patch v3 ===
 </script>
 
+
+<script>
+// === Validation patch v4: DOM-based completion (resilient) ===
+(function(){
+  function uniqueAnsweredCount(containerId){
+    var box = document.getElementById(containerId);
+    if(!box) return 0;
+    var items = box.querySelectorAll('.q-item');
+    var answered = 0;
+    items.forEach(function(it){
+      if(it.querySelector('.pill.selected')) answered++;
+    });
+    return answered;
+  }
+  function q1Done(){ return uniqueAnsweredCount('list-q1') >= 18; }
+  function q2Done(){ return uniqueAnsweredCount('list-q2') >= 17; }
+
+  function sync(){
+    try{
+      var q1Visible = document.getElementById('q1') && document.getElementById('q1').style.display !== 'none';
+      var q2Visible = document.getElementById('q2') && document.getElementById('q2').style.display !== 'none';
+      var b1 = document.getElementById('toQ2');
+      if(b1 && q1Visible) b1.disabled = !q1Done();
+      var b2 = document.getElementById('submitAll');
+      if(b2 && q2Visible) b2.disabled = !q2Done();
+    }catch(_){}
+  }
+
+  // Monitor pill clicks
+  document.addEventListener('click', function(ev){
+    var t = ev.target;
+    if(t && t.classList && t.classList.contains('pill')){
+      // Wait a tick for .selected class to update, then sync
+      setTimeout(sync, 0);
+    }
+  }, true);
+
+  // Wrap show() to re-sync after page changes
+  if(typeof window.show === 'function'){
+    var oldShow = window.show;
+    window.show = function(id){ oldShow(id); setTimeout(sync, 0); };
+  }
+
+  // Hard guard
+  document.addEventListener('click', function(ev){
+    var id = ev.target && ev.target.id;
+    if(id === 'toQ2' && !q1Done()){ ev.preventDefault(); ev.stopPropagation(); }
+    if(id === 'submitAll' && !q2Done()){ ev.preventDefault(); ev.stopPropagation(); }
+  }, true);
+
+  // Initial sync
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(sync, 0); });
+  setTimeout(sync, 50);
+})();
+// === End patch v4 ===
+</script>
+
 </body>
 </html>
