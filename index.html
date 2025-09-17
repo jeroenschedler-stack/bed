@@ -208,18 +208,18 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 
   .group-row{padding:2px 0; margin-bottom:0;}
 
-/* Phase A, Step 1 — PDF table borders */
-@media print{
+/* Phase A, Step 1 refined — PDF table borders */
+@media print {
   #pdfReport table, 
   #pdfReport th, 
   #pdfReport td {
-    border: none !important; /* remove all borders first */
+    border: none !important; /* remove all borders */
   }
   #pdfReport td {
-    border-bottom: 1px solid #1E90FF !important; /* thin brand-blue horizontal line */
+    border-bottom: 0.5px solid #87CEFA !important; /* thin light blue horizontal line */
   }
   #pdfReport tr:last-child td {
-    border-bottom: none !important; /* clean last row */
+    border-bottom: none !important;
   }
 }
 </style>
