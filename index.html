@@ -936,180 +936,40 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
 </script>
 
 
+
 <script>
-// --- Robust print handler for PDF ---
+// --- Clean print handler for PDF (v38) ---
 (function(){
   function ensurePdfVisibleForPrint(){
     var el = document.getElementById('pdfReport');
-    if(!el) return;
-    // Add a class to signal print mode (CSS uses @media print, but this helps some browsers)
+    if(el){ el.style.display = 'block'; }
     document.documentElement.classList.add('printing-pdf');
-    // Make sure the section is present and not hidden by inline styles
-    el.style.display = 'block';
   }
   function cleanupAfterPrint(){
     var el = document.getElementById('pdfReport');
     if(el){ el.style.display = ''; }
     document.documentElement.classList.remove('printing-pdf');
-    // Remove handler so multiple prints don't stack
     window.onafterprint = null;
   }
-  window.printPdfReport = function(){
+  function callBuild(){
     try{
-      var _fn = window.buildPdfReport || (typeof buildPdfReport === 'function' ? buildPdfReport : null);
-      if(_fn) _fn();
-      ensurePdfVisibleForPrint();
-      // Some browsers need a tick to layout before printing
-      setTimeout(function(){
-        window.onafterprint = cleanupAfterPrint;
-        window.print();
-      }, 250);
-    }catch(e){
-      // Fallback: open a minimal window with the report content
-      try{
-        var el = document.getElementById('pdfReport');
-        if(!el) return;
-        var w = window.open('', '_blank');
-        if(!w) return; // popup blocked
-        w.document.write('<html><head><title>BED Report</title>');
-        // Inline minimal styles for the popup
-        w.document.write('<style>body{margin:12mm;font-family:Arial,Helvetica,sans-serif} .pdf-bar{background:#1E90FF;color:#fff;border-radius:6px;padding:6px 12px;margin:10px 0 8px 0;font-size:14pt;font-weight:600}</style>');
-        w.document.write('</head><body>');
-        w.document.write(el.outerHTML);
-        w.document.write('
-<script>
-// --- Popup-based PDF export to avoid print errors ---
-(function(){
-  function buildThenPopup(){
-    var fn = window.buildPdfReport || (typeof buildPdfReport === 'function' ? buildPdfReport : null);
-    if(fn) fn();
-    var el = document.getElementById('pdfReport');
-    if(!el) return;
-
-    var w = window.open('', '_blank');
-    if(!w) { alert('Popup blocked. Please allow popups for this site.'); return; }
-
-    // Minimal CSS needed for a faithful print of #pdfReport
-    var css = `
-      @page { size: A4; margin: 12mm; }
-      body{ font-family: Arial, Helvetica, sans-serif; color:#333; }
-      #pdfReport{ display:block !important; }
-      .sec-h{ display:none !important; } /* hide old headers */
-      .pdf-bar{ background:#1E90FF; color:#fff; border-radius:6px; padding:6px 12px; margin:10px 0 8px 0;
-                font-size:14pt; font-weight:600; line-height:1.2; display:grid; gap:12px; align-items:center; }
-      .pdf-bar-info{ grid-template-columns:1fr 1fr; }
-      .pdf-bar-groups{ grid-template-columns:2fr .6fr 3fr; }
-      .pdf-bar-statements{ grid-template-columns:3fr 1.2fr 1fr; }
-      .muted{ color:#666; font-size:10pt; }
-      .card{ border-radius:10px; }
-      table{ width:100%; border-collapse:collapse; }
-      thead{ display:none; }
-      td{ padding:8px 12px; vertical-align:top; }
-      /* Blue horizontals, no verticals */
-      table, td, th{ border:none; }
-      td{ border-bottom:1px solid #1E90FF; }
-      tr:last-child td{ border-bottom:none; }
-      /* Column widths to match bars */
-      #groupResults td:nth-child(1){ width:40%; }
-      #groupResults td:nth-child(2){ width:10%; text-align:right; }
-      #groupResults td:nth-child(3){ width:50%; }
-      #pdfStatements td:nth-child(1){ width:60%; }
-      #pdfStatements td:nth-child(2){ width:20%; }
-      #pdfStatements td:nth-child(3){ width:20%; text-align:right; }
-      .st-title{ font-weight:600; margin-bottom:2px; }
-      .st-rating{ font-weight:700; }
-    `;
-
-    w.document.open();
-    w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>BED Report</title><style>'+css+'</style></head><body>');
-    w.document.write(el.outerHTML);
-    w.document.write('</body></html>');
-    w.document.close();
-    // Give the new window a moment to render before printing
-    w.onload = function(){ setTimeout(function(){ try{ w.print(); }catch(e){} }, 200); };
+      var fn = window.buildPdfReport || (typeof buildPdfReport === 'function' ? buildPdfReport : null);
+      if(fn) fn();
+    }catch(e){ /* no-op */ }
   }
-
-  // Rewire PDF button to popup export
-  var btn = document.getElementById('congratsPdf');
-  if(btn){ btn.onclick = buildThenPopup; }
-})();
-// --- End popup-based export ---
-</script>
-
-</body></html>');
-        w.document.close();
-        w.focus();
-        w.print();
-        w.close();
-      }catch(_){}
-    }
+  window.printPdfReport = function(){
+    callBuild();
+    ensurePdfVisibleForPrint();
+    setTimeout(function(){
+      window.onafterprint = cleanupAfterPrint;
+      window.print();
+    }, 200);
   };
-
-  // Rewire the button to the new handler (if present)
+  // Wire button
   var btn = document.getElementById('congratsPdf');
-  if(btn){ btn.onclick = printPdfReport; }
+  if(btn){ btn.onclick = window.printPdfReport; }
 })();
-// --- End robust print handler ---
-</script>
-
-
-<script>
-// --- Popup-based PDF export to avoid print errors ---
-(function(){
-  function buildThenPopup(){
-    var fn = window.buildPdfReport || (typeof buildPdfReport === 'function' ? buildPdfReport : null);
-    if(fn) fn();
-    var el = document.getElementById('pdfReport');
-    if(!el) return;
-
-    var w = window.open('', '_blank');
-    if(!w) { alert('Popup blocked. Please allow popups for this site.'); return; }
-
-    // Minimal CSS needed for a faithful print of #pdfReport
-    var css = `
-      @page { size: A4; margin: 12mm; }
-      body{ font-family: Arial, Helvetica, sans-serif; color:#333; }
-      #pdfReport{ display:block !important; }
-      .sec-h{ display:none !important; } /* hide old headers */
-      .pdf-bar{ background:#1E90FF; color:#fff; border-radius:6px; padding:6px 12px; margin:10px 0 8px 0;
-                font-size:14pt; font-weight:600; line-height:1.2; display:grid; gap:12px; align-items:center; }
-      .pdf-bar-info{ grid-template-columns:1fr 1fr; }
-      .pdf-bar-groups{ grid-template-columns:2fr .6fr 3fr; }
-      .pdf-bar-statements{ grid-template-columns:3fr 1.2fr 1fr; }
-      .muted{ color:#666; font-size:10pt; }
-      .card{ border-radius:10px; }
-      table{ width:100%; border-collapse:collapse; }
-      thead{ display:none; }
-      td{ padding:8px 12px; vertical-align:top; }
-      /* Blue horizontals, no verticals */
-      table, td, th{ border:none; }
-      td{ border-bottom:1px solid #1E90FF; }
-      tr:last-child td{ border-bottom:none; }
-      /* Column widths to match bars */
-      #groupResults td:nth-child(1){ width:40%; }
-      #groupResults td:nth-child(2){ width:10%; text-align:right; }
-      #groupResults td:nth-child(3){ width:50%; }
-      #pdfStatements td:nth-child(1){ width:60%; }
-      #pdfStatements td:nth-child(2){ width:20%; }
-      #pdfStatements td:nth-child(3){ width:20%; text-align:right; }
-      .st-title{ font-weight:600; margin-bottom:2px; }
-      .st-rating{ font-weight:700; }
-    `;
-
-    w.document.open();
-    w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>BED Report</title><style>'+css+'</style></head><body>');
-    w.document.write(el.outerHTML);
-    w.document.write('</body></html>');
-    w.document.close();
-    // Give the new window a moment to render before printing
-    w.onload = function(){ setTimeout(function(){ try{ w.print(); }catch(e){} }, 200); };
-  }
-
-  // Rewire PDF button to popup export
-  var btn = document.getElementById('congratsPdf');
-  if(btn){ btn.onclick = buildThenPopup; }
-})();
-// --- End popup-based export ---
+// --- End clean print handler for PDF ---
 </script>
 
 </body>
