@@ -228,6 +228,68 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   margin-top: 10px;
   margin-bottom: 40px; /* extra space before buttons */
 }
+
+/* Congrats page: center content block; more space above checkmark; buttons aligned right */
+#congrats {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* center as one group */
+}
+#congrats .big-check {
+  margin-top: 64px;   /* more whitespace above checkmark */
+  margin-bottom: 20px;
+}
+#congrats .center h3 { margin: 0 0 8px 0; }
+#congrats .center p  { margin: 0 0 32px 0; } /* extra space before buttons */
+#congrats .page-actions {
+  width: 100%;
+  display: flex !important;
+  flex-direction: row;
+  justify-content: flex-end; /* align to right side */
+  gap: 14px;
+  padding-left: 0;
+  margin-top: 10px;
+}
+
+/* PDF unified bars */
+#pdfReport .pdf-bar{
+  background:#1E90FF;
+  color:#fff;
+  border-radius:6px;
+  padding:6px 12px;
+  display:grid;
+  align-items:center;
+  gap:12px;
+  margin:10px 0 8px 0;
+  font-size:14pt;
+  font-weight:600;
+  line-height:1.2;
+}
+/* Info bar: 2 columns */
+#pdfReport .pdf-bar-info{ grid-template-columns: 1fr 1fr; }
+/* Results by Group: 3 columns matching table widths */
+#pdfReport .pdf-bar-groups{ grid-template-columns: 2fr 0.6fr 3fr; }
+/* Statements: 3 columns matching table widths (no NO. col) */
+#pdfReport .pdf-bar-statements{ grid-template-columns: 3fr 1.2fr 1fr; }
+
+/* Hide duplicate sub-headers inside the PDF section */
+#pdfReport .sub-h{ display:none; }
+/* Hide any remaining thead in PDF tables (safety) */
+#pdfReport table thead{ display:none; }
+
+/* Align table columns to match bars */
+#pdfReport .card table { width:100%; border-collapse:collapse; }
+#pdfReport .card table td { padding:8px 12px; vertical-align:top; }
+#pdfReport .card table td:nth-child(1){ width: 40%; }
+#pdfReport .card table td:nth-child(2){ width: 10%; text-align:right; }
+#pdfReport .card table td:nth-child(3){ width: 50%; }
+
+/* Statements table specific widths (after removing NO.) */
+#pdfReport #pdfStatements td:nth-child(1){ width: 60%; }
+#pdfReport #pdfStatements td:nth-child(2){ width: 20%; }
+#pdfReport #pdfStatements td:nth-child(3){ width: 20%; text-align:right; }
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
@@ -362,7 +424,12 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 </div>
 <div class="pdf-divider"></div>
-<div class="sec-h">INFORMATION</div>
+
+<div class="pdf-bar pdf-bar-info">
+  <div class="bar-title">Personal Information</div>
+  <div class="bar-title" style="text-align:right">Peer Information</div>
+</div>
+
 <div class="info-grid">
 <div>
 <div class="sub-h">PERSONAL INFORMATION</div>
@@ -382,15 +449,13 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 </div>
 <div class="sec-h">ASSESSMENT</div>
-<div class="card" style="padding:0">
-<table>
-<thead>
-<tr>
-<th>RESULTS BY GROUP</th>
-<th>%</th>
-<th>DESCRIPTION</th>
-</tr>
-</thead>
+
+<div class="pdf-bar pdf-bar-groups">
+  <div class="bar-title">Results by Group</div>
+  <div class="bar-title" style="text-align:center">%</div>
+  <div class="bar-title" style="text-align:right">Description</div>
+</div>
+<div class=\"card\" style=\"padding:0\"><table>
 <tbody id="pdfGroupRows">
 <!-- rows injected -->
 </tbody>
@@ -398,15 +463,13 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 <div class="sec-h">STATEMENTS</div>
 <div class="card" style="padding:0">
-<table id="pdfStatements">
-<thead>
-<tr>
-<th class="st-no">NO.</th>
-<th>STATEMENT</th>
-<th class="st-group">GROUP</th>
-<th class="st-rating">RATING</th>
-</tr>
-</thead>
+
+<div class="pdf-bar pdf-bar-statements">
+  <div class="bar-title">Statements</div>
+  <div class="bar-title" style="text-align:center">Group</div>
+  <div class="bar-title" style="text-align:right">Rating</div>
+</div>
+<table id=\"pdfStatements\">
 <tbody>
 <!-- rows injected -->
 </tbody>
@@ -628,16 +691,15 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
     tb.innerHTML = '';
     (S.questions||[]).forEach((q, i)=>{
       const tr = document.createElement('tr');
-      const tdNo = document.createElement('td'); tdNo.textContent = (i+1); tdNo.className='st-no';
       const tdSt = document.createElement('td');
       tdSt.innerHTML = '<div class="st-title">'+(stripLeadingNumber(q.statement||''))+'</div>'
-        + (q.subtext?('<div class="muted">'+q.subtext+'</div>'):''); 
+        + (q.subtext?('<div class="muted">'+q.subtext+'</div>'):'');
       const tdGp = document.createElement('td'); tdGp.textContent = q.group || '';
-      const tdRt = document.createElement('td'); tdRt.textContent = (S.answers[q.id] != null ? S.answers[q.id] : ''); tdRt.className='st-rating';
-      tr.appendChild(tdNo); tr.appendChild(tdSt); tr.appendChild(tdGp); tr.appendChild(tdRt);
+      const tdRt = document.createElement('td'); tdRt.textContent = (S.answers && S.answers[q.id] != null ? S.answers[q.id] : ''); tdRt.className='st-rating';
+      tr.appendChild(tdSt); tr.appendChild(tdGp); tr.appendChild(tdRt);
       tb.appendChild(tr);
     });
-  }
+}
 
   document.getElementById('congratsPdf').onclick = () => { buildPdfReport(); window.print(); };
 
