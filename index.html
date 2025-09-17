@@ -684,5 +684,84 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
 // === End patch ===
 </script>
 
+
+<script>
+// === Validation patch v3: robust state sync for Next/Submit ===
+(function(){
+  function Sref(){ return (window.__S || window.S || {}); }
+  function qIdsFor(range){
+    var S = Sref();
+    if(!Array.isArray(S.questions)) return [];
+    return S.questions.slice(range[0], range[1]).map(function(q){ return q.id; });
+  }
+  function allAnswered(ids){
+    var S = Sref();
+    if(!ids.length) return false;
+    return ids.every(function(id){ return S.answers && S.answers[id] != null; });
+  }
+  function isQ1Complete(){ return allAnswered(qIdsFor([0,18])); }
+  function isQ2Complete(){ return allAnswered(qIdsFor([18,35])); }
+
+  function setState(){
+    try{
+      var q1Visible = document.getElementById('q1') && document.getElementById('q1').style.display !== 'none';
+      var q2Visible = document.getElementById('q2') && document.getElementById('q2').style.display !== 'none';
+      var b1 = document.getElementById('toQ2');
+      if(b1 && q1Visible) b1.disabled = !isQ1Complete();
+      var b2 = document.getElementById('submitAll');
+      if(b2 && q2Visible) b2.disabled = !isQ2Complete();
+    }catch(_){}
+  }
+
+  // Hook pill clicks to re-evaluate states
+  document.addEventListener('click', function(ev){
+    var t = ev.target;
+    if(t && t.classList && t.classList.contains('pill')){
+      setState();
+    }
+  }, true);
+
+  // After entering Q1/Q2, sync button states
+  var toQ1 = document.getElementById('toQ1');
+  if(toQ1){
+    var prevToQ1 = toQ1.onclick;
+    toQ1.onclick = function(){
+      if(typeof prevToQ1 === 'function') prevToQ1();
+      setState();
+    };
+  }
+
+  var toQ2 = document.getElementById('toQ2');
+  if(toQ2){
+    var prevToQ2 = toQ2.onclick;
+    toQ2.onclick = function(){
+      if(typeof prevToQ2 === 'function') prevToQ2();
+      setState();
+    };
+  }
+
+  // Wrap show() to always refresh states after page changes (without touching visuals)
+  if(typeof window.show === 'function'){
+    var oldShow = window.show;
+    window.show = function(id){
+      oldShow(id);
+      setState();
+    };
+  }
+
+  // Hard guard against advancing when incomplete
+  document.addEventListener('click', function(ev){
+    var id = ev.target && ev.target.id;
+    if(id === 'toQ2' && !isQ1Complete()){ ev.preventDefault(); ev.stopPropagation(); }
+    if(id === 'submitAll' && !isQ2Complete()){ ev.preventDefault(); ev.stopPropagation(); }
+  }, true);
+
+  // Initial sync
+  document.addEventListener('DOMContentLoaded', setState);
+  setTimeout(setState, 0);
+})();
+// === End patch v3 ===
+</script>
+
 </body>
 </html>
