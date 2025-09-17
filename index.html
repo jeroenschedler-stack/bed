@@ -207,6 +207,27 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   .score-section{margin-top:40px;}
 
   .group-row{padding:2px 0; margin-bottom:0;}
+
+/* Congrats page layout improvements */
+#congrats {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+}
+#congrats .checkmark {
+  margin-top: 40px; /* extra space above icon */
+  margin-bottom: 20px;
+}
+#congrats h2 {
+  margin: 0;
+  padding: 0;
+}
+#congrats p {
+  margin-top: 10px;
+  margin-bottom: 40px; /* extra space before buttons */
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
