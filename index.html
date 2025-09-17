@@ -688,7 +688,7 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
     }catch(_){ return ''; }
   }
 
-  function buildPdfReport(){
+  window.buildPdfReport = function(){
     // Date + score box
     const totals = computeTotals();
     document.getElementById('pdfDate').textContent = 'Assessment Date ' + formatDate();
