@@ -316,6 +316,12 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   /* Optional: avoid page margins clipping */
   @page { margin: 12mm; }
 }
+
+/* Strengthened print targeting */
+@media print{
+  html.printing-pdf body > * { display: none !important; }
+  html.printing-pdf #pdfReport { display: block !important; }
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
@@ -927,6 +933,62 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
   setTimeout(sync, 50);
 })();
 // === End patch v4 ===
+</script>
+
+
+<script>
+// --- Robust print handler for PDF ---
+(function(){
+  function ensurePdfVisibleForPrint(){
+    var el = document.getElementById('pdfReport');
+    if(!el) return;
+    // Add a class to signal print mode (CSS uses @media print, but this helps some browsers)
+    document.documentElement.classList.add('printing-pdf');
+    // Make sure the section is present and not hidden by inline styles
+    el.style.display = 'block';
+  }
+  function cleanupAfterPrint(){
+    var el = document.getElementById('pdfReport');
+    if(el){ el.style.display = ''; }
+    document.documentElement.classList.remove('printing-pdf');
+    // Remove handler so multiple prints don't stack
+    window.onafterprint = null;
+  }
+  window.printPdfReport = function(){
+    try{
+      if(typeof buildPdfReport === 'function') buildPdfReport();
+      ensurePdfVisibleForPrint();
+      // Some browsers need a tick to layout before printing
+      setTimeout(function(){
+        window.onafterprint = cleanupAfterPrint;
+        window.print();
+      }, 0);
+    }catch(e){
+      // Fallback: open a minimal window with the report content
+      try{
+        var el = document.getElementById('pdfReport');
+        if(!el) return;
+        var w = window.open('', '_blank');
+        if(!w) return; // popup blocked
+        w.document.write('<html><head><title>BED Report</title>');
+        // Inline minimal styles for the popup
+        w.document.write('<style>body{margin:12mm;font-family:Arial,Helvetica,sans-serif} .pdf-bar{background:#1E90FF;color:#fff;border-radius:6px;padding:6px 12px;margin:10px 0 8px 0;font-size:14pt;font-weight:600}</style>');
+        w.document.write('</head><body>');
+        w.document.write(el.outerHTML);
+        w.document.write('</body></html>');
+        w.document.close();
+        w.focus();
+        w.print();
+        w.close();
+      }catch(_){}
+    }
+  };
+
+  // Rewire the button to the new handler (if present)
+  var btn = document.getElementById('congratsPdf');
+  if(btn){ btn.onclick = printPdfReport; }
+})();
+// --- End robust print handler ---
 </script>
 
 </body>
