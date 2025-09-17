@@ -16,11 +16,11 @@
   body{font-family:system-ui, Arial, sans-serif; background:#F9FAFB; color:var(--text); margin:0}
   .container{width:100%; margin:0; padding:24px var(--pad)}
 
-  .h1, .h1, .h1, h1 {
+  .h1, h1 {
   font-size:20pt;
   margin:0 0 8px 0;
   line-height:1.2;
-  font-weight:1000;   /* updated to heavy weight */
+  font-weight:900;   /* updated to heavy weight */
   color:#444;         /* unified dark gray */
 }
   .subheader{
@@ -70,8 +70,8 @@
   button{width:120px; height:42px; font-size:12pt; border:none; border-radius:14px; text-align:center;}
 button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
 button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
-button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
-button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
+
+
   .btn-secondary{width:120px; height:42px; font-size:12pt;}
 
   /* QUESTIONS */
@@ -595,7 +595,7 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
     body.innerHTML='';
     order.forEach(name=>{
       const tr = document.createElement('tr');
-      const tdName = document.createElement('td'); tdName.textContent = 'Score ' + name.split(' ')[0];
+      const tdName = document.createElement('td'); tdName.textContent = 'Score ' + name;
       const tdPct = document.createElement('td'); tdPct.textContent = (gp[name] != null ? gp[name] : '—') + '%';
       const tdDesc = document.createElement('td'); tdDesc.textContent = descMap[name] || '(add description)';
       tr.appendChild(tdName); tr.appendChild(tdPct); tr.appendChild(tdDesc);
