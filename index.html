@@ -315,6 +315,19 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
     border-bottom: none !important;
   }
 }
+
+/* PDF: Assessment header bar with three labels aligned to table columns */
+@media print {
+  #pdfReport .assess-bar{
+    display:grid;
+    grid-template-columns: 2fr 0.6fr 3fr; /* match group / % / description proportions */
+    column-gap: 0;
+    align-items: center;
+  }
+  #pdfReport .assess-bar .lbl-group{ text-align:left; }
+  #pdfReport .assess-bar .lbl-pct{ text-align:center; }
+  #pdfReport .assess-bar .lbl-desc{ text-align:left; }
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
@@ -468,7 +481,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 </div>
 </div>
-<div class="sec-h">ASSESSMENT</div>
+<div class="sec-h assess-bar"><span class="lbl-group">SCORE BY GROUP</span><span class="lbl-pct">%</span><span class="lbl-desc">DESCRIPTION</span></div>
 <div class="card" style="padding:0">
 <table>
 
