@@ -390,6 +390,28 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   #pdfReport .statements-bar .lbl-group { grid-column: 3; text-align: left; }
   #pdfReport .statements-bar .lbl-score { grid-column: 4; text-align: center; }
 }
+
+/* PDF: Refine Statements section alignment */
+@media print {
+  /* Header bar grid still uses locked column widths */
+  #pdfReport .statements-bar {
+    display: grid;
+    grid-template-columns: 10% 45% 30% 15%;
+    align-items: center;
+  }
+  /* Align STATEMENTS over NO column (left with numbers) */
+  #pdfReport .statements-bar .lbl-stmt { grid-column: 1; text-align: left; }
+  /* Align GROUP over Group col, left aligned */
+  #pdfReport .statements-bar .lbl-group { grid-column: 3; text-align: left; }
+  /* Align SCORE over Score col, centered */
+  #pdfReport .statements-bar .lbl-score { grid-column: 4; text-align: center; }
+
+  /* Body cells alignment */
+  #pdfReport .statements-table td:nth-child(1) { text-align: left; }   /* NO. */
+  #pdfReport .statements-table td:nth-child(2) { text-align: left; }   /* STATEMENT text */
+  #pdfReport .statements-table td:nth-child(3) { text-align: left; }   /* GROUP values */
+  #pdfReport .statements-table td:nth-child(4) { text-align: center; } /* SCORE values */
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
