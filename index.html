@@ -328,6 +328,15 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   #pdfReport .assess-bar .lbl-pct{ text-align:center; }
   #pdfReport .assess-bar .lbl-desc{ text-align:left; }
 }
+
+/* PDF: lock Statements table column widths */
+@media print {
+  #pdfReport .statements-table { table-layout: fixed; width: 100%; }
+  #pdfReport .statements-table col:nth-child(1) { width: 10%; }
+  #pdfReport .statements-table col:nth-child(2) { width: 50%; }
+  #pdfReport .statements-table col:nth-child(3) { width: 20%; }
+  #pdfReport .statements-table col:nth-child(4) { width: 20%; }
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
