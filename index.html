@@ -222,6 +222,30 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
     border-bottom: none !important;
   }
 }
+
+/* Phase A — Side borders removal (print only) */
+@media print {
+  /* Kill any container/card borders or shadows */
+  #pdfReport .card { border: 0 !important; box-shadow: none !important; }
+  /* Ensure no table frame borders */
+  #pdfReport table { 
+    border: 0 !important; 
+    border-left: 0 !important; 
+    border-right: 0 !important; 
+    border-top: 0 !important; 
+    border-bottom: 0 !important;
+    border-collapse: collapse !important;
+  }
+  /* Ensure no vertical borders on cells */
+  #pdfReport th, 
+  #pdfReport td {
+    border-left: 0 !important;
+    border-right: 0 !important;
+  }
+  /* Keep only horizontal light-blue separators */
+  #pdfReport td { border-bottom: 0.5px solid #87CEFA !important; }
+  #pdfReport tr:last-child td { border-bottom: none !important; }
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
