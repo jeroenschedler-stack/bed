@@ -378,6 +378,18 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   #pdfReport .statements-table col:nth-child(3) { width: 30%; }
   #pdfReport .statements-table col:nth-child(4) { width: 15%; }
 }
+
+/* PDF: Statements header bar with STATEMENTS, GROUP, SCORE */
+@media print {
+  #pdfReport .statements-bar {
+    display: grid;
+    grid-template-columns: 10% 45% 30% 15%; /* NO / STATEMENT / GROUP / RATING */
+    align-items: center;
+  }
+  #pdfReport .statements-bar .lbl-stmt { grid-column: 2; text-align: left; }
+  #pdfReport .statements-bar .lbl-group { grid-column: 3; text-align: left; }
+  #pdfReport .statements-bar .lbl-score { grid-column: 4; text-align: center; }
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
@@ -540,7 +552,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </tbody>
 </table>
 </div>
-<div class="sec-h">STATEMENTS</div>
+<div class="sec-h statements-bar"><span class="lbl-stmt">STATEMENTS</span><span class="lbl-group">GROUP</span><span class="lbl-score">SCORE</span></div>
 <div class="card" style="padding:0">
 <table id="pdfStatements">
 <thead>
