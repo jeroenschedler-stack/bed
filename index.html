@@ -254,37 +254,25 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 }
 
 /* PDF unified bars */
-#pdfReport .pdf-bar{
-  background:#1E90FF;
-  color:#fff;
-  border-radius:6px;
-  padding:6px 12px;
-  display:grid;
-  align-items:center;
-  gap:12px;
-  margin:10px 0 8px 0;
-  font-size:14pt;
-  font-weight:600;
-  line-height:1.2;
-}
+
 /* Info bar: 2 columns */
-#pdfReport .pdf-bar-info{ grid-template-columns: 1fr 1fr; }
+
 /* Results by Group: 3 columns matching table widths */
-#pdfReport .pdf-bar-groups{ grid-template-columns: 2fr 0.6fr 3fr; }
+
 /* Statements: 3 columns matching table widths (no NO. col) */
-#pdfReport .pdf-bar-statements{ grid-template-columns: 3fr 1.2fr 1fr; }
+
 
 /* Hide duplicate sub-headers inside the PDF section */
-#pdfReport .sub-h{ display:none; }
+
 /* Hide any remaining thead in PDF tables (safety) */
-#pdfReport table thead{ display:none; }
+
 
 /* Align table columns to match bars */
-#pdfReport .card table { width:100%; border-collapse:collapse; }
+
 #pdfReport .card table td { padding:8px 12px; vertical-align:top; }
-#pdfReport .card table td:nth-child(1){ width: 40%; }
-#pdfReport .card table td:nth-child(2){ width: 10%; text-align:right; }
-#pdfReport .card table td:nth-child(3){ width: 50%; }
+
+
+
 
 /* Statements table specific widths (after removing NO.) */
 #pdfReport #pdfStatements td:nth-child(1){ width: 60%; }
@@ -292,20 +280,12 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 #pdfReport #pdfStatements td:nth-child(3){ width: 20%; text-align:right; }
 
 /* PDF table border adjustments */
-#pdfReport table, 
-#pdfReport table td, 
-#pdfReport table th {
-  border: none !important; /* remove all borders first */
-}
 
-#pdfReport table td {
-  border-bottom: 1px solid #1E90FF !important; /* thin blue horizontal line */
-}
+
+
 
 /* remove border from last row */
-#pdfReport table tr:last-child td {
-  border-bottom: none !important;
-}
+
 
 /* Ensure proper print layout for PDF button */
 @media print{
@@ -322,33 +302,6 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   html.printing-pdf body > * { display: none !important; }
   html.printing-pdf #pdfReport { display: block !important; }
 }
-
-/* Hide legacy section headers inside PDF report */
-#pdfReport .sec-h { display: none !important; }
-
-/* Final PDF polish: hide legacy headers and align columns */
-#pdfReport .sec-h, 
-#pdfReport .sub-h, 
-#pdfReport table thead { display: none !important; }
-
-#pdfReport .pdf-bar{
-  background:#1E90FF; color:#fff; border-radius:6px;
-  padding:6px 12px; display:grid; align-items:center; gap:12px;
-  margin:10px 0 8px 0; font-size:14pt; font-weight:600; line-height:1.2;
-}
-#pdfReport .pdf-bar-info{ grid-template-columns:1fr 1fr; }
-#pdfReport .pdf-bar-groups{ grid-template-columns: 2fr 0.6fr 3fr; }
-#pdfReport .pdf-bar-statements{ grid-template-columns: 3fr 1.2fr 1fr; }
-
-#pdfReport .card table{ width:100%; border-collapse:collapse; }
-#pdfReport .card table td{ padding:8px 12px; vertical-align:top; }
-#pdfReport .card table td:nth-child(1){ width: 40%; }
-#pdfReport .card table td:nth-child(2){ width: 10%; text-align:right; }
-#pdfReport .card table td:nth-child(3){ width: 50%; }
-
-#pdfReport #pdfStatements td:nth-child(1){ width: 60%; }
-#pdfReport #pdfStatements td:nth-child(2){ width: 20%; }
-#pdfReport #pdfStatements td:nth-child(3){ width: 20%; text-align:right; }
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
@@ -394,13 +347,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <div class="actions">
 <button disabled="" id="toInstructions">Start</button>
 </div>
-
-<div class="pdf-bar pdf-bar-statements">
-  <div class="bar-title">Statements</div>
-  <div class="bar-title" style="text-align:center">Group</div>
-  <div class="bar-title" style="text-align:right">Rating</div>
-</div>
-<div class="card" style="padding:0"><table id="pdfStatements"><tbody></tbody></table></div></section>
+</section>
 <!-- Instructions -->
 <section id="instructions" style="display:none">
 <h2 class="section-title">HOW TO ASSESS YOURSELF</h2>
@@ -419,13 +366,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button class="btn-secondary" id="backToWelcome">Back</button>
 <button id="toQ1">Start</button>
 </div>
-
-<div class="pdf-bar pdf-bar-statements">
-  <div class="bar-title">Statements</div>
-  <div class="bar-title" style="text-align:center">Group</div>
-  <div class="bar-title" style="text-align:right">Rating</div>
-</div>
-<div class="card" style="padding:0"><table id="pdfStatements"><tbody></tbody></table></div></section>
+</section>
 <!-- Q1 -->
 <section id="q1" style="display:none">
 <div id="list-q1"></div>
@@ -433,13 +374,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button class="btn-secondary" id="backToInstructions">Back</button>
 <button id="toQ2">Next</button>
 </div>
-
-<div class="pdf-bar pdf-bar-statements">
-  <div class="bar-title">Statements</div>
-  <div class="bar-title" style="text-align:center">Group</div>
-  <div class="bar-title" style="text-align:right">Rating</div>
-</div>
-<div class="card" style="padding:0"><table id="pdfStatements"><tbody></tbody></table></div></section>
+</section>
 <!-- Q2 -->
 <section id="q2" style="display:none">
 <div id="list-q2"></div>
@@ -447,13 +382,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button class="btn-secondary" id="backToQ1">Back</button>
 <button id="submitAll">Submit</button>
 </div>
-
-<div class="pdf-bar pdf-bar-statements">
-  <div class="bar-title">Statements</div>
-  <div class="bar-title" style="text-align:center">Group</div>
-  <div class="bar-title" style="text-align:right">Rating</div>
-</div>
-<div class="card" style="padding:0"><table id="pdfStatements"><tbody></tbody></table></div></section>
+</section>
 <!-- Score -->
 <section id="finish" style="display:none"><div class="score-section"><div class="score-kicker">your self assessment results</div><div class="score-big" id="scorePercent">OVERALL SCORE —%</div><div class="gauge" id="gauge"></div><div class="rec-kicker"></div><div class="rec-text" id="recText">—</div></div>
 <br/>
@@ -467,13 +396,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button class="btn-secondary" id="backToQ2">Back</button>
 <button id="nextToPeer">Next</button>
 </div>
-
-<div class="pdf-bar pdf-bar-statements">
-  <div class="bar-title">Statements</div>
-  <div class="bar-title" style="text-align:center">Group</div>
-  <div class="bar-title" style="text-align:right">Rating</div>
-</div>
-<div class="card" style="padding:0"><table id="pdfStatements"><tbody></tbody></table></div></section>
+</section>
 <!-- Congrats -->
 <section id="congrats" style="display:none">
 <div class="big-check"></div>
@@ -485,13 +408,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button class="btn-secondary btn-wide" id="congratsBack">Back</button>
 <button class="btn-wide" id="congratsPdf">PDF</button>
 </div>
-
-<div class="pdf-bar pdf-bar-statements">
-  <div class="bar-title">Statements</div>
-  <div class="bar-title" style="text-align:center">Group</div>
-  <div class="bar-title" style="text-align:right">Rating</div>
-</div>
-<div class="card" style="padding:0"><table id="pdfStatements"><tbody></tbody></table></div></section>
+</section>
 </main>
 <!-- Modal -->
 <div class="modal-backdrop" id="eligBackdrop" style="position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:50">
@@ -519,12 +436,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 </div>
 <div class="pdf-divider"></div>
-
-<div class="pdf-bar pdf-bar-info">
-  <div class="bar-title">Personal Information</div>
-  <div class="bar-title" style="text-align:right">Peer Information</div>
-</div>
-
+<div class="sec-h">INFORMATION</div>
 <div class="info-grid">
 <div>
 <div class="sub-h">PERSONAL INFORMATION</div>
@@ -544,13 +456,15 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 </div>
 <div class="sec-h">ASSESSMENT</div>
-
-<div class="pdf-bar pdf-bar-groups">
-  <div class="bar-title">Results by Group</div>
-  <div class="bar-title" style="text-align:center">%</div>
-  <div class="bar-title" style="text-align:right">Description</div>
-</div>
-<div class=\"card\" style=\"padding:0\"><table>
+<div class="card" style="padding:0">
+<table>
+<thead>
+<tr>
+<th>RESULTS BY GROUP</th>
+<th>%</th>
+<th>DESCRIPTION</th>
+</tr>
+</thead>
 <tbody id="pdfGroupRows">
 <!-- rows injected -->
 </tbody>
@@ -558,25 +472,21 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 <div class="sec-h">STATEMENTS</div>
 <div class="card" style="padding:0">
-
-<div class="pdf-bar pdf-bar-statements">
-  <div class="bar-title">Statements</div>
-  <div class="bar-title" style="text-align:center">Group</div>
-  <div class="bar-title" style="text-align:right">Rating</div>
-</div>
-<table id=\"pdfStatements\">
+<table id="pdfStatements">
+<thead>
+<tr>
+<th class="st-no">NO.</th>
+<th>STATEMENT</th>
+<th class="st-group">GROUP</th>
+<th class="st-rating">RATING</th>
+</tr>
+</thead>
 <tbody>
 <!-- rows injected -->
 </tbody>
 </table>
 </div>
-
-<div class="pdf-bar pdf-bar-statements">
-  <div class="bar-title">Statements</div>
-  <div class="bar-title" style="text-align:center">Group</div>
-  <div class="bar-title" style="text-align:right">Rating</div>
-</div>
-<div class="card" style="padding:0"><table id="pdfStatements"><tbody></tbody></table></div></section>
+</section>
 <script>
 (function(){
   const S = {answers:{}, questions:[], groups:[]}; window.__S = S;
@@ -757,7 +667,7 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
     }catch(_){ return ''; }
   }
 
-  window.buildPdfReport = function(){
+  function buildPdfReport(){
     // Date + score box
     const totals = computeTotals();
     document.getElementById('pdfDate').textContent = 'Assessment Date ' + formatDate();
@@ -1041,6 +951,6 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
 // --- End clean print handler for PDF ---
 </script>
 
-<script>window.stripLeadingNumber=function(t){return String(t||'').replace(/^\s*\d+\.\s*/, '');};</script>
+<script>try{window.buildPdfReport = buildPdfReport;}catch(_){}</script>
 </body>
 </html>
