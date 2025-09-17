@@ -207,6 +207,21 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   .score-section{margin-top:40px;}
 
   .group-row{padding:2px 0; margin-bottom:0;}
+
+/* Phase A, Step 1 — PDF table borders */
+@media print{
+  #pdfReport table, 
+  #pdfReport th, 
+  #pdfReport td {
+    border: none !important; /* remove all borders first */
+  }
+  #pdfReport td {
+    border-bottom: 1px solid #1E90FF !important; /* thin brand-blue horizontal line */
+  }
+  #pdfReport tr:last-child td {
+    border-bottom: none !important; /* clean last row */
+  }
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
