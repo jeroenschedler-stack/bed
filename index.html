@@ -337,6 +337,47 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   #pdfReport .statements-table col:nth-child(3) { width: 20%; }
   #pdfReport .statements-table col:nth-child(4) { width: 20%; }
 }
+
+/* PDF: lock Information section to 20/30/20/30 total width */
+@media print {
+  /* Ensure the whole info section spans exactly the report width */
+  #pdfReport .info-grid {
+    display: grid !important;
+    grid-template-columns: 50% 50%; /* two cards side-by-side => total 100% */
+    width: 100% !important;
+    gap: 0 0; /* avoid extra horizontal spacing */
+  }
+  /* Inside each card: labels 40%, fields 60% -> combined = 20%/30% of total */
+  #pdfReport .info-grid .card {
+    display: grid !important;
+    grid-template-columns: 40% 60%;
+    box-sizing: border-box;
+    width: 100%;
+    border: 0 !important; /* keep no card borders in print */
+    box-shadow: none !important;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  /* Label cells left column, field cells right column */
+  #pdfReport .info-grid .card .label,
+  #pdfReport .info-grid .card .kv-label { grid-column: 1; text-align: left; }
+  #pdfReport .info-grid .card .value,
+  #pdfReport .info-grid .card .kv-value { grid-column: 2; text-align: left; }
+
+  /* Make sure rows align and wrap properly */
+  #pdfReport .info-grid .card > * {
+    break-inside: avoid;
+  }
+}
+
+/* PDF: lock Statements table columns to 10/45/30/15 */
+@media print {
+  #pdfReport .statements-table { table-layout: fixed; width: 100%; }
+  #pdfReport .statements-table col:nth-child(1) { width: 10%; }
+  #pdfReport .statements-table col:nth-child(2) { width: 45%; }
+  #pdfReport .statements-table col:nth-child(3) { width: 30%; }
+  #pdfReport .statements-table col:nth-child(4) { width: 15%; }
+}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
