@@ -1204,5 +1204,54 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
 })();
 </script>
 
+
+<script id="pdf-dev-tools">
+(function(){
+  function q(sel){ return document.querySelector(sel); }
+  function qa(sel){ return Array.from(document.querySelectorAll(sel)); }
+  function hasFlag(name){
+    return new URLSearchParams(location.search).get(name)==='1' || (location.hash||'').includes(name);
+  }
+
+  // Optional: force-enable disabled PDF buttons
+  if (hasFlag('pdfunlock')) {
+    window.addEventListener('DOMContentLoaded', function(){
+      qa('button, a, [role=button]').forEach(function(el){
+        var t = (el.textContent||'').toLowerCase();
+        if (t.includes('pdf')) {
+          try{ el.disabled = false; el.removeAttribute('disabled'); }catch(e){}
+        }
+      });
+    });
+  }
+
+  // Optional: floating test button to trigger printing without relying on app button
+  if (hasFlag('pdftest')) {
+    window.addEventListener('DOMContentLoaded', function(){
+      var b = document.createElement('button');
+      b.textContent = 'Quick PDF';
+      b.type = 'button';
+      b.style.cssText = 'position:fixed;right:12px;bottom:12px;padding:10px 14px;border:0;border-radius:999px;background:#ffcc00;color:#222;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,.15);z-index:99999;';
+      b.addEventListener('click', function(){
+        try{
+          var host = document.getElementById('pdfReport');
+          if(host){
+            host.className = 'pdf-v2 show-for-print';
+            host.style.display = 'block';
+          }
+          // Attempt to fill mapped fields
+          if (typeof fillMapped === 'function') fillMapped();
+          // Wait for background image load if needed
+          var img = document.querySelector('#pdfReport .a4-bg');
+          var doPrint = function(){ setTimeout(function(){ window.print(); }, 80); };
+          if (img && !img.complete) img.addEventListener('load', doPrint, {once:true}); else doPrint();
+        }catch(e){ console.error('Quick PDF failed', e); }
+      });
+      document.body.appendChild(b);
+    });
+  }
+})();
+</script>
+
 </body>
 </html>
