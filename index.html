@@ -717,17 +717,28 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
       S.questions = data.questions || [];
       S.groups = data.groups || [];
     }catch(e){
-      S.questions = []; 
+      S.questions = [];
       S.groups = [
         {"name":"Hospitality Skills","description":"Basic service skills for daily tasks and guest care."},
         {"name":"Hospitality Competencies","description":"Advanced ability to read people and situations."},
         {"name":"Taking Ownership","description":"Acting independently and sharing responsibility."},
         {"name":"Collaboration","description":"Building trust and helping across the BED community."}
       ];
+      // Show a visible banner so the user knows the JSON is missing
+      (function(){
+        var host = document.getElementById('welcome') || document.body;
+        var banner = document.getElementById('jsonErrBanner');
+        if(!banner){
+          banner = document.createElement('div');
+          banner.id = 'jsonErrBanner';
+          banner.style.cssText = 'background:#fff4e5;color:#8a4b00;border:1px solid #f1c48b;padding:10px 12px;margin:10px 0;border-radius:8px;font-size:14px;';
+          banner.textContent = '⚠ Could not load questions.json. Please place questions.json in the same folder as this HTML and reload.';
+          host.insertBefore(banner, host.firstChild);
+        }
+      })();
     }
   }
-
-  function validateWelcome() {
+function validateWelcome() {
     const allFilled = ['nick','email','hotel','peerName','peerEmail','peerHotel'].every(id => el(id).value && el(id).value.trim()!=='');
     el('toInstructions').disabled = !allFilled;
   }
@@ -795,7 +806,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
     _eligCancelBtn.onclick = () => { closeModal(); _eligOkBtn.onclick = oldOk; _eligCancelBtn.onclick = oldCancel; };
   };
   el('backToWelcome').onclick = () => show('welcome');
-  el('toQ1').onclick = () => { const l=el('list-q1'); l.innerHTML=''; (S.questions||[]).slice(0,18).forEach((q,i)=>l.appendChild(makeQ(q,i+1))); show('q1'); };
+  el('toQ1').onclick = () => { if(!S.questions || !S.questions.length){ alert('Could not load questions.json. Place it in the same folder and reload.'); return; } const l=el('list-q1'); l.innerHTML=''; (S.questions||[]).slice(0,18).forEach((q,i)=>l.appendChild(makeQ(q,i+1))); show('q1'); };
   el('backToInstructions').onclick = () => show('instructions');
   el('toQ2').onclick = () => { const l=el('list-q2'); l.innerHTML=''; (S.questions||[]).slice(18,35).forEach((q,i)=>l.appendChild(makeQ(q,19+i))); show('q2'); };
   el('backToQ1').onclick = () => show('q1');
