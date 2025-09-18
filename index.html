@@ -1195,9 +1195,13 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
     if(!btn) return;
     btn.addEventListener('click', function(){
       var host = document.getElementById('pdfReport');
-      if(host) host.className = 'pdf-v2';
-      fillMapped();
-      setTimeout(function(){ window.print(); }, 60);
+      if(host){
+        host.className = 'pdf-v2 show-for-print';
+        host.style.display = 'block';
+      }
+      if (typeof fillMapped === 'function') fillMapped();
+      // Synchronous print for mobile gesture
+      window.print();
     }, true);
   }
   window.addEventListener('DOMContentLoaded', hook);
@@ -1243,7 +1247,7 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
           if (typeof fillMapped === 'function') fillMapped();
           // Wait for background image load if needed
           var img = document.querySelector('#pdfReport .a4-bg');
-          var doPrint = function(){ setTimeout(function(){ window.print(); }, 80); };
+          var doPrint = function(){ window.print(); };
           if (img && !img.complete) img.addEventListener('load', doPrint, {once:true}); else doPrint();
         }catch(e){ console.error('Quick PDF failed', e); }
       });
@@ -1251,6 +1255,20 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
     });
   }
 })();
+</script>
+
+
+<script id="pdf-preload-fix">
+window.addEventListener('DOMContentLoaded', function(){
+  var img = document.querySelector('#pdfReport .a4-bg');
+  if (img) {
+    if (!img.complete) {
+      var pre = new Image();
+      pre.src = img.getAttribute('src');
+      pre.onload = function(){ try{ img.src = pre.src; }catch(e){} };
+    }
+  }
+});
 </script>
 
 </body>
