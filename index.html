@@ -573,34 +573,10 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
   }
 
   function buildPdfReport(){
-    // Date + score box
-    const totals = computeTotals();
-    document.getElementById('pdfDate').textContent = 'Assessment Date ' + formatDate();
-    document.getElementById('pdfTotalPct').textContent = (isFinite(totals.pct) ? totals.pct : '—') + '%';
-    document.getElementById('pdfTotalRaw').textContent = (totals.raw||0) + ' OUT OF ' + ((S.questions||[]).length * 5 || 175);
-
-    // Info
-    document.getElementById('pdfEmpName').textContent = document.getElementById('nick').value || '';
-    document.getElementById('pdfEmpEmail').textContent = document.getElementById('email').value || '';
-    document.getElementById('pdfEmpHotel').textContent = document.getElementById('hotel').value || '';
-    document.getElementById('pdfPeerName').textContent = document.getElementById('peerName').value || '';
-    document.getElementById('pdfPeerEmail').textContent = document.getElementById('peerEmail').value || '';
-    document.getElementById('pdfPeerHotel').textContent = document.getElementById('peerHotel').value || '';
-
-    // Group rows
-    const gp = computeGroupPercents();
-    const descMap = groupDescMap();
-    const order = ["Hospitality Skills","Hospitality Competencies","Taking Ownership","Collaboration"];
-    const body = document.getElementById('pdfGroupRows');
-    body.innerHTML='';
-    order.forEach(name=>{
-      const tr = document.createElement('tr');
-      const tdName = document.createElement('td'); tdName.textContent = 'Score ' + name.split(' ')[0];
-      const tdPct = document.createElement('td'); tdPct.textContent = (gp[name] != null ? gp[name] : '—') + '%';
-      const tdDesc = document.createElement('td'); tdDesc.textContent = descMap[name] || '(add description)';
-      tr.appendChild(tdName); tr.appendChild(tdPct); tr.appendChild(tdDesc);
-      body.appendChild(tr);
-    });
+  try{ var el = document.getElementById('pdfReport'); if(el) el.innerHTML = ''; }catch(e){}
+}
+try{ window.buildPdfReport = buildPdfReport; }catch(e){}
+);
 
     // Statements table
     const tb = document.querySelector('#pdfStatements tbody');
