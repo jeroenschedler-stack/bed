@@ -207,54 +207,6 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   .score-section{margin-top:40px;}
 
   .group-row{padding:2px 0; margin-bottom:0;}
-
-/* v57 PDF header & layout */
-@media print {
-  #pdfReport .pdf-head {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: start;
-    gap: 12px;
-    margin-bottom: 10px;
-  }
-  #pdfReport .head-line1 {
-    font-size: 16pt;
-    font-weight: 700;
-    color: #1E90FF;
-    line-height: 1.2;
-  }
-  #pdfReport .head-line2 {
-    font-size: 12pt;
-    font-weight: 700;
-    color: #000;
-    line-height: 1.2;
-  }
-  #pdfReport .score-box {
-    background: #1E90FF;
-    color: #fff;
-    padding: 10px 14px;
-    border-radius: 10px;
-    text-align: center;
-    min-width: 88px;
-  }
-  #pdfReport .score-big { font-size: 20pt; font-weight: 800; line-height: 1; }
-  #pdfReport .score-points { margin-top: 4px; font-size: 10pt; font-weight: 600; }
-
-  #pdfReport .sec-h {
-    background: #1E90FF; color: #fff; border-radius: 6px;
-    padding: 6px 12px; font-size: 14pt; font-weight: 700; margin: 12px 0 8px 0;
-  }
-
-  /* Results by Group widths (current order Group | % | Description) */
-  #pdfReport #pdfGroupRows tr td:nth-child(1) { width: 40% !important; text-align: left !important; }
-  #pdfReport #pdfGroupRows tr td:nth-child(2) { width: 10% !important; text-align: right !important; }
-  #pdfReport #pdfGroupRows tr td:nth-child(3) { width: 50% !important; text-align: left !important; }
-
-  /* Statements widths */
-  #pdfReport #pdfStatements td:nth-child(1) { width: 60% !important; }
-  #pdfReport #pdfStatements td:nth-child(2) { width: 20% !important; }
-  #pdfReport #pdfStatements td:nth-child(3) { width: 20% !important; text-align: right !important; }
-}
 </style>
 <script id="embeddedQuestions" type="application/json">[]</script>
 </head>
@@ -376,21 +328,6 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 <!-- PRINT REPORT (Blue-branded) -->
 <section aria-hidden="true" id="pdfReport">
-
-<!-- PDF Header: two lines + top-right score box -->
-<div class="pdf-head">
-  <div class="head-left">
-    <div class="head-line1">BED HOSPITALITY 2.0</div>
-    <div class="head-line2">ASSESSMENT REPORT 17 SEPT 2025</div>
-  </div>
-  <div class="head-right">
-    <div class="score-box">
-      <div class="score-big" id="pdfHeaderPct">--%</div>
-      <div class="score-points" id="pdfHeaderPts">-- of --</div>
-    </div>
-  </div>
-</div>
-
 <div class="pdf-top">
 <div>
 <div class="pdf-title">BED HOSPITALITY 2.0</div>
@@ -423,7 +360,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 </div>
 </div>
-<div class=\"sec-h\">OVERALL ASSESSMENT</div>
+<div class="sec-h">ASSESSMENT</div>
 <div class="card" style="padding:0">
 <table>
 <thead>
@@ -636,18 +573,6 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
   }
 
   function buildPdfReport(){
-  try {
-    var S = window.S || window.__S || {};
-    var qs = (S.questions||[]);
-    var max = 5;
-    var totalPts = qs.length * max;
-    var earned = 0;
-    for (var i=0;i<qs.length;i++){ var q=qs[i]; var v=(S.answers&&S.answers[q.id]!=null)?Number(S.answers[q.id]):0; if(!isNaN(v)) earned+=v; }
-    var pct = totalPts>0 ? Math.round(earned*100/totalPts) : 0;
-    var elPct = document.getElementById('pdfHeaderPct'); if(elPct) elPct.textContent = pct + '%';
-    var elPts = document.getElementById('pdfHeaderPts'); if(elPts) elPts.textContent = earned + ' of ' + totalPts;
-  } catch(e) {}
-
     // Date + score box
     const totals = computeTotals();
     document.getElementById('pdfDate').textContent = 'Assessment Date ' + formatDate();
