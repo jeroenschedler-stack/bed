@@ -1271,5 +1271,38 @@ window.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
+
+<script id="pdf-show-mode">
+(function(){
+  function hasFlag(name){
+    return new URLSearchParams(location.search).get(name)==='1' || (location.hash||'').includes(name);
+  }
+  if (!hasFlag('showpdf')) return;
+
+  window.addEventListener('DOMContentLoaded', function(){
+    try{
+      var host = document.getElementById('pdfReport');
+      if(host){
+        host.className = 'pdf-v2 show-for-print';
+        host.style.display = 'block';
+      }
+      if (typeof fillMapped === 'function') fillMapped();
+
+      // Floating helper to trigger print (and a hint to use browser menu if blocked)
+      var b = document.createElement('a');
+      b.textContent = 'Print PDF';
+      b.href = 'javascript:window.print()';
+      b.style.cssText = 'position:fixed;right:12px;bottom:12px;padding:10px 14px;border-radius:999px;background:#2563eb;color:#fff;font-weight:700;text-decoration:none;box-shadow:0 6px 18px rgba(0,0,0,.18);z-index:99999;';
+      document.body.appendChild(b);
+
+      var hint = document.createElement('div');
+      hint.textContent = 'If tapping does nothing, use Chrome menu ⋮ → Print.';
+      hint.style.cssText = 'position:fixed;left:12px;bottom:12px;padding:8px 10px;border-radius:8px;background:#eef2ff;color:#1e40af;font:12px/1.3 system-ui,Segoe UI,Arial;z-index:99999;';
+      document.body.appendChild(hint);
+    }catch(e){ console.error('showpdf mode error', e); }
+  });
+})();
+</script>
+
 </body>
 </html>
