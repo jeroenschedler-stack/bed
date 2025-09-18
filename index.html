@@ -553,47 +553,34 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   margin: 16px 0 8px 0 !important;
 }
 </style>
-<!-- PDF v2 scoped styles -->
 <style id="pdfv2-styles">
-@media print {
+@page { size: A4; margin: 14mm; }
+@media print { 
+  html, body { width:210mm; height:297mm; }
   body * { visibility: hidden !important; }
   #pdfReport, #pdfReport * { visibility: visible !important; }
-  #pdfReport { position: static; }
 }
 #pdfReport.pdf-v2{
-  --blue:#1E90FF;
-  --text:#444;
-  --muted:#6b7280;
-  --border:#dbeafe;
-  --h1:20pt; --h2:14pt; --h3:12pt; --body:11pt;
   print-color-adjust: exact; -webkit-print-color-adjust: exact;
   font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-  color:var(--text);
-  padding:16mm 14mm;
+  position:relative; color:#333;
 }
-#pdfReport.pdf-v2 .title-grid{display:grid;grid-template-columns:1fr 48mm;gap:10mm;align-items:start;margin-bottom:8mm;}
-#pdfReport.pdf-v2 .brand{color:var(--blue);font-size:var(--h1);font-weight:800;letter-spacing:.2px}
-#pdfReport.pdf-v2 .report-title{font-size:var(--h2);font-weight:700;margin:.8mm 0 0 0}
-#pdfReport.pdf-v2 .date{font-size:var(--body);color:var(--muted);margin-top:1mm}
-#pdfReport.pdf-v2 .scorebox{border:1px solid var(--blue);border-radius:8px;padding:6mm 5mm;text-align:center}
-#pdfReport.pdf-v2 .scorebox .pct{font-size:24pt;font-weight:800;color:#fff;background:var(--blue);border-radius:10px;padding:8px 0;line-height:1;margin-bottom:6px}
-#pdfReport.pdf-v2 .scorebox .raw{font-size:var(--body)}
+#pdfReport.pdf-v2 .a4-bg { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+#pdfReport.pdf-v2 .layer { position:relative; z-index:1; }
 
-#pdfReport.pdf-v2 .section-ribbon{position:relative;margin:8mm 0 0}
-#pdfReport.pdf-v2 .section-ribbon .bar{height:8mm;background:var(--blue);border-radius:6px}
-#pdfReport.pdf-v2 .section-ribbon .labels{position:absolute;top:0;left:0;right:0;height:8mm;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:0 6mm;color:#fff;font-weight:700;letter-spacing:.3px;font-size:11pt}
-
-#pdfReport.pdf-v2 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6mm;margin-top:5mm}
-#pdfReport.pdf-v2 .card{border:1px solid var(--border);border-radius:8px;padding:5mm}
-#pdfReport.pdf-v2 .kv{display:grid;grid-template-columns:40% 60%;row-gap:3mm}
-#pdfReport.pdf-v2 .kv .k{color:#6b7280}
-#pdfReport.pdf-v2 .kv .v{color:#111}
-
-#pdfReport.pdf-v2 .overall{margin-top:10mm;display:grid;grid-template-columns:36mm 1fr;gap:8mm}
-#pdfReport.pdf-v2 .overall .label{font-weight:700}
-#pdfReport.pdf-v2 .overall .box{border:1px solid var(--border);border-radius:8px;padding:5mm}
-#pdfReport.pdf-v2 .overall .big{font-size:18pt;font-weight:800}
-#pdfReport.pdf-v2 .overall .muted{color:var(--muted);margin-top:2mm}
+/* Mapped overlay positions */
+#pdfReport.pdf-v2 .map-title      { position:absolute; left: 16mm; top: 22mm; }
+#pdfReport.pdf-v2 .map-subtitle   { position:absolute; left: 16mm; top: 37mm; }
+#pdfReport.pdf-v2 .map-date       { position:absolute; left: 16mm; top: 44mm; }
+#pdfReport.pdf-v2 .map-scorebox-pct { position:absolute; left: 152mm; top: 24mm; width:36mm; text-align:center; font-size:18pt; font-weight:800; color:#fff; background:#1E90FF; border-radius:3mm; padding:2mm 0; }
+#pdfReport.pdf-v2 .map-scorebox-raw { position:absolute; left: 152mm; top: 34mm; width:36mm; text-align:center; font-size:10pt; color:#0b2f66; font-weight:600; }
+#pdfReport.pdf-v2 .map-ribbon { position:absolute; left:16mm; top:56mm; width:178mm; height:8mm; background:#1E90FF; border-radius:2mm; }
+#pdfReport.pdf-v2 .map-ribbon .l { position:absolute; left:6mm; top:1.2mm; color:#fff; font-weight:800; letter-spacing:.2px; }
+#pdfReport.pdf-v2 .map-ribbon .r { position:absolute; right:6mm; top:1.2mm; color:#fff; font-weight:800; letter-spacing:.2px; }
+#pdfReport.pdf-v2 .map-team     { position:absolute; left: 18mm; top: 67mm; width: 84mm; }
+#pdfReport.pdf-v2 .map-peer     { position:absolute; left: 110mm; top: 67mm; width: 84mm; }
+#pdfReport.pdf-v2 .row { display:grid; grid-template-columns: 22mm 1fr; column-gap:6mm; row-gap:3mm; font-size:11pt; }
+#pdfReport.pdf-v2 .k { color:#6b7280; }
 </style>
 
 </head>
@@ -1155,140 +1142,62 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
   }
 })();
 </script>
-<!-- PDF v2 builder and safe questions loader -->
-<script id="pdfv2-script">
+<script>
 (function(){
-  async function loadQuestionsJSON(){
+  function computeTotals(){
     try{
-      const r = await fetch('./questions.json', {cache:'no-store'});
-      if(!r.ok) throw new Error('HTTP '+r.status);
-      const j = await r.json();
-      window.__QUEST = j;
-      const b = document.getElementById('qjson-banner');
-      if(b) b.remove();
-      console.log('[SAR] Loaded questions.json', j.questions?.length||0);
-      return true;
-    }catch(e){
-      console.warn('[SAR] Could not load questions.json', e);
-      const host = document.querySelector('#content') || document.body;
-      if(!document.getElementById('qjson-banner')){
-        const div = document.createElement('div');
-        div.id = 'qjson-banner';
-        div.style.cssText = 'margin:12px 0;padding:10px 12px;border:1px solid #f2c97d;background:#fff7e6;color:#8a6d3b;border-radius:6px;';
-        div.textContent = 'Could not load questions.json. Please place questions.json in the same folder as this HTML and reload.';
-        host.prepend(div);
-      }
-      return false;
-    }
-  }
-  window.addEventListener('DOMContentLoaded', loadQuestionsJSON, {once:true});
-
-  function computeTotalsSafe(){
-    try{
-      if (window.__S && window.__S.totals && typeof window.__S.totals.max === 'number'){
-        const t = window.__S.totals;
-        if(!t.max || t.max < 1){
-          const qn = (window.__QUEST?.questions?.length||35);
-          t.max = qn * 5;
-        }
-        if(typeof t.percent !== 'number' && typeof t.points === 'number'){
-          t.percent = t.max ? Math.round((t.points/t.max)*100) : 0;
-        }
+      if (window.__S && window.__S.totals) {
+        var t = window.__S.totals;
+        var qn = (window.__QUEST?.questions?.length||35);
+        if(!t.max || t.max < 1) t.max = qn * 5;
+        if(typeof t.percent !== 'number') t.percent = t.max ? Math.round((t.points/t.max)*100) : 0;
         return t;
       }
     }catch(e){}
-    var answered = 0, points = 0;
-    document.querySelectorAll('input[type=radio][name^="q-"]:checked').forEach(r=>{
-      answered += 1;
-      points += parseInt(r.value||'0',10);
-    });
-    const qn = (window.__QUEST?.questions?.length||35);
-    const max = qn * 5;
-    const pct = Math.round((points/max)*100);
-    return {points: points, max: max, percent: isFinite(pct)?pct:0};
+    var qn = (window.__QUEST?.questions?.length||35);
+    return {percent:0, points:0, max: qn*5};
   }
-
-  function getField(ids){
-    for(const id of ids){
-      const el = document.getElementById(id);
-      if(el && 'value' in el) return (el.value||'').trim();
-    }
-    return '';
-  }
+  function getField(ids){ for (var i=0;i<ids.length;i++){ var el = document.getElementById(ids[i]); if(el && 'value' in el) return (el.value||'').trim(); } return ''; }
   function collectForm(){
     return {
-      member: {
-        name: getField(['name','yourName','tm_name','member_name']),
-        email: getField(['email','yourEmail','tm_email','member_email']),
-        hotel: getField(['location','yourLocation','tm_hotel','member_hotel'])
-      },
-      peer: {
-        name: getField(['peerName','name_peer','peer_name']),
-        email: getField(['peerEmail','email_peer','peer_email']),
-        hotel: getField(['peerLocation','peer_location','peer_hotel'])
-      }
+      mName: getField(['name','yourName','tm_name','member_name']),
+      mEmail: getField(['email','yourEmail','tm_email','member_email']),
+      mHotel: getField(['location','yourLocation','tm_hotel','member_hotel']),
+      pName: getField(['peerName','name_peer','peer_name']),
+      pEmail: getField(['peerEmail','email_peer','peer_email']),
+      pHotel: getField(['peerLocation','peer_location','peer_hotel'])
     };
   }
+  function fillMapped(){
+    // date (Report Date DD MON YYYY)
+    var d = new Date();
+    var months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    var ds = d.getDate().toString().padStart(2,'0')+' '+months[d.getMonth()]+' '+d.getFullYear();
+    document.getElementById('pdf-date').textContent = 'Report Date ' + ds;
 
-  function buildPdfV2(){
-    const totals = computeTotalsSafe();
-    const form = collectForm();
-    const host = document.getElementById('pdfReport');
-    if(!host) return;
-    host.className = 'pdf-v2';
-    host.innerHTML = ''+
-    '<div class="title-grid">'+
-      '<div>'+
-        '<div class="brand">BED HOSPITALITY 2.0</div>'+
-        '<div class="report-title">ASSESSMENT REPORT</div>'+
-        '<div class="date">'+new Date().toLocaleDateString()+'</div>'+
-      '</div>'+
-      '<div class="scorebox">'+
-        '<div class="pct">'+(isFinite(totals.percent)?totals.percent:0)+'%</div>'+
-        '<div class="raw">'+(totals.points||0)+' of '+(totals.max||((window.__QUEST?.questions?.length||35)*5))+' points</div>'+
-      '</div>'+
-    '</div>'+
+    var t = computeTotals();
+    document.getElementById('pdf-score-pct').textContent = (t.percent||0) + '%';
+    document.getElementById('pdf-score-raw').textContent = (t.points||0) + ' of ' + (t.max||175) + ' points';
 
-    '<div class="section-ribbon">'+
-      '<div class="bar"></div>'+
-      '<div class="labels"><div>TEAM MEMBER</div><div style="text-align:right">PEER REVIEWER</div></div>'+
-    '</div>'+
-
-    '<div class="info-grid">'+
-      '<div class="card">'+
-        '<div class="kv">'+
-          '<div class="k">Name</div><div class="v">'+(form.member.name||'—')+'</div>'+
-          '<div class="k">Email</div><div class="v">'+(form.member.email||'—')+'</div>'+
-          '<div class="k">Hotel</div><div class="v">'+(form.member.hotel||'—')+'</div>'+
-        '</div>'+
-      '</div>'+
-      '<div class="card">'+
-        '<div class="kv">'+
-          '<div class="k">Name</div><div class="v">'+(form.peer.name||'—')+'</div>'+
-          '<div class="k">Email</div><div class="v">'+(form.peer.email||'—')+'</div>'+
-          '<div class="k">Hotel</div><div class="v">'+(form.peer.hotel||'—')+'</div>'+
-        '</div>'+
-      '</div>'+
-    '</div>'+
-
-    '<div class="overall">'+
-      '<div class="label">OVERALL</div>'+
-      '<div class="box">'+
-        '<div class="big">'+(isFinite(totals.percent)?totals.percent:0)+'%</div>'+
-        '<div class="muted">Total: '+(totals.points||0)+' / '+(totals.max||((window.__QUEST?.questions?.length||35)*5))+' points</div>'+
-      '</div>'+
-    '</div>';
+    var f = collectForm();
+    document.getElementById('tm-name').textContent  = f.mName || '—';
+    document.getElementById('tm-email').textContent = f.mEmail || '—';
+    document.getElementById('tm-hotel').textContent = f.mHotel || '—';
+    document.getElementById('pr-name').textContent  = f.pName || '—';
+    document.getElementById('pr-email').textContent = f.pEmail || '—';
+    document.getElementById('pr-hotel').textContent = f.pHotel || '—';
   }
-
-  function hookPdfButton(){
-    const btn = document.querySelector('#congratsPdf, .pdf-btn, button#print, button#createPdf');
+  function hook(){
+    var btn = document.querySelector('#congratsPdf, .pdf-btn, button#print, button#createPdf');
     if(!btn) return;
-    btn.addEventListener('click', function(ev){
-      try{ buildPdfV2(); }catch(e){ console.error('buildPdfV2 failed', e); }
-      setTimeout(function(){ window.print(); }, 50);
+    btn.addEventListener('click', function(){
+      var host = document.getElementById('pdfReport');
+      if(host) host.className = 'pdf-v2';
+      fillMapped();
+      setTimeout(function(){ window.print(); }, 60);
     }, true);
   }
-  window.addEventListener('DOMContentLoaded', hookPdfButton);
+  window.addEventListener('DOMContentLoaded', hook);
 })();
 </script>
 
