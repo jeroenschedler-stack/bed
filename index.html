@@ -1,11 +1,9 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 
 <html lang="en">
 <head>
-&lt;!-- ===== LOCKED BASELINE v72-LOCK =====
-Do not edit above this line.
-All overrides (v69, v70, v72) are consolidated here.
---&gt;
+
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>BED HOSPITALITY — Self-Assessment</title>
@@ -563,7 +561,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <span class="dot"></span><span class="dot"></span><span class="dot"></span>
 <span class="dot"></span><span class="dot"></span><span class="dot"></span>
 </div>
-
+<!-- PAGE 1 -->
 <section id="welcome">
 <h2 class="section-title">Your Information</h2>
 <div class="row"><label for="nick">your name</label><input id="nick"/></div>
@@ -598,7 +596,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button disabled="" id="toInstructions">Start</button>
 </div>
 </section>
-
+<!-- Instructions -->
 <section id="instructions" style="display:none">
 <h2 class="section-title">HOW TO ASSESS YOURSELF</h2>
 <p class="intro">
@@ -617,7 +615,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button id="toQ1">Start</button>
 </div>
 </section>
-
+<!-- Q1 -->
 <section id="q1" style="display:none">
 <div id="list-q1"></div>
 <div class="actions">
@@ -625,7 +623,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button id="toQ2">Next</button>
 </div>
 </section>
-
+<!-- Q2 -->
 <section id="q2" style="display:none">
 <div id="list-q2"></div>
 <div class="actions">
@@ -633,7 +631,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button id="submitAll">Submit</button>
 </div>
 </section>
-
+<!-- Score -->
 <section id="finish" style="display:none"><div class="score-section"><div class="score-kicker">your self assessment results</div><div class="score-big" id="scorePercent">OVERALL SCORE —%</div><div class="gauge" id="gauge"></div><div class="rec-kicker"></div><div class="rec-text" id="recText">—</div></div>
 <br/>
 <div id="groupResultsContainer" style="margin-top:18px">
@@ -647,7 +645,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button id="nextToPeer">Next</button>
 </div>
 </section>
-
+<!-- Congrats -->
 <section id="congrats" style="display:none">
 <div class="big-check"></div>
 <div class="center">
@@ -660,7 +658,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 </section>
 </main>
-
+<!-- Modal -->
 <div class="modal-backdrop" id="eligBackdrop" style="position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:50">
 <div class="modal" style="width:min(92vw,520px); background:#fff; border-radius:18px; padding:20px; box-shadow:0 20px 60px rgba(0,0,0,.25)">
 <h3 style="margin:0 0 10px 0; font-size:18px">Peer eligibility</h3>
@@ -671,7 +669,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 </div>
 </div>
-
+<!-- PRINT REPORT (Blue-branded) -->
 <section aria-hidden="true" id="pdfReport">
 <div class="pdf-top">
 <div>
@@ -709,7 +707,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <div class="card" style="padding:0">
 <table>
 <tbody id="pdfGroupRows">
-
+<!-- rows injected -->
 </tbody>
 </table>
 </div>
@@ -725,7 +723,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </tr>
 </thead>
 <tbody>
-
+<!-- rows injected -->
 </tbody>
 </table>
 </div>
