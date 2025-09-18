@@ -1201,5 +1201,47 @@ else rec='Excellent! Your understanding of BED is an inspiration for others. Con
 })();
 </script>
 
+
+<script id="pdf-button-autohook">
+(function(){
+  // expose manual trigger just in case
+  window.makePdfV2 = function(){
+    try {
+      var host = document.getElementById('pdfReport'); if(host) host.className = 'pdf-v2';
+      // call the filler from the previous script if present
+      if (typeof fillMapped === 'function') fillMapped();
+      else {
+        // minimal inline duplicate (defensive)
+        var ev = new Event('fill-mapped'); document.dispatchEvent(ev);
+      }
+      setTimeout(function(){ window.print(); }, 60);
+    } catch(e){ console.error('PDF v2 error', e); }
+  };
+
+  function looksLikePdfButton(el){
+    if(!el) return false;
+    var id = (el.id||'').toLowerCase();
+    var cls = (el.className||'').toString().toLowerCase();
+    var txt = (el.textContent||'').trim().toLowerCase();
+    return id.includes('pdf') || cls.includes('pdf') || /create\s*pdf|pdf/.test(txt);
+  }
+
+  function hookAll(){
+    // direct known ids
+    var candidates = Array.from(document.querySelectorAll('button, a, .btn, [role=button]'));
+    candidates.forEach(function(btn){
+      if(looksLikePdfButton(btn)){
+        btn.addEventListener('click', function(ev){
+          // ensure user gesture triggers print
+          window.makePdfV2();
+        }, true);
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', hookAll);
+})();
+</script>
+
 </body>
 </html>
