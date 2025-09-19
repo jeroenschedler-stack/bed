@@ -476,6 +476,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
   }
 }
 </style>
+<script id="embeddedQuestions" type="application/json">[]</script>
 <style>
 /* === FINAL fixes v68: Statements duplicate header removal + header alignment (print only) === */
 @media print {
@@ -562,7 +563,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <span class="dot"></span><span class="dot"></span><span class="dot"></span>
 <span class="dot"></span><span class="dot"></span><span class="dot"></span>
 </div>
-
+<!-- PAGE 1 -->
 <section id="welcome">
 <h2 class="section-title">Your Information</h2>
 <div class="row"><label for="nick">your name</label><input id="nick"/></div>
@@ -597,7 +598,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button disabled="" id="toInstructions">Start</button>
 </div>
 </section>
-
+<!-- Instructions -->
 <section id="instructions" style="display:none">
 <h2 class="section-title">HOW TO ASSESS YOURSELF</h2>
 <p class="intro">
@@ -616,7 +617,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button id="toQ1">Start</button>
 </div>
 </section>
-
+<!-- Q1 -->
 <section id="q1" style="display:none">
 <div id="list-q1"></div>
 <div class="actions">
@@ -624,7 +625,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button id="toQ2">Next</button>
 </div>
 </section>
-
+<!-- Q2 -->
 <section id="q2" style="display:none">
 <div id="list-q2"></div>
 <div class="actions">
@@ -632,7 +633,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button id="submitAll">Submit</button>
 </div>
 </section>
-
+<!-- Score -->
 <section id="finish" style="display:none"><div class="score-section"><div class="score-kicker">your self assessment results</div><div class="score-big" id="scorePercent">OVERALL SCORE —%</div><div class="gauge" id="gauge"></div><div class="rec-kicker"></div><div class="rec-text" id="recText">—</div></div>
 <br/>
 <div id="groupResultsContainer" style="margin-top:18px">
@@ -646,7 +647,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <button id="nextToPeer">Next</button>
 </div>
 </section>
-
+<!-- Congrats -->
 <section id="congrats" style="display:none">
 <div class="big-check"></div>
 <div class="center">
@@ -659,7 +660,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 </section>
 </main>
-
+<!-- Modal -->
 <div class="modal-backdrop" id="eligBackdrop" style="position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:50">
 <div class="modal" style="width:min(92vw,520px); background:#fff; border-radius:18px; padding:20px; box-shadow:0 20px 60px rgba(0,0,0,.25)">
 <h3 style="margin:0 0 10px 0; font-size:18px">Peer eligibility</h3>
@@ -670,7 +671,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </div>
 </div>
 </div>
-
+<!-- PRINT REPORT (Blue-branded) -->
 <section aria-hidden="true" id="pdfReport">
 <div class="pdf-top">
 <div>
@@ -708,7 +709,7 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 <div class="card" style="padding:0">
 <table>
 <tbody id="pdfGroupRows">
-
+<!-- rows injected -->
 </tbody>
 </table>
 </div>
@@ -724,9 +725,449 @@ button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 </tr>
 </thead>
 <tbody>
-
+<!-- rows injected -->
 </tbody>
 </table>
 </div>
 </section>
-</body></html>
+<script>
+(function(){
+  const S = {answers:{}, questions:[], groups:[]}; window.__S = S;
+  const el = id => document.getElementById(id);
+  const sections = ['welcome','instructions','q1','q2','finish','congrats'];
+
+  function show(id){
+    sections.forEach(s => (document.getElementById(s).style.display = (s===id ? 'block' : 'none')));
+    let n = 1;
+    if(id==='instructions') n = 2;
+    else if(id==='q1') n = 3;
+    else if(id==='q2') n = 4;
+    else if(id==='finish') n = 5;
+    else if(id==='congrats') n = 6;
+    setProgress(n);
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  function setProgress(n){
+    const dots = document.querySelectorAll('#progressHeader .dot');
+    dots.forEach((d,i)=>d.classList.toggle('active', i < n));
+  }
+  setProgress(1);
+
+  function stripLeadingNumber(t){ return String(t||'').replace(/^\\s*\\d+\\.\\s*/, ''); }
+
+  function makeQ(q, ord){
+    const wrap = document.createElement('div');
+    wrap.className = 'q-item'; wrap.dataset.qid = q.id;
+    const num = document.createElement('div'); num.className = 'q-num'; num.textContent = ord + '.'; wrap.appendChild(num);
+    const body = document.createElement('div'); body.className='q-body';
+    const title = document.createElement('span'); title.className='q-title'; title.textContent = stripLeadingNumber(q.statement||''); body.appendChild(title);
+    if(q.subtext){ const sub = document.createElement('span'); sub.className='q-sub'; sub.textContent = q.subtext; body.appendChild(sub); }
+    for(let v=1; v<=5; v++){ const p=document.createElement('span'); p.className='pill'; p.textContent=v; p.dataset.val=v;
+      p.onclick=()=>{ S.answers[q.id]=v; wrap.querySelectorAll('.pill').forEach(x=>x.classList.toggle('selected',x===p)); }; body.appendChild(p); }
+    wrap.appendChild(body);
+    return wrap;
+  }
+
+  async function loadQuestions(){
+    try{
+      const res = await fetch('questions.json', {cache:'no-store'});
+      if(!res.ok) throw new Error('fetch failed');
+      const data = await res.json();
+      S.questions = data.questions || [];
+      S.groups = data.groups || [];
+    }catch(e){
+      S.questions = []; 
+      S.groups = [
+        {"name":"Hospitality Skills","description":"Basic service skills for daily tasks and guest care."},
+        {"name":"Hospitality Competencies","description":"Advanced ability to read people and situations."},
+        {"name":"Taking Ownership","description":"Acting independently and sharing responsibility."},
+        {"name":"Collaboration","description":"Building trust and helping across the BED community."}
+      ];
+    }
+  }
+
+  function validateWelcome() {
+    const allFilled = ['nick','email','hotel','peerName','peerEmail','peerHotel'].every(id => el(id).value && el(id).value.trim()!=='');
+    el('toInstructions').disabled = !allFilled;
+  }
+
+  function computeTotals(){
+    const ids = (S.questions||[]).map(q=>q.id);
+    const answered = ids.filter(id => S.answers[id] != null);
+    const raw = answered.reduce((sum,id)=> sum + (Number(S.answers[id]||0)||0), 0);
+    const max = (S.questions||[]).length * 5;
+    const avg = answered.length ? raw/answered.length : 0;
+    const pct = answered.length ? Math.round(25 + ((avg - 1) / 4) * 75) : 25;
+    return {raw, max, pct};
+  }
+
+  function computeGroupPercents(){
+    const byGroup = {};
+    (S.groups||[]).forEach(g=>byGroup[g.name]=[]);
+    (S.questions||[]).forEach(q=>{
+      const g = q.group;
+      const v = parseInt(S.answers[q.id],10);
+      if(g && !isNaN(v) && v>0) byGroup[g].push(v);
+    });
+    const res = {};
+    Object.keys(byGroup).forEach(g=>{
+      const vals = byGroup[g];
+      if(!vals.length){ res[g]=0; return; }
+      const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+      res[g] = Math.round(25 + ((avg - 1) / 4) * 75);
+    });
+    return res;
+  }
+
+  function groupDescMap(){
+    const m = {}; (S.groups||[]).forEach(g=>m[g.name]=g.description||''); return m;
+  }
+
+  function renderGroupResults(){
+    const holder = document.getElementById('groupResults');
+    if(!holder) return;
+    const gp = computeGroupPercents();
+    const desc = groupDescMap();
+    const order = ["Hospitality Skills","Hospitality Competencies","Taking Ownership","Collaboration"];
+    let rows = '';
+    order.forEach(name=>{
+      const p = gp[name] ?? 0;
+      rows += '<div class="group-row">'
+           +    '<div style="font-weight:600">'+name+' '+p+'%</div>'
+           +  '</div>'
+           +  '<div class="group-desc">'+(desc[name]||'')+'</div>';
+    });
+    holder.innerHTML = rows;
+  }
+
+  // Navigation + eligibility modal
+  const _eligOkBtn = document.getElementById('eligOk');
+  const _eligCancelBtn = document.getElementById('eligCancel');
+  function openModal(){ document.getElementById('eligBackdrop').style.display='flex'; }
+  function closeModal(){ document.getElementById('eligBackdrop').style.display='none'; }
+
+  el('toInstructions').onclick = () => {
+    openModal();
+    const oldOk = _eligOkBtn.onclick;
+    const oldCancel = _eligCancelBtn.onclick;
+    _eligOkBtn.onclick = () => { closeModal(); show('instructions'); _eligOkBtn.onclick = oldOk; _eligCancelBtn.onclick = oldCancel; };
+    _eligCancelBtn.onclick = () => { closeModal(); _eligOkBtn.onclick = oldOk; _eligCancelBtn.onclick = oldCancel; };
+  };
+  el('backToWelcome').onclick = () => show('welcome');
+  el('toQ1').onclick = () => { const l=el('list-q1'); l.innerHTML=''; (S.questions||[]).slice(0,18).forEach((q,i)=>l.appendChild(makeQ(q,i+1))); show('q1'); };
+  el('backToInstructions').onclick = () => show('instructions');
+  el('toQ2').onclick = () => { const l=el('list-q2'); l.innerHTML=''; (S.questions||[]).slice(18,35).forEach((q,i)=>l.appendChild(makeQ(q,19+i))); show('q2'); };
+  el('backToQ1').onclick = () => show('q1');
+
+  el('submitAll').onclick = () => {
+    const totals = computeTotals();
+    el('scorePercent').textContent = 'OVERALL SCORE ' + totals.pct + '%';
+    const gauge = el('gauge');
+    gauge.style.setProperty('--marker', totals.pct + '%'); 
+    gauge.style.position='relative';
+    let markerStyle = document.getElementById('markerStyle'); 
+    if(!markerStyle){ markerStyle=document.createElement('style'); markerStyle.id='markerStyle'; document.head.appendChild(markerStyle);}
+    markerStyle.textContent = '.gauge::after{left: calc(var(--marker) - 5px);}';
+    let rec=''; 
+    if(totals.pct<50) rec='You are behind and may need more support. Please contact your coach and ask your team members for guidance'; 
+else if(totals.pct<70) rec='Focus on self-development. Constant practice will make you better. Ask feedback from friends so you know you improve'; 
+else if(totals.pct<85) rec='Great hospitality! Keep challenging yourself and help others by giving them honest and positive feedback'; 
+else rec='Excellent! Your understanding of BED is an inspiration for others. Continue to lead others by example';
+    document.getElementById('recText').textContent = rec;
+    renderGroupResults();
+    show('finish');
+  };
+
+  el('backToQ2').onclick = () => show('q2');
+  el('nextToPeer').onclick = () => show('congrats');
+
+  el('congratsBack').onclick = () => show('finish');
+
+  // Validation
+  ['nick','email','hotel','peerName','peerEmail','peerHotel'].forEach(id => {
+    el(id).addEventListener('input', validateWelcome);
+    el(id).addEventListener('change', validateWelcome);
+  });
+  validateWelcome();
+
+  // Subheader update
+  const subheaderEl = document.querySelector('p.subheader');
+  const _oldShow = show;
+  show = function(id) {
+    _oldShow(id);
+    if (!subheaderEl) return;
+    if (id === 'q1') { subheaderEl.textContent = 'STATEMENTS PART 1'; } 
+    else if (id === 'q2') { subheaderEl.textContent = 'STATEMENTS PART 2'; } 
+    else if (id === 'congrats') { subheaderEl.textContent = 'ASSESSMENT COMPLETED'; } 
+    else { subheaderEl.textContent = 'TEAM MEMBER FORM'; }
+  };
+
+  function formatDate(){
+    try{
+      const dt = new Date();
+      const opts = {day:'numeric', month:'short', year:'numeric'};
+      return dt.toLocaleDateString(undefined, opts);
+    }catch(_){ return ''; }
+  }
+
+  function buildPdfReport(){
+    // Date + score box
+    const totals = computeTotals();
+    document.getElementById('pdfDate').textContent = 'Assessment Date ' + formatDate();
+    document.getElementById('pdfTotalPct').textContent = (isFinite(totals.pct) ? totals.pct : '—') + '%';
+    document.getElementById('pdfTotalRaw').textContent = (totals.raw||0) + ' OUT OF ' + ((S.questions||[]).length * 5 || 175);
+
+    // Info
+    document.getElementById('pdfEmpName').textContent = document.getElementById('nick').value || '';
+    document.getElementById('pdfEmpEmail').textContent = document.getElementById('email').value || '';
+    document.getElementById('pdfEmpHotel').textContent = document.getElementById('hotel').value || '';
+    document.getElementById('pdfPeerName').textContent = document.getElementById('peerName').value || '';
+    document.getElementById('pdfPeerEmail').textContent = document.getElementById('peerEmail').value || '';
+    document.getElementById('pdfPeerHotel').textContent = document.getElementById('peerHotel').value || '';
+
+    // Group rows
+    const gp = computeGroupPercents();
+    const descMap = groupDescMap();
+    const order = ["Hospitality Skills","Hospitality Competencies","Taking Ownership","Collaboration"];
+    const body = document.getElementById('pdfGroupRows');
+    body.innerHTML='';
+    order.forEach(name=>{
+      const tr = document.createElement('tr');
+      const tdName = document.createElement('td'); tdName.textContent = 'Score ' + name;
+      const tdPct = document.createElement('td'); tdPct.textContent = (gp[name] != null ? gp[name] : '—') + '%';
+      const tdDesc = document.createElement('td'); tdDesc.textContent = descMap[name] || '(add description)';
+      tr.appendChild(tdName); tr.appendChild(tdPct); tr.appendChild(tdDesc);
+      body.appendChild(tr);
+    });
+
+    // Statements table
+    const tb = document.querySelector('#pdfStatements tbody');
+    tb.innerHTML = '';
+    (S.questions||[]).forEach((q, i)=>{
+      const tr = document.createElement('tr');
+      const tdNo = document.createElement('td'); tdNo.textContent = (i+1); tdNo.className='st-no';
+      const tdSt = document.createElement('td');
+      tdSt.innerHTML = '<div class="st-title">'+(stripLeadingNumber(q.statement||''))+'</div>'
+        + (q.subtext?('<div class="muted">'+q.subtext+'</div>'):''); 
+      const tdGp = document.createElement('td'); tdGp.textContent = q.group || '';
+      const tdRt = document.createElement('td'); tdRt.textContent = (S.answers[q.id] != null ? S.answers[q.id] : ''); tdRt.className='st-rating';
+      tr.appendChild(tdNo); tr.appendChild(tdSt); tr.appendChild(tdGp); tr.appendChild(tdRt);
+      tb.appendChild(tr);
+    });
+  }
+
+  document.getElementById('congratsPdf').onclick = () => { buildPdfReport(); window.print(); };
+
+  // Init
+  loadQuestions();
+})(); 
+</script>
+<script>
+// === Validation patch v2 (uses window.__S) ===
+(function(){
+  function Sref(){ return (window.__S || window.S || {}); }
+  function qIdsFor(range){
+    var S = Sref();
+    if(!Array.isArray(S.questions)) return [];
+    return S.questions.slice(range[0], range[1]).map(function(q){ return q.id; });
+  }
+  function allAnswered(ids){
+    var S = Sref();
+    if(!ids.length) return false;
+    return ids.every(function(id){ return S.answers && S.answers[id] != null; });
+  }
+  function isQ1Complete(){ return allAnswered(qIdsFor([0,18])); }
+  function isQ2Complete(){ return allAnswered(qIdsFor([18,35])); }
+
+  // Hook pill clicks to re-evaluate states
+  document.addEventListener('click', function(ev){
+    var t = ev.target;
+    if(t && t.classList && t.classList.contains('pill')){
+      var b1 = document.getElementById('toQ2');
+      if(b1) b1.disabled = !isQ1Complete();
+      var b2 = document.getElementById('submitAll');
+      if(b2) b2.disabled = !isQ2Complete();
+    }
+  }, true);
+
+  // After entering Q1/Q2, sync button states
+  var toQ1 = document.getElementById('toQ1');
+  if(toQ1){
+    var prevToQ1 = toQ1.onclick;
+    toQ1.onclick = function(){
+      if(typeof prevToQ1 === 'function') prevToQ1();
+      var b1 = document.getElementById('toQ2');
+      if(b1) b1.disabled = !isQ1Complete();
+    };
+  }
+
+  var toQ2 = document.getElementById('toQ2');
+  if(toQ2){
+    var prevToQ2 = toQ2.onclick;
+    toQ2.onclick = function(){
+      if(typeof prevToQ2 === 'function') prevToQ2();
+      var sub = document.getElementById('submitAll');
+      if(sub) sub.disabled = !isQ2Complete();
+    };
+  }
+
+  // Hard guard against advancing when incomplete
+  document.addEventListener('click', function(ev){
+    var id = ev.target && ev.target.id;
+    if(id === 'toQ2' && !isQ1Complete()){ ev.preventDefault(); ev.stopPropagation(); }
+    if(id === 'submitAll' && !isQ2Complete()){ ev.preventDefault(); ev.stopPropagation(); }
+  }, true);
+})();
+// === End patch ===
+</script>
+<script>
+// === Validation patch v3: robust state sync for Next/Submit ===
+(function(){
+  function Sref(){ return (window.__S || window.S || {}); }
+  function qIdsFor(range){
+    var S = Sref();
+    if(!Array.isArray(S.questions)) return [];
+    return S.questions.slice(range[0], range[1]).map(function(q){ return q.id; });
+  }
+  function allAnswered(ids){
+    var S = Sref();
+    if(!ids.length) return false;
+    return ids.every(function(id){ return S.answers && S.answers[id] != null; });
+  }
+  function isQ1Complete(){ return allAnswered(qIdsFor([0,18])); }
+  function isQ2Complete(){ return allAnswered(qIdsFor([18,35])); }
+
+  function setState(){
+    try{
+      var q1Visible = document.getElementById('q1') && document.getElementById('q1').style.display !== 'none';
+      var q2Visible = document.getElementById('q2') && document.getElementById('q2').style.display !== 'none';
+      var b1 = document.getElementById('toQ2');
+      if(b1 && q1Visible) b1.disabled = !isQ1Complete();
+      var b2 = document.getElementById('submitAll');
+      if(b2 && q2Visible) b2.disabled = !isQ2Complete();
+    }catch(_){}
+  }
+
+  // Hook pill clicks to re-evaluate states
+  document.addEventListener('click', function(ev){
+    var t = ev.target;
+    if(t && t.classList && t.classList.contains('pill')){
+      setState();
+    }
+  }, true);
+
+  // After entering Q1/Q2, sync button states
+  var toQ1 = document.getElementById('toQ1');
+  if(toQ1){
+    var prevToQ1 = toQ1.onclick;
+    toQ1.onclick = function(){
+      if(typeof prevToQ1 === 'function') prevToQ1();
+      setState();
+    };
+  }
+
+  var toQ2 = document.getElementById('toQ2');
+  if(toQ2){
+    var prevToQ2 = toQ2.onclick;
+    toQ2.onclick = function(){
+      if(typeof prevToQ2 === 'function') prevToQ2();
+      setState();
+    };
+  }
+
+  // Wrap show() to always refresh states after page changes (without touching visuals)
+  if(typeof window.show === 'function'){
+    var oldShow = window.show;
+    window.show = function(id){
+      oldShow(id);
+      setState();
+    };
+  }
+
+  // Hard guard against advancing when incomplete
+  document.addEventListener('click', function(ev){
+    var id = ev.target && ev.target.id;
+    if(id === 'toQ2' && !isQ1Complete()){ ev.preventDefault(); ev.stopPropagation(); }
+    if(id === 'submitAll' && !isQ2Complete()){ ev.preventDefault(); ev.stopPropagation(); }
+  }, true);
+
+  // Initial sync
+  document.addEventListener('DOMContentLoaded', setState);
+  setTimeout(setState, 0);
+})();
+// === End patch v3 ===
+</script>
+<script>
+// === Validation patch v4: DOM-based completion (resilient) ===
+(function(){
+  function uniqueAnsweredCount(containerId){
+    var box = document.getElementById(containerId);
+    if(!box) return 0;
+    var items = box.querySelectorAll('.q-item');
+    var answered = 0;
+    items.forEach(function(it){
+      if(it.querySelector('.pill.selected')) answered++;
+    });
+    return answered;
+  }
+  function q1Done(){ return uniqueAnsweredCount('list-q1') >= 18; }
+  function q2Done(){ return uniqueAnsweredCount('list-q2') >= 17; }
+
+  function sync(){
+    try{
+      var q1Visible = document.getElementById('q1') && document.getElementById('q1').style.display !== 'none';
+      var q2Visible = document.getElementById('q2') && document.getElementById('q2').style.display !== 'none';
+      var b1 = document.getElementById('toQ2');
+      if(b1 && q1Visible) b1.disabled = !q1Done();
+      var b2 = document.getElementById('submitAll');
+      if(b2 && q2Visible) b2.disabled = !q2Done();
+    }catch(_){}
+  }
+
+  // Monitor pill clicks
+  document.addEventListener('click', function(ev){
+    var t = ev.target;
+    if(t && t.classList && t.classList.contains('pill')){
+      // Wait a tick for .selected class to update, then sync
+      setTimeout(sync, 0);
+    }
+  }, true);
+
+  // Wrap show() to re-sync after page changes
+  if(typeof window.show === 'function'){
+    var oldShow = window.show;
+    window.show = function(id){ oldShow(id); setTimeout(sync, 0); };
+  }
+
+  // Hard guard
+  document.addEventListener('click', function(ev){
+    var id = ev.target && ev.target.id;
+    if(id === 'toQ2' && !q1Done()){ ev.preventDefault(); ev.stopPropagation(); }
+    if(id === 'submitAll' && !q2Done()){ ev.preventDefault(); ev.stopPropagation(); }
+  }, true);
+
+  // Initial sync
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(sync, 0); });
+  setTimeout(sync, 50);
+})();
+// === End patch v4 ===
+</script>
+<script>
+(function(){
+  var bar = document.querySelector('#pdfReport .statements-bar');
+  if(!bar) return;
+  var labelStmt = bar.querySelector('.lbl-stmt');
+  if(labelStmt){
+    labelStmt.textContent = 'STATEMENTS';
+  }
+  var labelGroup = bar.querySelector('.lbl-group');
+  if(labelGroup){
+    labelGroup.textContent = 'GROUP';
+  }
+  var labelScore = bar.querySelector('.lbl-score');
+  if(labelScore){
+    labelScore.textContent = 'SCORE';
+  }
+})();
+</script></body>
+</html>
