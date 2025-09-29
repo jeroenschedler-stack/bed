@@ -78,8 +78,7 @@ let deferredPrompt=null;
 
 const isStandalone = () =>
   window.matchMedia('(display-mode: standalone)').matches ||
-  window.navigator.standalone === true ||
-  localStorage.getItem('bed_installed') === '1';
+  window.navigator.standalone === true;
 
 const $ = (s)=>document.querySelector(s);
 const toast = (t)=>{
