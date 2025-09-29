@@ -18,8 +18,17 @@
            });
          });
       </script>
-   </head>
-   <body>
+  </head>
+<body>
+<script>
+(function(){
+  const installed =
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+    window.navigator.standalone === true ||
+    localStorage.getItem('bed_installed') === '1';
+  if(!installed) location.replace('../install.html'); // note the ../ because this file is inside /team/
+})();
+</script>
       <main class="container">
          <h1>BED HOSPITALITY 2.0</h1>
          <p class="subheader">PEER REVIEW FORM</p>
