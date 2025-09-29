@@ -1,20 +1,12 @@
 {
-  "name": "BED Hospitality 2.0",
-  "short_name": "BED 2.0",
-  "start_url": ".",
+  "name": "BED",
+  "short_name": "BED",
+  "start_url": "./selection.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1E90FF",
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
