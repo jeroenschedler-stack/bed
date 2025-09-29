@@ -295,8 +295,8 @@
          // Initialize
          setProgress(1);
          
-             function stripLeadingNumber(t) {
-                 return String(t || "").replace(/^\\s*\\d+\\.\\s*/, "");
+            function stripLeadingNumber(t) {
+  return String(t || "").replace(/^\s*\d+\.\s*/, "");
              }
          
          // Rating legend map
@@ -376,10 +376,17 @@
                  }
              }
          
-             function validateWelcome() {
-                 const allFilled = ["nick", "email", "hotel", "peerName", "peerEmail", "peerHotel"].every((id) => el(id).value && el(id).value.trim() !== "");
-                 el("toInstructions").disabled = !allFilled;
-             }
+           function validateWelcome() {
+  const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const v = (id) => (el(id).value || "").trim();
+
+  const allFilled =
+    v("nick") && v("email") && v("hotel") &&
+    v("peerName") && v("peerEmail") && v("peerHotel");
+
+  const emailsOK = emailRx.test(v("email")) && emailRx.test(v("peerEmail"));
+  el("toInstructions").disabled = !(allFilled && emailsOK);
+}
          
              function computeTotals() {
                  const ids = (S.questions || []).map((q) => q.id);
@@ -458,21 +465,32 @@
                      _eligCancelBtn.onclick = oldCancel;
                  };
              };
-             el("backToWelcome").onclick = () => show("welcome");
-             el("toQ1").onclick = () => {
-                 const l = el("list-q1");
-                 l.innerHTML = "";
-                 (S.questions || []).slice(0, 18).forEach((q, i) => l.appendChild(makeQ(q, i + 1)));
-                 show("q1");
-             };
-             el("backToInstructions").onclick = () => show("instructions");
-             el("toQ2").onclick = () => {
-                 const l = el("list-q2");
-                 l.innerHTML = "";
-                 (S.questions || []).slice(18, 35).forEach((q, i) => l.appendChild(makeQ(q, 19 + i)));
-                 show("q2");
-             };
-             el("backToQ1").onclick = () => show("q1");
+           el("backToWelcome").onclick = () => show("welcome");
+
+const _goQ1 = () => {
+  const l = el("list-q1");
+  l.innerHTML = "";
+  (S.questions || []).slice(0, 18).forEach((q, i) => l.appendChild(makeQ(q, i + 1)));
+  show("q1");
+  // Start disabled; Validation v4 will re-enable at 18 unique
+  setTimeout(() => { const b = el("toQ2"); if (b) b.disabled = true; }, 0);
+};
+el("toQ1").onclick = _goQ1;
+
+el("backToInstructions").onclick = () => show("instructions");
+
+const _goQ2 = () => {
+  const l = el("list-q2");
+  l.innerHTML = "";
+  (S.questions || []).slice(18, 35).forEach((q, i) => l.appendChild(makeQ(q, 19 + i)));
+  show("q2");
+  // Start disabled; Validation v4 will re-enable at ≥17 unique
+  setTimeout(() => { const b = el("submitAll"); if (b) b.disabled = true; }, 0);
+};
+el("toQ2").onclick = _goQ2;
+
+el("backToQ1").onclick = () => show("q1");
+
          
              el("submitAll").onclick = () => {
                  const totals = computeTotals();
@@ -729,386 +747,34 @@
              }
          })();
       </script>
-      <!-- === Non-invasive group rename + display sync (drop-in) === -->
-      <script>
+
+       <script>
          (function () {
-             const MAP = {
-                 "Hospitality Skills": "Hospitality skills",
-                 "Hospitality Competencies": "BED competencies",
-                 "Taking Ownership": "Taking ownership",
-                 Collaboration: "Collaboration",
-             };
-             const TARGET_ORDER = ["Hospitality skills", "BED competencies", "Taking ownership", "Collaboration"];
-             function normalizeData() {
-                 const S = window.__S || window.S;
-                 if (!S || !Array.isArray(S.groups) || !Array.isArray(S.questions)) return false;
-                 S.groups.forEach((g) => {
-                     if (MAP[g.name]) g.name = MAP[g.name];
-                 });
-                 S.groups.sort((a, b) => TARGET_ORDER.indexOf(a.name) - TARGET_ORDER.indexOf(b.name));
-                 S.questions.forEach((q) => {
-                     if (MAP[q.group]) q.group = MAP[q.group];
-                 });
-                 return true;
+           // Date format: DDMMMYYYY (e.g., 24Sep2025)
+           function formatDateDDMMMYYYY(d = new Date()) {
+             const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+             const dd = String(d.getDate()).padStart(2, "0");
+             return `${dd}${mon[d.getMonth()]}${d.getFullYear()}`;
+           }
+         
+           // Try multiple sources to get overall % (robust)
+           function getOverallPct() {
+             try {
+               if (typeof window.computeOverallPercent === "function") {
+                 const v = window.computeOverallPercent();
+                 if (!isNaN(v)) return Math.round(v);
+               }
+             } catch (e) {}
+             try {
+               if (window.totals && typeof window.totals.pct === "number") return Math.round(window.totals.pct);
+             } catch (e) {}
+             const sp = document.getElementById("scorePercent");
+             if (sp) {
+               const m = sp.textContent.match(/(\d+)\s*%/);
+               if (m) return parseInt(m[1], 10);
              }
-             function replaceOldLabelsIn(container) {
-                 if (!container) return;
-                 const TEXT_MAP = {
-                     "Hospitality Skills": "Hospitality skills",
-                     "Hospitality Competencies": "BED competencies",
-                     "Taking Ownership": "Taking ownership",
-                     Collaboration: "Collaboration",
-                     "Score Hospitality Skills": "Score hospitality skills",
-                     "Score Hospitality Competencies": "Score BED competencies",
-                     "Score Taking Ownership": "Score taking ownership",
-                     "Score Collaboration": "Score Collaboration",
-                 };
-                 const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
-                 let n;
-                 while ((n = walker.nextNode())) {
-                     const t = n.nodeValue;
-                     if (!t) continue;
-                     let out = t;
-                     for (const [from, to] of Object.entries(TEXT_MAP)) {
-                         if (out.indexOf(from) !== -1) out = out.replaceAll(from, to);
-                     }
-                     if (out !== t) n.nodeValue = out;
-                 }
-             }
-             function ensureBeforeRender() {
-                 try {
-                     normalizeData();
-                     replaceOldLabelsIn(document.getElementById("finish"));
-                     replaceOldLabelsIn(document.getElementById("pdfReport"));
-                 } catch (e) {}
-             }
-             let tries = 0;
-             const t = setInterval(() => {
-                 if (normalizeData() || ++tries > 40) clearInterval(t);
-             }, 150);
-             ["toQ2", "submitAll", "congratsPdf"].forEach((id) => {
-                 const el = document.getElementById(id);
-                 if (!el) return;
-                 el.addEventListener("click", ensureBeforeRender, { capture: true });
-             });
-             document.addEventListener("DOMContentLoaded", () => {
-                 ensureBeforeRender();
-                 setTimeout(ensureBeforeRender, 200);
-             });
-         })();
-      </script>
-      <!-- === End drop-in === -->
-      <script>
-         (function () {
-             // Map old->new
-             const MAP = {
-                 "Hospitality Skills": "Hospitality skills",
-                 "Hospitality Competencies": "BED competencies",
-                 "Taking Ownership": "Taking ownership",
-                 Collaboration: "Collaboration",
-             };
-             const TARGET_ORDER = ["Hospitality skills", "BED competencies", "Taking ownership", "Collaboration"];
-         
-             function normalizedOrder(S) {
-                 const byName = new Map();
-                 (S.groups || []).forEach((g) => byName.set(g.name, g));
-                 // Build using target order but include fallback to any extras
-                 const out = [];
-                 TARGET_ORDER.forEach((n) => {
-                     if (byName.has(n)) out.push(n);
-                 });
-                 (S.groups || []).forEach((g) => {
-                     if (!out.includes(g.name)) out.push(g.name);
-                 });
-                 return out;
-             }
-         
-             // Override renderGroupResults
-             const _render = window.renderGroupResults;
-             window.renderGroupResults = function () {
-                 const S = window.__S || window.S || {};
-                 // Normalize question tags
-                 (S.questions || []).forEach((q) => {
-                     if (MAP[q.group]) q.group = MAP[q.group];
-                 });
-                 // Normalize groups
-                 (S.groups || []).forEach((g) => {
-                     if (MAP[g.name]) g.name = MAP[g.name];
-                 });
-                 const order = normalizedOrder(S);
-                 const byPct = window.computeGroupPercents ? window.computeGroupPercents() : {};
-                 const holder = document.getElementById("groupResults");
-                 if (!holder) {
-                     if (typeof _render === "function") return _render();
-                     else return;
-                 }
-                 holder.innerHTML = "";
-                 order.forEach((name) => {
-                     const p = byPct[name] ?? 0;
-                     const row = document.createElement("div");
-                     row.className = "group-row";
-                     row.innerHTML = '<div class="group-label">' + name + "</div>" + '<div class="group-bar"><div class="fill" style="width:' + p + '%"></div></div>' + '<div class="group-pct">' + p + "%</div>";
-                     holder.appendChild(row);
-                 });
-             };
-         
-             // Override buildPdfReport
-             const _buildPdf = window.buildPdfReport;
-             window.buildPdfReport = function () {
-                 const S = window.__S || window.S || {};
-                 (S.questions || []).forEach((q) => {
-                     if (MAP[q.group]) q.group = MAP[q.group];
-                 });
-                 (S.groups || []).forEach((g) => {
-                     if (MAP[g.name]) g.name = MAP[g.name];
-                 });
-                 const order = normalizedOrder(S);
-                 // Call original to lay out the PDF shell first (date, name, totals, etc.)
-                 if (typeof _buildPdf === "function") _buildPdf();
-                 // Then replace the SCORE BY GROUP table using our normalized order
-                 const table = document.getElementById("pdfGroupTable");
-                 if (table) {
-                     table.innerHTML = "";
-                     const byPct = window.computeGroupPercents ? window.computeGroupPercents() : {};
-                     order.forEach((name) => {
-                         const tr = document.createElement("tr");
-                         const td1 = document.createElement("td");
-                         td1.textContent = name;
-                         const td2 = document.createElement("td");
-                         td2.textContent = (byPct[name] ?? 0) + "%";
-                         tr.appendChild(td1);
-                         tr.appendChild(td2);
-                         table.appendChild(tr);
-                     });
-                 }
-             };
-         })();
-      </script>
-      <script>
-         // === Final normalization & rendering vFinal ===
-         (function () {
-             const MAP = {
-                 "Hospitality Skills": "Hospitality skills",
-                 "Hospitality Competencies": "BED competencies",
-                 "Taking Ownership": "Taking ownership",
-                 Collaboration: "Collaboration",
-             };
-             const ORDER = ["Hospitality skills", "BED competencies", "Taking ownership", "Collaboration"];
-         
-             function normalizeAll() {
-                 const S = window.__S || window.S || {};
-                 if (Array.isArray(S.groups))
-                     S.groups.forEach((g) => {
-                         if (MAP[g.name]) g.name = MAP[g.name];
-                     });
-                 if (Array.isArray(S.questions))
-                     S.questions.forEach((q) => {
-                         if (MAP[q.group]) q.group = MAP[q.group];
-                     });
-             }
-             function byOrder(names) {
-                 const seen = new Set();
-                 const out = [];
-                 ORDER.forEach((n) => {
-                     if (names.includes(n) && !seen.has(n)) {
-                         out.push(n);
-                         seen.add(n);
-                     }
-                 });
-                 names.forEach((n) => {
-                     if (!seen.has(n)) out.push(n);
-                 });
-                 return out;
-             }
-         
-             // Replace scoring-page renderer
-             window.renderGroupResults = function () {
-                 normalizeAll();
-                 const S = window.__S || window.S || {};
-                 const holder = document.getElementById("groupResults");
-                 if (!holder) return;
-                 const pctMap = window.computeGroupPercents ? window.computeGroupPercents() : {};
-                 const descMap = {};
-                 (S.groups || []).forEach((g) => (descMap[g.name] = g.description || ""));
-                 const names = byOrder(Object.keys(descMap));
-                 holder.innerHTML = "";
-                 names.forEach((name) => {
-                     const p = pctMap[name] ?? 0;
-                     const wrap = document.createElement("div");
-                     wrap.className = "group-row";
-                     wrap.innerHTML = '<div class="group-line"><span class="group-name">' + name + '</span><span class="group-pct">' + p + "%</span></div>" + '<div class="group-desc">' + (descMap[name] || "") + "</div>";
-                     holder.appendChild(wrap);
-                 });
-             };
-         
-             // Replace PDF builder (keeps original totals/date/etc. from existing function)
-             const _origBuild = window.buildPdfReport;
-             window.buildPdfReport = function () {
-                 normalizeAll();
-                 if (typeof _origBuild === "function") _origBuild(); // lays out date, totals, info, statements
-         
-                 const S = window.__S || window.S || {};
-                 const body = document.getElementById("pdfGroupRows");
-                 if (!body) return;
-                 // Rebuild the SCORE BY GROUP rows with normalized order and clean labels
-                 body.innerHTML = "";
-                 const pctMap = window.computeGroupPercents ? window.computeGroupPercents() : {};
-                 const descMap = {};
-                 (S.groups || []).forEach((g) => (descMap[g.name] = g.description || ""));
-                 const names = byOrder(Object.keys(descMap));
-                 names.forEach((name) => {
-                     const tr = document.createElement("tr");
-                     const tdName = document.createElement("td");
-                     tdName.textContent = name;
-                     const tdPct = document.createElement("td");
-                     tdPct.textContent = (pctMap[name] ?? 0) + "%";
-                     const tdDesc = document.createElement("td");
-                     tdDesc.textContent = descMap[name] || "";
-                     tr.appendChild(tdName);
-                     tr.appendChild(tdPct);
-                     tr.appendChild(tdDesc);
-                     body.appendChild(tr);
-                 });
-             };
-         })();
-      </script>
-      <script>
-         // === Strong patch v2: force-normalize + recompute group % independent of S.groups ===
-         (function () {
-             const MAP = {
-                 "Hospitality Skills": "Hospitality skills",
-                 "Hospitality Competencies": "BED competencies",
-                 "Taking Ownership": "Taking ownership",
-                 Collaboration: "Collaboration",
-             };
-             const ORDER = ["Hospitality skills", "BED competencies", "Taking ownership", "Collaboration"];
-             const DESC_FALLBACK = {
-                 "Hospitality skills": "Practical service actions and daily guest care done the BED way.",
-                 "BED competencies": "Reading people and situations; proactive judgement; turning intent into consistent action.",
-                 "Taking ownership": "Acting independently, fixing problems, and sharing responsibility for outcomes.",
-                 Collaboration: "Building trust, communicating clearly, and helping across the BED community.",
-             };
-         
-             function normName(n) {
-                 return MAP[n] || n;
-             }
-         
-             function ensureNormalized() {
-                 const S = window.__S || window.S || {};
-                 if (Array.isArray(S.questions))
-                     S.questions.forEach((q) => {
-                         q.group = normName(q.group);
-                     });
-                 if (Array.isArray(S.groups))
-                     S.groups.forEach((g) => {
-                         g.name = normName(g.name);
-                         g.description = g.description || DESC_FALLBACK[g.name] || "";
-                     });
-             }
-         
-             // Override computeGroupPercents to derive from questions directly
-             window.computeGroupPercents = function () {
-                 ensureNormalized();
-                 const S = window.__S || window.S || {};
-                 const buckets = Object.create(null);
-                 (S.questions || []).forEach((q) => {
-                     const g = normName(q.group || "");
-                     if (!g) return;
-                     (buckets[g] ||= []).push(parseInt(S.answers[q.id], 10) || 0);
-                 });
-                 // Compute BED scale %
-                 const out = Object.create(null);
-                 Object.keys(buckets).forEach((g) => {
-                     const vals = buckets[g].filter((v) => v > 0);
-                     if (!vals.length) {
-                         out[g] = 0;
-                         return;
-                     }
-                     const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
-                     out[g] = Math.round(25 + ((avg - 1) / 4) * 75);
-                 });
-                 return out;
-             };
-         
-             function orderedNames() {
-                 ensureNormalized();
-                 const S = window.__S || window.S || {};
-                 const names = new Set();
-                 (S.questions || []).forEach((q) => {
-                     const n = normName(q.group);
-                     if (n) names.add(n);
-                 });
-                 (S.groups || []).forEach((g) => names.add(normName(g.name)));
-                 const arr = Array.from(names);
-                 // sort by ORDER
-                 const idx = (n) => {
-                     const i = ORDER.indexOf(n);
-                     return i === -1 ? 999 : i;
-                 };
-                 return arr.sort((a, b) => idx(a) - idx(b));
-             }
-         
-             function descMap() {
-                 ensureNormalized();
-                 const S = window.__S || window.S || {};
-                 const d = Object.create(null);
-                 (S.groups || []).forEach((g) => (d[g.name] = g.description || DESC_FALLBACK[g.name] || ""));
-                 // ensure fallbacks
-                 Object.keys(DESC_FALLBACK).forEach((k) => {
-                     if (!(k in d)) d[k] = DESC_FALLBACK[k];
-                 });
-                 return d;
-             }
-         
-             // Override renderers
-             window.renderGroupResults = function () {
-                 ensureNormalized();
-                 const holder = document.getElementById("groupResults");
-                 if (!holder) return;
-                 const pct = window.computeGroupPercents();
-                 const d = descMap();
-                 holder.innerHTML = "";
-                 orderedNames().forEach((name) => {
-                     const p = pct[name] ?? 0;
-                     const block = document.createElement("div");
-                     block.className = "group-row";
-                     block.innerHTML = '<div style="font-weight:700">' + name + " " + p + "%</div>" + '<div class="group-desc">' + (d[name] || "") + "</div>";
-                     holder.appendChild(block);
-                 });
-             };
-         
-             const _origBuild = window.buildPdfReport;
-             window.buildPdfReport = function () {
-                 ensureNormalized();
-                 if (typeof _origBuild === "function") _origBuild();
-                 const body = document.getElementById("pdfGroupRows");
-                 if (!body) return;
-                 body.innerHTML = "";
-                 const pct = window.computeGroupPercents();
-                 const d = descMap();
-                 orderedNames().forEach((name) => {
-                     const tr = document.createElement("tr");
-                     const td1 = document.createElement("td");
-                     td1.textContent = name;
-                     const td2 = document.createElement("td");
-                     td2.textContent = (pct[name] ?? 0) + "%";
-                     const td3 = document.createElement("td");
-                     td3.textContent = d[name] || "";
-                     tr.appendChild(td1);
-                     tr.appendChild(td2);
-                     tr.appendChild(td3);
-                     body.appendChild(tr);
-                 });
-             };
-         
-             // Ensure our overrides are active BEFORE submitAll runs
-             document.addEventListener("DOMContentLoaded", ensureNormalized);
-             // Also prime right before clicking submit
-             const sub = document.getElementById("submitAll");
-             if (sub) sub.addEventListener("click", ensureNormalized, { capture: true });
-             // And right before PDF print
-             const pdf = document.getElementById("congratsPdf");
-             if (pdf) pdf.addEventListener("click", ensureNormalized, { capture: true });
+             return 0;
+           }
          })();
       </script>
       <script>
@@ -1230,35 +896,6 @@
                  },
                  true
              );
-         })();
-      </script>
-      <script>
-         (function () {
-           // Date format: DDMMMYYYY (e.g., 24Sep2025)
-           function formatDateDDMMMYYYY(d = new Date()) {
-             const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-             const dd = String(d.getDate()).padStart(2, "0");
-             return `${dd}${mon[d.getMonth()]}${d.getFullYear()}`;
-           }
-         
-           // Try multiple sources to get overall % (robust)
-           function getOverallPct() {
-             try {
-               if (typeof window.computeOverallPercent === "function") {
-                 const v = window.computeOverallPercent();
-                 if (!isNaN(v)) return Math.round(v);
-               }
-             } catch (e) {}
-             try {
-               if (window.totals && typeof window.totals.pct === "number") return Math.round(window.totals.pct);
-             } catch (e) {}
-             const sp = document.getElementById("scorePercent");
-             if (sp) {
-               const m = sp.textContent.match(/(\d+)\s*%/);
-               if (m) return parseInt(m[1], 10);
-             }
-             return 0;
-           }
          })();
       </script>
    </body>
