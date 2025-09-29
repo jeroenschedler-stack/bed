@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BED – Peer Questions</title>
+
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#1E90FF">
   <script>
@@ -11,9 +12,39 @@
     navigator.serviceWorker.register('../sw.js', {scope: '../'});
   }
   </script>
+
+  <style>
+    :root{--blue:#1E90FF; --grey:#888;}
+    body{font-family:system-ui,Arial,sans-serif; margin:0; padding:24px;}
+    .container{max-width:640px; margin:0 auto;}
+    h1{font-size:26px; font-weight:700; margin:0;}
+    .subheader{font-size:20px; font-weight:600; margin:6px 0 18px; color:#444;}
+    .question{margin-bottom:20px;}
+    label{display:block; font-weight:600; margin-bottom:6px;}
+    textarea{width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; min-height:80px;}
+    .actions{margin-top:24px;}
+    .btn{padding:12px 16px; border-radius:10px; border:1px solid #ddd; font-size:16px; cursor:pointer;}
+    .btn-primary{background:var(--blue); color:#fff; border-color:var(--blue);}
+  </style>
 </head>
 <body>
-  <h1>Peer Review Questions – Page 1</h1>
-  <p>This is a placeholder page. Here we will build the peer review questions.</p>
+  <main class="container">
+    <h1>BED HOSPITALITY 2.0</h1>
+    <p class="subheader">Peer Reviewer – Questions Page 1</p>
+
+    <div class="question">
+      <label for="q1">1. What strengths do you see in this team member?</label>
+      <textarea id="q1"></textarea>
+    </div>
+
+    <div class="question">
+      <label for="q2">2. Which area could they improve?</label>
+      <textarea id="q2"></textarea>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" onclick="alert('Next page coming soon…')">Next</button>
+    </div>
+  </main>
 </body>
 </html>
