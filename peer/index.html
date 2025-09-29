@@ -37,8 +37,7 @@
 (function(){
   const installed =
     (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
-    window.navigator.standalone === true ||
-    localStorage.getItem('bed_installed') === '1';
+    window.navigator.standalone === true;
   if(!installed) location.replace('../install.html');
 })();
 </script>
