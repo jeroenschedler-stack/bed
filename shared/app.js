@@ -32,16 +32,22 @@ const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 document.title = cfg.title;
 document.body.innerHTML = `
   <header class="appHeader">
-    <h1>${cfg.title}</h1>
-    <p class="subheader" id="subheader">${cfg.subheaders.q1}</p>
-    <div class="progressDots" id="progress">
-      <span class="dot active"></span>
-      <span class="dot"></span>
-      <span class="dot"></span>
+    <div class="container">
+      <h1>${cfg.title}</h1>
+      <p class="subheader" id="subheader">${cfg.subheaders.q1}</p>
+      <div class="progressDots" id="progress">
+        <span class="dot active"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
     </div>
   </header>
 
-  <main id="screen"></main>
+  <main>
+    <div class="container">
+      <div id="screen"></div>
+    </div>
+  </main>
 
   <footer id="footer" class="appFooter"></footer>
 `;
