@@ -1,96 +1,136 @@
-:root{
-  --bg:#f6f8f9;
-  --text:#111;
-  --muted:#666;
-  --brand:#111;           /* header text */
-  --accent:#d23f57;       /* active dot + primary button */
-  --border:#e4e7ea;
-  --radius:12px;
-  --pad:16px;
-  --shadow:0 2px 10px rgba(0,0,0,.04);
-}
-
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0; background:var(--bg); color:var(--text);
-  font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif;
+/* ===== Reset & Base ===== */
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font:15px/1.5 "Segoe UI",Arial,sans-serif;
+  background:#fff;
+  color:#222;
 }
 
 /* ===== Header ===== */
-.appHeader{
-  position:sticky; top:0; z-index:3;
+.appHeader {
   background:#fff;
-  border-bottom:1px solid var(--border);
-  padding:14px var(--pad) 10px;
+  border-bottom:2px solid #ddd;
+  padding:14px 20px;
 }
-.appHeader h1{
-  margin:0 0 6px; font-size:20px; font-weight:800; color:var(--brand);
-  letter-spacing:.2px;
+.appHeader h1 {
+  margin:0;
+  font-size:22px;
+  font-weight:700;
 }
-.subheader{margin:0; color:var(--muted); font-weight:700; font-size:13px}
-
-/* Progress dots */
-.progressDots{display:flex; gap:8px; margin:8px 0 0}
-.progressDots .dot{
-  width:10px; height:10px; border-radius:50%;
-  background:#dfe3e6; border:1px solid #cfd6dc;
-}
-.progressDots .dot.active{background:var(--accent); border-color:var(--accent)}
-
-/* ===== Layout ===== */
-main{padding:var(--pad)}
-.container{max-width:860px; margin:0 auto}
-.card{
-  background:#fff; border:1px solid var(--border); border-radius:var(--radius);
-  box-shadow:var(--shadow); padding:18px; margin:12px 0 18px;
+.subheader {
+  margin:4px 0 0;
+  font-size:14px;
+  font-weight:600;
+  color:#666;
 }
 
-/* Fieldsets & inputs */
-fieldset{border:none; padding:0; margin:0 0 12px}
-legend{font-weight:800; margin:0 0 8px}
-label{display:block; font-weight:700; margin:10px 0 6px}
-input[type="email"], input[type="text"], select{
-  width:100%; padding:12px; border-radius:10px;
-  border:1px solid var(--border); background:#fff; outline:none;
+/* ===== Progress Dots ===== */
+.progressDots { margin-top:8px; }
+.progressDots .dot {
+  display:inline-block;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#ccc;
+  margin-right:6px;
 }
-input:focus, select:focus{border-color:var(--accent); box-shadow:0 0 0 3px rgba(210,63,87,.15)}
-
-/* Questions */
-.q{
-  border:1px solid var(--border); border-radius:10px;
-  padding:12px; margin:12px 0;
+.progressDots .dot.active {
+  background:#1e90ff;
 }
-.stmt{font-weight:800}
-.no{opacity:.65; margin-right:6px}
-.sub{color:var(--muted); font-size:13px; margin:4px 0 8px}
-.scale label{margin-right:14px; font-weight:700}
-.scale input{margin-right:6px}
 
-/* Summary table */
-.tableWrap{overflow:auto}
-table.summary{border-collapse:collapse; width:100%}
-table.summary th, table.summary td{
-  border:1px solid var(--border); padding:8px; text-align:left; vertical-align:top;
+/* ===== Card & Container ===== */
+.card {
+  margin:20px auto;
+  max-width:880px;
+  border:1px solid #ddd;
+  border-radius:8px;
+  padding:16px 20px;
+  background:#fafafa;
 }
-table.summary th{background:#fafbfc; font-weight:800}
-
-/* Buttons */
-.actions{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap}
-button{
-  appearance:none; border-radius:10px; border:1px solid #cfd6dc;
-  padding:10px 14px; background:#fff; cursor:pointer;
+.actions {
+  margin-top:16px;
+  text-align:right;
 }
-button.primary{background:var(--accent); color:#fff; border-color:var(--accent)}
-button.primary:focus{box-shadow:0 0 0 3px rgba(210,63,87,.2)}
-button.secondary{background:#fff}
-button:disabled{opacity:.6; cursor:not-allowed}
 
-/* Footer (optional) */
-.appFooter{padding:10px var(--pad) 24px; color:#888; font-size:12px}
+/* ===== Statement rows ===== */
+.statements-bar {
+  display:grid;
+  grid-template-columns:50px 1fr 160px 140px;
+  font-weight:700;
+  font-size:14px;
+  padding:8px 0;
+  border-bottom:2px solid #ccc;
+}
+.statements-table .q-row {
+  display:grid;
+  grid-template-columns:50px 1fr 160px 140px;
+  align-items:flex-start;
+  padding:10px 0;
+  border-bottom:1px solid #eee;
+}
+.q-num { font-weight:700; }
+.q-title { display:block; font-weight:600; }
+.q-sub { display:block; font-size:13px; color:#555; margin-top:3px; }
+.q-group { font-size:14px; color:#333; }
+.q-scale label { margin-right:10px; font-weight:600; }
+.q-scale input { margin-right:4px; }
 
-/* Width constraint on larger screens */
-@media (min-width:760px){
-  main{display:block}
-  .container{max-width:860px}
+/* ===== Inputs ===== */
+input[type="email"], input[type="text"] {
+  width:100%;
+  padding:10px;
+  font-size:15px;
+  border:1px solid #ccc;
+  border-radius:6px;
+}
+input:focus {
+  outline:none;
+  border-color:#1e90ff;
+  box-shadow:0 0 0 2px rgba(30,144,255,.2);
+}
+
+/* ===== Buttons ===== */
+button {
+  padding:8px 14px;
+  border:1px solid #ccc;
+  border-radius:6px;
+  font-size:15px;
+  cursor:pointer;
+}
+button.primary {
+  background:#1e90ff;
+  color:#fff;
+  border-color:#1e90ff;
+}
+button.secondary {
+  background:#fff;
+  color:#333;
+}
+button:disabled { opacity:0.5; }
+
+/* ===== Summary table ===== */
+.tableWrap { overflow-x:auto; }
+table.summary {
+  border-collapse:collapse;
+  width:100%;
+  margin-top:14px;
+}
+table.summary th, table.summary td {
+  border:1px solid #ddd;
+  padding:8px;
+  text-align:left;
+  font-size:14px;
+}
+table.summary th {
+  background:#f0f0f0;
+  font-weight:700;
+}
+
+/* ===== Footer ===== */
+.appFooter {
+  padding:14px 20px;
+  font-size:12px;
+  color:#888;
+  text-align:center;
 }
