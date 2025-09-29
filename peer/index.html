@@ -10,22 +10,26 @@
   <meta name="theme-color" content="#1E90FF">
   <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('../sw.js', {scope: '../'})
-      .catch(console.error);
+    navigator.serviceWorker.register('../sw.js', {scope: '../'}).catch(console.error);
   }
   </script>
 
   <style>
     :root{--blue:#1E90FF; --grey:#888;}
     body{font-family:system-ui,Arial,sans-serif; margin:0; padding:24px;}
-    .container{max-width:600px; margin:0 auto;}
+    .container{max-width:640px; margin:0 auto;}
     h1{font-size:28px; font-weight:700; margin:0;}
     .subheader{font-size:20px; font-weight:600; margin:4px 0 16px; color:#444;}
+    .section-title{font-size:20px; font-weight:700; margin:18px 0 8px;}
+    .hint{color:var(--grey); font-size:13px; margin:0 0 10px;}
+    .row{margin-bottom:12px;}
+    label{display:block; margin:8px 0 4px; font-weight:600;}
+    input,select{width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;}
+    .actions{margin-top:16px;}
+    .btn{padding:12px 16px; border-radius:10px; border:1px solid #ddd; font-size:16px; cursor:pointer;}
+    .btn-primary{background:var(--blue); color:#fff; border-color:var(--blue);}
     .progress{margin:12px 0;}
     .dot{height:10px;width:10px;margin:0 2px;background:#ddd;border-radius:50%;display:inline-block;}
-    label{display:block; margin:10px 0 4px; font-weight:600;}
-    input,select{width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;}
-    .row{margin-bottom:12px;}
   </style>
 </head>
 <body>
@@ -42,18 +46,22 @@
 <main class="container">
   <h1>BED HOSPITALITY 2.0</h1>
   <p class="subheader">PEER REVIEW FORM</p>
+
   <div class="progress" id="progressHeader">
     <span class="dot"></span><span class="dot"></span><span class="dot"></span>
     <span class="dot"></span><span class="dot"></span><span class="dot"></span>
   </div>
 
-  <section id="welcome">
+  <!-- SECTION 1: Peer reviewer details -->
+  <section id="peer">
     <h2 class="section-title">peer reviewer information</h2>
-    <div class="row"><label for="nick">your name</label><input id="nick" /></div>
-    <div class="row"><label for="email">your email</label><input id="email" type="email" /></div>
+    <p class="hint">your details</p>
+
+    <div class="row"><label for="peer_name">your name</label><input id="peer_name" autocomplete="name"></div>
+    <div class="row"><label for="peer_email">your email</label><input id="peer_email" type="email" autocomplete="email"></div>
     <div class="row">
-      <label for="hotel">your location</label>
-      <select id="hotel" required>
+      <label for="peer_location">your location</label>
+      <select id="peer_location" required>
         <option disabled selected value="">select hotel</option>
         <option>BED Changkian</option>
         <option>BED Phrasingh</option>
@@ -64,6 +72,33 @@
       </select>
     </div>
   </section>
+
+  <!-- SECTION 2: Team member being reviewed -->
+  <section id="subject">
+    <h2 class="section-title">team member being reviewed</h2>
+    <p class="hint">their details</p>
+
+    <div class="row"><label for="subject_name">team member name</label><input id="subject_name"></div>
+    <div class="row"><label for="subject_email">team member email (optional)</label><input id="subject_email" type="email"></div>
+    <div class="row">
+      <label for="subject_location">team member location</label>
+      <select id="subject_location" required>
+        <option disabled selected value="">select hotel</option>
+        <option>BED Changkian</option>
+        <option>BED Phrasingh</option>
+        <option>BED Nimman</option>
+        <option>BED Chiangmai Gate</option>
+        <option>BED Flying</option>
+        <option>BED Support</option>
+      </select>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button class="btn btn-primary" onclick="/* TODO: navigate to questions page */ alert('Continue to questions…')">
+      continue
+    </button>
+  </div>
 </main>
 </body>
 </html>
