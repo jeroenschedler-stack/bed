@@ -1,8 +1,24 @@
 import { MODES } from "./config.js";
 
-const mode = window.__MODE__ || "team";
-const cfg  = MODES[mode];
+function resolveMode() {
+  // 1) Preferred: data-mode on <html>
+  const dm = document.documentElement.dataset.mode;
+  if (dm === "team" || dm === "peer") return dm;
 
+  // 2) Legacy global (if ever used)
+  if (window.__MODE__ === "team" || window.__MODE__ === "peer") return window.__MODE__;
+
+  // 3) URL fallback (works on GitHub Pages)
+  const p = (location.pathname || "").toLowerCase();
+  if (p.includes("/peer/")) return "peer";
+  if (p.includes("/team/")) return "team";
+
+  return "team";
+}
+
+const mode = resolveMode();
+const cfg  = MODES[mode];
+console.log("Mode resolved as:", mode);
 // Set page title
 document.title = cfg.title;
 
