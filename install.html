@@ -110,9 +110,9 @@ function init(){
   };
 
   $("#openBtn").onclick = ()=>{
-    if(isStandalone()){ location.href = 'index.html'; } // Page 1
-    else toast('Please install BED first');
-  };
+  if(isStandalone()){ location.href = 'selection.html'; } // Page 1
+  else toast('Please install BED first');
+};
 }
 
 addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') updateOpenState(); });
