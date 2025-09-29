@@ -55,6 +55,16 @@
   </style>
 </head>
 <body>
+<script>
+(function(){
+  const installed =
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+    window.navigator.standalone === true ||
+    localStorage.getItem('bed_installed') === '1';
+  if(!installed) location.replace('install.html');
+})();
+</script>
+
   <div class="card">
     <h1>BED HOSPITALITY 2.0</h1>
     <h2 class="subheader">Self-assessment form</h2>
