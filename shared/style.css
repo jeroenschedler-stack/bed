@@ -2,7 +2,7 @@
 * { box-sizing:border-box; }
 body {
   margin:0;
-  font:15px/1.5 "Segoe UI",Arial,sans-serif;
+  font:15px/1.5 "Segoe UI", Arial, sans-serif;
   background:#fff;
   color:#222;
 }
@@ -53,15 +53,23 @@ body {
   text-align:right;
 }
 
-/* ===== Statement rows ===== */
+/* ===== Statements Header Bar ===== */
 .statements-bar {
   display:grid;
   grid-template-columns:50px 1fr 160px 140px;
-  font-weight:700;
+  align-items:center;
+  padding:10px 0;
+  border-bottom:2px solid #000;
+  background:#f0f0f0;
   font-size:14px;
-  padding:8px 0;
-  border-bottom:2px solid #ccc;
+  font-weight:700;
+  letter-spacing:0.2px;
 }
+.statements-bar .lbl-stmt { grid-column:2; }
+.statements-bar .lbl-group { grid-column:3; text-align:left; }
+.statements-bar .lbl-score { grid-column:4; text-align:left; }
+
+/* ===== Question Rows ===== */
 .statements-table .q-row {
   display:grid;
   grid-template-columns:50px 1fr 160px 140px;
@@ -109,7 +117,7 @@ button.secondary {
 }
 button:disabled { opacity:0.5; }
 
-/* ===== Summary table ===== */
+/* ===== Summary Table ===== */
 .tableWrap { overflow-x:auto; }
 table.summary {
   border-collapse:collapse;
@@ -133,4 +141,37 @@ table.summary th {
   font-size:12px;
   color:#888;
   text-align:center;
+}
+
+/* ===== Print Styles (PDF Export) ===== */
+@media print {
+  body { background:#fff; color:#000; }
+
+  .appHeader, .progressDots, .actions, .appFooter {
+    display:none !important;
+  }
+
+  .card {
+    border:none;
+    box-shadow:none;
+    padding:0;
+    margin:0;
+  }
+
+  .statements-bar {
+    font-size:12px;
+    border-bottom:1px solid #000;
+    background:#fff;
+  }
+
+  .statements-table .q-row {
+    font-size:12px;
+    border-bottom:1px solid #ccc;
+    padding:4px 0;
+  }
+
+  table.summary th, table.summary td {
+    font-size:11px;
+    padding:4px;
+  }
 }
