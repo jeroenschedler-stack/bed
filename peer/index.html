@@ -11,6 +11,17 @@
 
   <!-- Embedded questions (kept here, not in CSS) -->
   <script id="embeddedQuestions" type="application/json">[]</script>
+  <script>
+  // Force cache busting for CSS/JS links
+  document.addEventListener("DOMContentLoaded", () => {
+    const bust = Date.now(); // unique number every reload
+    document.querySelectorAll('link[rel="stylesheet"], script[src]').forEach(el => {
+      const attr = el.tagName === "LINK" ? "href" : "src";
+      el[attr] = el[attr] + (el[attr].includes("?") ? "&" : "?") + "v=" + bust;
+    });
+  });
+</script>
+
 </head>
     <body>
         <main class="container">
