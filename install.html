@@ -22,6 +22,16 @@
   .card ol{margin:8px 0; padding-left:20px;}
   .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#333; color:#fff; padding:10px 14px; border-radius:8px; font-size:14px; display:none;}
 </style>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1E90FF">
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js', {scope: './'})
+    .then(reg => console.log('SW registered', reg))
+    .catch(err => console.error('SW failed', err));
+}
+</script>
+
 </head>
 <body>
   <div class="wrap">
