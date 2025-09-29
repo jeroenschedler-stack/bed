@@ -1,1 +1,13 @@
-
+:root { --pad:16px; }
+*{box-sizing:border-box}
+body{font-family:system-ui, Arial, sans-serif; margin:var(--pad); line-height:1.5}
+h1{font-size:18px; margin:0 0 6px}
+.subheader{font-weight:600; margin:0 0 16px}
+label{display:block; margin:10px 0}
+#questions .q{padding:12px; border:1px solid #e5e5e5; border-radius:8px; margin:10px 0}
+#questions .stmt{font-weight:600}
+#questions .sub{font-size:13px; color:#555; margin:4px 0 8px}
+.scale label{margin-right:10px}
+button{padding:8px 12px; border:1px solid #ccc; border-radius:8px; background:#fff}
+#actions{margin-top:12px}
+#finish{margin-top:16px; padding:12px; border:1px dashed #bbb; border-radius:8px}
