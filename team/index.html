@@ -2,89 +2,365 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>BED – Team Member Form</title>
 
-  <!-- PWA -->
+  <!-- PWA essentials -->
   <link rel="manifest" href="../manifest.json">
   <meta name="theme-color" content="#1E90FF">
   <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('../sw.js', {scope: '../'}).catch(console.error);
-  }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('../sw.js')
+        .then(reg => console.log('SW registered', reg))
+        .catch(err => console.error('SW failed', err));
+    }
   </script>
 
+  <!-- CLEANED original CSS (single block, validator-safe) -->
   <style>
-    :root{--blue:#1E90FF; --grey:#888;}
-    body{font-family:system-ui,Arial,sans-serif; margin:0; padding:24px;}
-    .container{max-width:640px; margin:0 auto;}
-    h1{font-size:28px; font-weight:700; margin:0;}
-    .subheader{font-size:20px; font-weight:600; margin:4px 0 16px; color:#444;}
-    .section-title{font-size:20px; font-weight:700; margin:18px 0 8px;}
-    .hint{color:var(--grey); font-size:13px; margin:0 0 10px;}
-    .row{margin-bottom:12px;}
-    label{display:block; margin:8px 0 4px; font-weight:600;}
-    input,select{width:100%; padding:10px; border:1px solid #ddd; border-radius:8px;}
-    .actions{margin-top:16px;}
-    .btn{padding:12px 16px; border-radius:10px; border:1px solid #ddd; font-size:16px; cursor:pointer;}
-    .btn-primary{background:var(--blue); color:#fff; border-color:var(--blue);}
-    .progress{margin:12px 0;}
-    .dot{height:10px;width:10px;margin:0 2px;background:#ddd;border-radius:50%;display:inline-block;}
+    /* FINAL consolidated fixes */
+    @media print {
+      /* Score by Group rows */
+      #pdfReport #pdfGroupRows td {
+        padding: 8px 1px !important;
+        vertical-align: middle !important;
+        font-size: 12px !important;
+        text-align: left !important;
+      }
+      /* STATEMENTS header bar alignment */
+      #pdfReport .statements-bar {
+        display: grid !important;
+        grid-template-columns: 10% 55% 20% 15% !important; /* NO | STATEMENT | GROUP | SCORE */
+        align-items: center !important;
+        padding: 6px 10px !important;
+      }
+      #pdfReport .statements-bar .lbl-stmt {
+        grid-column: 1 / span 2 !important;
+        justify-self: start !important;
+        text-align: left !important;
+      }
+      #pdfReport .statements-bar .lbl-group {
+        grid-column: 3 !important;
+        justify-self: start !important;
+        text-align: left !important;
+      }
+      #pdfReport .statements-bar .lbl-score {
+        grid-column: 4 !important;
+        justify-self: center !important;
+        text-align: center !important;
+      }
+    }
+
+    :root{
+      --pad:20px; --label-w:96px; --gap:6px;
+      --brand-blue:#1E90FF; --blue:#1E90FF;
+      --progress-red:#E11D48; --progress-gray:#f3f4f6; --gray-300:#cfd4dc;
+      --text:#111; --muted:#555; --line:#e5e7eb;
+    }
+    *{box-sizing:border-box}
+    body{font-family:system-ui, Arial, sans-serif; background:#F9FAFB; color:var(--text); margin:0}
+    .container{width:100%; margin:0; padding:24px var(--pad)}
+
+    h1{
+      font-size:20pt;
+      margin:0 0 8px 0;
+      line-height:1.2;
+      font-weight:900;
+      color:#444;
+    }
+    .subheader{
+      font-size:15pt;
+      font-weight:800;
+      color:#444;
+      margin:0 0 12px 0;
+    }
+    .section-title{
+      font-size:18pt;
+      font-weight:700;
+      color:#444;
+      margin:18px 0 10px 0;
+      line-height:1.25;
+    }
+    .intro{
+      font-size:11pt;
+      font-weight:400;
+      line-height:1.4;
+      color:#444;
+      margin:4px 0 14px 0;
+    }
+
+    .progress{display:flex; gap:10px; margin:6px 0 16px 0}
+    .dot{
+      width:14px;
+      height:14px;
+      border-radius:50%;
+      background:var(--progress-gray);
+      border:1px solid #e5e7eb;
+    }
+    .dot.active{background:var(--progress-red); border-color:var(--progress-red)}
+
+    .row{display:grid; grid-template-columns:minmax(84px, var(--label-w)) 1fr; column-gap:var(--gap); align-items:center; margin:10px 0}
+    .row>label{
+      font-size:11pt;
+      font-weight:400;
+      color:#444;
+      white-space:normal;
+      word-break:break-word;
+    }
+    .row>input, .row>select{
+      width:100%; padding:10px 12px; font-size:10pt;
+      border:1px solid var(--gray-300); border-radius:10px;
+      background:#fff; transition:box-shadow .15s, border-color .15s
+    }
+    .row>input:focus, .row>select:focus{
+      outline:none; border-color:rgba(30,144,255,.8);
+      box-shadow:0 0 0 3px rgba(30,144,255,.18); background:#fff
+    }
+    select:invalid{color:#aaa}
+
+    .actions{padding-left:calc(var(--label-w) + var(--gap)); margin-top:14px; display:flex; gap:10px; justify-content:flex-end}
+    button{width:120px; height:42px; font-size:12pt; border:none; border-radius:14px; text-align:center;}
+    button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
+    button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
+    .btn-secondary{width:120px; height:42px; font-size:12pt;}
+
+    /* QUESTIONS */
+    .q-item{padding:12px 0; display:grid; grid-template-columns: 26px 1fr; column-gap:6px; align-items:baseline}
+    .q-num{font-size:11pt; font-weight:500; line-height:1.4; color:#444; text-align:right;}
+    .q-body{display:block}
+    .q-title{display:block; font-size:11pt; font-weight:500; margin:0 0 3px 0; line-height:1.4; color:#444;}
+    .q-sub{display:block; font-size:11pt; font-weight:400; margin:0 0 8px 0; line-height:1.4; color:#444;}
+    .pill{display:inline-block; width:30px; height:30px; line-height:30px; text-align:center; border:1px solid #cfcfcf; border-radius:50%; margin-right:10px; cursor:pointer; user-select:none; font-size:16px}
+    .pill.selected{background:var(--blue); color:#fff}
+
+    /* SCORE */
+    .score-kicker{font-size:10pt; font-weight:400; color:#999; margin:12px 0 8px 0}
+    .score-big{font-size:20pt; font-weight:900; color:#444; margin:0 0 24px 0}
+    .gauge{position:relative; height:28px; border-radius:8px; background:linear-gradient(90deg,#ef4444 0%, #f59e0b 35%, #fbbf24 50%, #84cc16 70%, #22c55e 100%);}
+    .gauge::after{content:""; position:absolute; top:-8px; bottom:-8px; width:10px; border-radius:6px; background:#444}
+
+    /* Congrats */
+    .big-check{width:120px; height:120px; border-radius:60px; background:var(--blue); display:flex; align-items:center; justify-content:center; margin:16px auto}
+    .big-check:after{content:'✔'; color:#fff; font-weight:800; font-size:54px}
+    .center{text-align:center}
+
+    @media (max-width:340px){
+      .row{grid-template-columns:1fr; row-gap:6px}
+      .actions{padding-left:0}
+      .q-item{grid-template-columns: 26px 1fr;}
+    }
+
+    /* PRINT: Blue-branded template */
+    #pdfReport{display:none}
+    @media print{
+      .row>label{font-size:11pt; font-weight:400; color:#444;}
+      body{background:#fff; color:#000}
+      main, .modal-backdrop{display:none !important}
+      #pdfReport{display:block; font-family:Arial, Helvetica, sans-serif; padding:18px 24px}
+
+      :root{ --blue:#1E90FF; }
+
+      .pdf-top{display:grid; grid-template-columns: 1fr 220px; gap:16px; align-items:start; margin-bottom:10px}
+      .pdf-title{font-size:45px; font-weight:1000; color:var(--blue); margin:0}
+      .pdf-sub{ font-size:30px; font-weight:600; color:var(--blue); margin:2px 0; line-height:1.2; text-align:left; }
+      .pdf-date{ font-size:18px; font-weight:500; color:var(--blue); margin:2px 0; line-height:1.2; text-align:left; }
+      .pdf-divider{height:1px; background:#cfd4dc; margin:8px 0 14px 0}
+
+      /* SCORE BOX */
+      .score-box{
+        background:var(--blue) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color:#fff !important;
+        border-radius:6px;
+        padding:12px 14px;
+        text-align:center;
+      }
+      .score-box .pct{font-size:40px; font-weight:900; margin:4px 0 2px 0}
+      .score-box .raw{ font-size:20px; font-weight:800; color:#fff !important; margin-bottom:6px; }
+    }
+
+    /* SECTION HEADERS */
+    .sec-h{
+      background:var(--blue) !important;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      color:#fff !important; font-weight:800; text-transform:uppercase;
+      padding:6px 10px; border-radius:4px; margin:16px 0 8px 0;
+    }
+    .pdf-top{ display:grid; grid-template-columns: 1fr 180px; gap:16px; align-items:start; margin-bottom:10px; }
+    .pdf-title { font-size:34px; font-weight:900; color:var(--blue); margin:0; }
+
+    /* TABLES */
+    table{width:100%; border-collapse:collapse}
+    th{
+      background:var(--blue) !important;
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+      color:#fff !important; font-weight:800; text-transform:uppercase; font-size:12px; padding:8px
+    }
+    td{border:1px solid #d1d5db; font-size:12px; padding:8px; vertical-align:top}
+    .muted{color:#666; font-size:11px}
+
+    /* Phase A, Step 1: only horizontal light blue lines */
+    @media print {
+      #pdfReport #pdfEmpName, #pdfReport #pdfEmpEmail, #pdfReport #pdfEmpHotel {
+        padding-left: 0 !important; padding-right: 0 !important;
+      }
+      #pdfReport table, #pdfReport th, #pdfReport td { border: none !important; }
+      #pdfReport td { border-bottom: 0.5px solid #87CEFA !important; }
+      #pdfReport tr:last-child td { border-bottom: none !important; }
+    }
+
+    /* Phase A — side borders removal (print only) */
+    @media print {
+      #pdfReport .card { border: 0 !important; box-shadow: none !important; }
+      #pdfReport table { border: 0 !important; border-collapse: collapse !important; }
+      #pdfReport th, #pdfReport td { border-left: 0 !important; border-right: 0 !important; }
+      #pdfReport td { border-bottom: 0.5px solid #87CEFA !important; }
+      #pdfReport tr:last-child td { border-bottom: none !important; }
+    }
+
+    /* A4 page size */
+    @media print { @page { size: A4; margin: 15mm; } }
+
+    /* Info table styling */
+    @media print {
+      #pdfReport #pdfInfoTable { table-layout: fixed; width: 100%; border-collapse: collapse; }
+      #pdfReport #pdfInfoTable td {
+        padding: 8px 1px !important; font-size: 12px !important; vertical-align: middle !important;
+        text-align: left !important; border-bottom: 0.5px solid #87CEFA !important;
+        overflow-wrap: anywhere; word-break: break-word;
+      }
+      #pdfReport #pdfInfoTable tr:last-child td { border-bottom: none !important; }
+      #pdfReport #pdfInfoTable td:nth-child(odd) { font-weight: 600; }
+    }
+
+    /* Assessment header bar & statements table */
+    @media print {
+      #pdfReport .assess-bar{
+        display:grid; grid-template-columns: 2fr 0.6fr 3fr; column-gap:0; align-items:center;
+      }
+      #pdfReport .assess-bar .lbl-group{ text-align:left; }
+      #pdfReport .assess-bar .lbl-pct{ text-align:center; }
+      #pdfReport .assess-bar .lbl-desc{ text-align:left; }
+    }
+    @media print {
+      #pdfReport .sec-h.assess-bar { margin-top:16px !important; margin-bottom:6px !important; padding:4px 8px !important; }
+    }
+    @media print { #pdfReport .statements-table { table-layout: fixed; width:100%; } }
+
+    /* Info-grid and statements alignment */
+    @media print {
+      #pdfReport .info-grid { display:grid !important; grid-template-columns: 50% 50%; width:100% !important; gap:0 0; }
+      #pdfReport .info-grid .card { display:grid !important; grid-template-columns: 40% 60%; box-sizing:border-box; width:100%; border:0 !important; box-shadow:none !important; padding-left:12px; padding-right:12px; }
+      #pdfReport .info-grid .card .label, #pdfReport .info-grid .card .kv-label { grid-column:1; text-align:left; }
+      #pdfReport .info-grid .card .value, #pdfReport .info-grid .card .kv-value { grid-column:2; text-align:left; }
+      #pdfReport .info-grid .card > * { break-inside: avoid; }
+    }
+
+    /* Align headers to columns */
+    #pdfReport .statements-bar .lbl-stmt { grid-column: 1; text-align: left; }
+    #pdfReport .statements-bar .lbl-group { grid-column: 3; text-align: left; }
+    #pdfReport .statements-bar .lbl-score { grid-column: 4; text-align: center; }
+    #pdfReport .statements-table td:nth-child(1) { text-align: left; }
+    #pdfReport .statements-table td:nth-child(2) { text-align: left; }
+    #pdfReport .statements-table td:nth-child(3) { text-align: left; }
+    #pdfReport .statements-table td:nth-child(4) { text-align: center; }
+
+    /* Remove duplicate header rows under blue bar */
+    @media print {
+      #pdfReport .statements-bar { padding-left:0 !important; padding-right:0 !important; margin-left:0 !important; margin-right:0 !important; }
+      #pdfReport .statements-bar span { margin:0 !important; padding:0 !important; }
+      #pdfReport #pdfStatements thead,
+      #pdfReport #pdfStatements thead tr,
+      #pdfReport #pdfStatements thead th { display:none !important; }
+    }
+
+    /* Info section label weight (screen + print) */
+    #pdfReport .info-grid .fields { align-items:center !important; }
+    #pdfReport .info-grid .fields label { font-weight:400 !important; }
+
+    /* Match blue header height */
+    @media print { #pdfReport .statements-bar { padding:6px 10px !important; margin:16px 0 8px 0 !important; } }
+    #pdfReport .statements-bar { padding:6px 10px !important; margin:16px 0 8px 0 !important; }
+
+    /* Number circle utility */
+    .number-circle{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:28px; height:28px; border-radius:50%;
+      background-color:#1e90ff; color:#fff; font-size:16px; font-weight:bold; margin-right:10px;
+    }
+    .step{ display:flex; align-items:center; margin-top:8px; font-size:18px; color:#374151; }
+
+    /* scoring page group line layout */
+    .group-line{ display:flex; justify-content:space-between; align-items:center; font-weight:600; margin:2px 0; }
+
+    /* canonical widths for statements */
+    #pdfReport .statements-bar{
+      display:grid !important; grid-template-columns:10% 55% 20% 15% !important;
+      align-items:center !important; padding:6px 10px !important;
+    }
+    @media print {
+      #pdfReport .statements-table { table-layout:fixed; width:100%; }
+      #pdfReport .statements-table col:nth-child(1){ width:10% !important; }
+      #pdfReport .statements-table col:nth-child(2){ width:55% !important; }
+      #pdfReport .statements-table col:nth-child(3){ width:20% !important; }
+      #pdfReport .statements-table col:nth-child(4){ width:15% !important; }
+    }
+    /* visually hidden utility */
+    .visually-hidden{
+      position:absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+    }
   </style>
 </head>
 <body>
-<script>
-(function(){
-  const installed =
-    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
-    window.navigator.standalone === true;
-  if(!installed) location.replace('../install.html');
-})();
-</script>
+  <!-- Guard: only allow when app is installed -->
+  <script>
+    (function(){
+      const installed =
+        (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+        window.navigator.standalone === true;
+      if(!installed) location.replace('../install.html');
+    })();
+  </script>
 
-<main class="container">
-  <h1>BED HOSPITALITY 2.0</h1>
-  <p class="subheader">TEAM MEMBER FORM</p>
+  <main class="container">
+    <h1>BED HOSPITALITY 2.0</h1>
+    <p class="subheader">TEAM MEMBER FORM</p>
 
-  <div class="progress" id="progressHeader">
-    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-  </div>
-
-  <!-- SECTION 1: Team member details -->
-  <section id="member">
-    <h2 class="section-title">team member information</h2>
-    <p class="hint">your details</p>
-
-    <div class="row"><label for="member_name">your name</label><input id="member_name" autocomplete="name"></div>
-    <div class="row"><label for="member_email">your email</label><input id="member_email" type="email" autocomplete="email"></div>
-    <div class="row">
-      <label for="member_location">your location</label>
-      <select id="member_location" required>
-        <option disabled selected value="">select hotel</option>
-        <option>BED Changkian</option>
-        <option>BED Phrasingh</option>
-        <option>BED Nimman</option>
-        <option>BED Chiangmai Gate</option>
-        <option>BED Flying</option>
-        <option>BED Support</option>
-      </select>
+    <div class="progress" id="progressHeader">
+      <span class="dot active"></span><span class="dot"></span><span class="dot"></span>
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
     </div>
-  </section>
 
-  <!-- SECTION 2: Reviewer details (optional) -->
-  <section id="reviewer">
-    <h2 class="section-title">reviewer information</h2>
-    <p class="hint">if someone else is filling this form for you</p>
+    <!-- SECTION 1: Team member details -->
+    <section id="member">
+      <h2 class="section-title">team member information</h2>
+      <div class="row"><label for="member_name">your name</label><input id="member_name" autocomplete="name"></div>
+      <div class="row"><label for="member_email">your email</label><input id="member_email" type="email" autocomplete="email"></div>
+      <div class="row">
+        <label for="member_location">your location</label>
+        <select id="member_location" required>
+          <option disabled selected value="">select hotel</option>
+          <option>BED Changkian</option>
+          <option>BED Phrasingh</option>
+          <option>BED Nimman</option>
+          <option>BED Chiangmai Gate</option>
+          <option>BED Flying</option>
+          <option>BED Support</option>
+        </select>
+      </div>
+    </section>
 
-    <div class="row"><label for="reviewer_name">reviewer name</label><input id="reviewer_name"></div>
-    <div class="row"><label for="reviewer_email">reviewer email</label><input id="reviewer_email" type="email"></div>
-  </section>
+    <!-- SECTION 2: Reviewer details (optional) -->
+    <section id="reviewer">
+      <h2 class="section-title">reviewer information</h2>
+      <div class="row"><label for="reviewer_name">reviewer name</label><input id="reviewer_name"></div>
+      <div class="row"><label for="reviewer_email">reviewer email</label><input id="reviewer_email" type="email"></div>
+    </section>
 
-  <div class="actions">
-    <button class="btn btn-primary" onclick="location.href='questions-part1.html'">continue</button>
-
-  </div>
-</main>
+    <div class="actions">
+      <button class="btn-primary" onclick="location.href='questions-part1.html'">continue</button>
+    </div>
+  </main>
 </body>
 </html>
