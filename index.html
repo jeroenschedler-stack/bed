@@ -1,129 +1,57 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>BED HOSPITALITY 2.0</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BED – Index</title>
 
+  <!-- PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#1E90FF">
-  <link rel="icon" href="icon-192.png" sizes="192x192">
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js', {scope: './'})
+      .catch(console.error);
+  }
+  </script>
 
+  <!-- Styles -->
   <style>
-    body {
-      display:flex;
-      min-height:100vh;
-      align-items:center;
-      justify-content:center;
-      font-family:system-ui,Arial,sans-serif;
-    }
-    .card {
-      padding:24px;
-      border:1px solid #ddd;
-      border-radius:12px;
-      text-align:center;
-    }
-    h1 {
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    h2.subheader {
-      font-size: 16px;
-      font-weight: 500;
-      margin-top: 0;
-      margin-bottom: 20px;
-      color: #444;
-    }
-    .btn {
-      display:inline-block;
-      margin:8px 6px;
-      padding:10px 16px;
-      border-radius:8px;
-      text-decoration:none;
-      border:1px solid #1E90FF;
-      min-width: 200px; /* ensures same width */
-    }
-    .btn.primary {
-      background:#1E90FF;
-      color:#fff;
-    }
-    .btn.secondary {
-      background:#fff;
-      color:#434343; /* dark grey */
-    }
+    :root{--blue:#1E90FF; --grey:#888;}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,Arial,sans-serif; margin:0; padding:24px;}
+    .wrap{max-width:480px; margin:0 auto;}
+    .h1{font-weight:700; font-size:28px; line-height:1.1; margin:0;}
+    .h2{font-weight:700; font-size:24px; line-height:1.2; margin:2px 0 16px;}
+    .btn{width:100%; padding:14px 16px; border:1px solid #ddd; border-radius:10px; font-size:16px; cursor:pointer; margin-top:10px;}
+    .btn-primary{background:var(--blue); color:#fff; border-color:var(--blue);}
+    .note{color:var(--grey); font-size:14px; margin:4px 0 14px;}
+    footer{margin-top:36px; color:var(--grey); font-size:12px; text-align:center;}
   </style>
 </head>
 <body>
-<script>
-(function(){
-  const installed =
-    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
-    window.navigator.standalone === true ||
-    localStorage.getItem('bed_installed') === '1';
-  if(!installed) location.replace('install.html');
-})();
-</script>
+  <!-- Hard gate: force install first -->
+  <script>
+  (function(){
+    const installed =
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+      window.navigator.standalone === true ||
+      localStorage.getItem('bed_installed') === '1';
+    if(!installed) location.replace('install.html');
+  })();
+  </script>
 
-  <div class="card">
-    <h1>BED HOSPITALITY 2.0</h1>
-    <h2 class="subheader">Self-assessment form</h2>
-    <p>
-      <a class="btn primary" href="team/">I am a team member</a>
-      <a class="btn secondary" href="peer/">I am a peer reviewer</a>
-    </p>
+  <div class="wrap">
+    <div class="h1">BED Hospitality 2.0</div>
+    <div class="h2">Select your role</div>
+
+    <button class="btn btn-primary" onclick="location.href='team/index.html'">I am a team member</button>
+    <p class="note">click if you will assess yourself</p>
+
+    <button class="btn" onclick="location.href='peer/index.html'">I am a peer reviewer</button>
+    <p class="note">click if you will review a team member</p>
+
+    <footer>© BED Hotels 2025</footer>
   </div>
-  <!-- Install Overlay -->
-<div id="installOverlay" style="position:fixed; inset:0; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; text-align:center; padding:20px;">
-  <h2 style="margin-bottom:12px;">Install BED Hospitality 2.0</h2>
-  <p style="max-width:320px; font-size:16px; color:#444; line-height:1.4;">
-    For the best experience, please install this app on your home screen before starting.
-  </p>
-  <button id="installBtn" style="margin-top:20px; padding:10px 18px; border:none; border-radius:6px; background:#1E90FF; color:#fff; font-size:16px; cursor:pointer;">
-    Install now
-  </button>
-  <button id="confirmInstalled" style="margin-top:10px; padding:10px 18px; border:1px solid #ccc; border-radius:6px; background:#f8f8f8; color:#333; font-size:16px; cursor:pointer;">
-    I already installed
-  </button>
-</div>
-
-<script>
-  const card = document.querySelector(".card");
-  const overlay = document.getElementById("installOverlay");
-  let deferredPrompt;
-
-  // Hide main content initially
-  card.style.display = "none";
-
-  // If already confirmed earlier, skip overlay
-  if (localStorage.getItem("appInstalled") === "true") {
-    overlay.style.display = "none";
-    card.style.display = "block";
-  }
-
-  // Capture browser's install prompt
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    document.getElementById("installBtn").onclick = async () => {
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === "accepted") {
-        finishInstall();
-      }
-      deferredPrompt = null;
-    };
-  });
-
-  // Fallback confirm
-  document.getElementById("confirmInstalled").onclick = finishInstall;
-
-  function finishInstall() {
-    overlay.style.display = "none";
-    card.style.display = "block";
-    localStorage.setItem("appInstalled", "true");
-  }
-</script>
-
 </body>
 </html>
