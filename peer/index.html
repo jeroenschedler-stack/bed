@@ -339,23 +339,24 @@
                  return wrap;
              }
          
-             async function loadQuestions() {
-                 try {
-                     const res = await fetch("questions.json", { cache: "no-store" });
-                     if (!res.ok) throw new Error("fetch failed");
-                     const data = await res.json();
-                     S.questions = data.questions || [];
-                     S.groups = data.groups || [];
-                 } catch (e) {
-                     S.questions = [];
-                     S.groups = [
-                         { name: "Hospitality skills", description: "Practical service actions and daily guest care done the BED way." },
-                         { name: "BED competencies", description: "Reading people and situations; proactive judgement; turning intent into consistent action." },
-                         { name: "Taking ownership", description: "Acting independently, fixing problems, and sharing responsibility for outcomes." },
-                         { name: "Collaboration", description: "Building trust, communicating clearly, and helping across the BED community." },
-                     ];
-                 }
-             }
+  async function loadQuestions() {
+  try {
+    const res = await fetch("../data/questions_peer.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("fetch failed");
+    const data = await res.json();
+    S.questions = data.questions || [];
+    S.groups = data.groups || [];
+  } catch (e) {
+    S.questions = [];
+    S.groups = [
+      { "name": "Hospitality skills", "description": "Basic skills for daily tasks and guests services" },
+      { "name": "BED competencies", "description": "Advanced ability to read people and situations" },
+      { "name": "Taking ownership", "description": "Acting independently and sharing responsibility" },
+      { "name": "Collaboration", "description": "Building trust and helping others across BED" }
+    ];
+  }
+}
+
          
   function validateWelcome() {
   const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -766,12 +767,13 @@
                  Collaboration: "Collaboration",
              };
              const ORDER = ["Hospitality skills", "BED competencies", "Taking ownership", "Collaboration"];
-             const DESC = {
-                 "Hospitality skills": "Practical service actions and daily guest care done the BED way.",
-                 "BED competencies": "Reading people and situations; proactive judgement; turning intent into consistent action.",
-                 "Taking ownership": "Acting independently, fixing problems, and sharing responsibility for outcomes.",
-                 Collaboration: "Building trust, communicating clearly, and helping across the BED community.",
-             };
+            const DESC = {
+  "Hospitality skills": "Basic skills for daily tasks and guests services",
+  "BED competencies": "Advanced ability to read people and situations",
+  "Taking ownership": "Acting independently and sharing responsibility",
+  "Collaboration": "Building trust and helping others across BED",
+};
+
              const norm = (n) => MAP[n] || n;
          
              function S() {
