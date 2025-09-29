@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BED – Install</title>
+<style>
+  :root{--blue:#1E90FF; --grey:#888;}
+  body{font-family: system-ui, Arial, sans-serif; margin:0; padding:24px;}
+  .wrap{max-width:480px; margin:0 auto;}
+  .h1{font-weight:700; font-size:28px; line-height:1.1; margin:0;}
+  .h2{font-weight:600; font-size:20px; line-height:1.2; margin:6px 0 24px;}
+  .note{color:var(--grey); font-size:14px; margin:0 0 6px;}
+  .btn{width:100%; padding:14px 16px; border:1px solid #ddd; border-radius:10px; font-size:16px; cursor:pointer;}
+  .btn-primary{background:var(--blue); color:#fff; border-color:var(--blue);}
+  .btn[disabled]{opacity:.45; cursor:not-allowed; background:#f2f2f2; color:#999; border-color:#e5e5e5;}
+  .spacer{height:16px;}
+  .checklist{color:var(--grey); font-size:13px; margin:8px 0 16px; padding-left:18px;}
+  .ios{position:fixed; inset:0; background:rgba(0,0,0,.5); display:none; align-items:center; justify-content:center;}
+  .card{background:#fff; padding:16px; border-radius:12px; max-width:420px; box-shadow:0 6px 30px rgba(0,0,0,.15);}
+  .card h3{margin:0 0 8px; font-size:18px;}
+  .card ol{margin:8px 0; padding-left:20px;}
+  .toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#333; color:#fff; padding:10px 14px; border-radius:8px; font-size:14px; display:none;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="h1">BED Hospitality 2.0</div>
+    <div class="h2">Self-Assessment Form</div> <!-- change this line if you want another subheader -->
+
+    <div class="checklist"><strong>Install BED once — use it for all future forms</strong>
+      <ul>
+        <li>Faster and offline</li>
+        <li>One tap from Home Screen</li>
+        <li>Works for all BED tools</li>
+      </ul>
+    </div>
+
+    <p class="note">add the BED app to your home screen</p>
+    <button id="installBtn" class="btn btn-primary">install app</button>
+
+    <div class="spacer"></div>
+
+    <p class="note">then open the app</p>
+    <button id="openBtn" class="btn" disabled>open BED app</button>
+  </div>
+
+  <!-- iOS instructions -->
+  <div id="ios" class="ios" role="dialog" aria-modal="true">
+    <div class="card">
+      <h3>Add to Home Screen</h3>
+      <ol>
+        <li>Tap the <em>Share</em> icon in Safari</li>
+        <li>Tap <strong>Add to Home Screen</strong></li>
+        <li>Open <strong>BED</strong> from your Home Screen</li>
+      </ol>
+      <button id="iosClose" class="btn" style="margin-top:8px;">OK</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Please install BED first</div>
+
+<script>
+let deferredPrompt=null;
+
+const isStandalone = () =>
+  window.matchMedia('(display-mode: standalone)').matches ||
+  window.navigator.standalone === true ||
+  localStorage.getItem('bed_installed') === '1';
+
+const $ = (s)=>document.querySelector(s);
+const toast = (t)=>{
+  const el=$("#toast"); el.textContent=t; el.style.display='block';
+  setTimeout(()=>el.style.display='none',1800);
+};
+
+addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault(); deferredPrompt=e;
+});
+
+addEventListener('appinstalled', ()=>{
+  localStorage.setItem('bed_installed','1');
+  updateOpenState();
+});
+
+function showIOSHowTo(){
+  $("#ios").style.display='flex';
+}
+$("#iosClose").onclick=()=>$("#ios").style.display='none';
+
+function updateOpenState(){
+  const on = isStandalone();
+  const ob = $("#openBtn");
+  ob.disabled=!on;
+  if(on){ ob.classList.add('btn-primary'); } else { ob.classList.remove('btn-primary'); }
+}
+
+function init(){
+  updateOpenState();
+
+  $("#installBtn").onclick = async ()=>{
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      setTimeout(updateOpenState, 500);
+    }else{
+      showIOSHowTo();
+    }
+  };
+
+  $("#openBtn").onclick = ()=>{
+    if(isStandalone()){ location.href = 'index.html'; } // Page 1
+    else toast('Please install BED first');
+  };
+}
+
+addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='visible') updateOpenState(); });
+init();
+</script>
+</body>
+</html>
