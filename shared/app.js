@@ -271,25 +271,39 @@ function escapeHtml(s) {
 
 function $all(sel) { return Array.from(document.querySelectorAll(sel)); }
 
+
 /* ---------- Data load & boot ---------- */
+function normalizeQuestions(list) {
+  // Map {id,...} OR {no,...} → {no, group, statement, subtext}
+  return (Array.isArray(list) ? list : []).map(q => ({
+    no: q.no ?? q.id,                 // accept id or no
+    group: q.group ?? "",
+    statement: q.statement ?? "",
+    subtext: q.subtext ?? "",
+    part: q.part                      // optional; if present we’ll use it
+  })).filter(q => q.no != null);
+}
+
 async function boot() {
-  // Load questions JSON
-  const all = await fetch(cfg.questionsFile).then(r => r.json()).catch(()=>[]);
-  // Split into Part 1 / Part 2 by simple rule:
-  // If your JSON already has "part": 1|2, use that.
-  // Otherwise split by counts in config (first N = q1, next M = q2).
+  // Load JSON which has shape: { groups: [...], questions: [...] }
+  const raw = await fetch(cfg.questionsFile).then(r => r.json()).catch(()=>({questions:[]}));
+  const all = normalizeQuestions(raw.questions || raw);  // support either wrap or flat array
+
+  // Split into Part 1 & 2
   let q1 = [], q2 = [];
-  if (all.length && all[0] && (all[0].part !== undefined)) {
+  if (all.length && all[0] && all[0].part !== undefined) {
     q1 = all.filter(x => x.part === 1);
     q2 = all.filter(x => x.part === 2);
   } else {
-    q1 = all.slice(0, clamp(cfg.required.q1, 0, all.length));
-    q2 = all.slice(clamp(cfg.required.q1, 0, all.length));
+    const n1 = cfg.required.q1;                 // 18
+    q1 = all.slice(0, n1);
+    q2 = all.slice(n1);
   }
+
   state.q1 = q1;
   state.q2 = q2;
 
-  // TEMP badge so we can see mode (remove later)
+  // TEMP badge so we see mode (remove later)
   document.body.insertAdjacentHTML(
     "afterbegin",
     `<div id="modeBadge" style="position:fixed;top:8px;right:8px;padding:4px 8px;border:1px solid #ccc;border-radius:6px;background:#fff;font:12px/1.2 system-ui;z-index:9999;">Mode: ${mode}</div>`
