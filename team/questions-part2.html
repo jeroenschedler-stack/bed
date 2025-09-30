@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BED – Team Questions Page 2</title>
+  <link rel="stylesheet" href="../shared/style.css?v=1">
+</head>
+<body>
+  <main class="container">
+    <h1>BED HOSPITALITY 2.0</h1>
+    <h2>Team Member – Questions Page 2</h2>
+
+    <form id="questions"></form>
+
+    <div class="actions">
+      <button type="button" onclick="location.href='questions-part1.html'">Back</button>
+      <button type="button" id="nextBtn">Next</button>
+    </div>
+  </main>
+
+  <script>
+    fetch('../data/questions_team.json')
+      .then(r => r.json())
+      .then(data => {
+        const wrap = document.getElementById('questions');
+        // Load only questions 6–10 as Page 2
+        data.questions.slice(5,10).forEach((q, i) => {
+          const div = document.createElement('div');
+          div.className = 'q-item';
+          div.innerHTML = `
+            <div class="q-num">${i+6}.</div>
+            <div class="q-body">
+              <div class="q-title">${q.statement}</div>
+              <div class="q-sub">${q.subtext || ''}</div>
+              <input type="text" />
+            </div>`;
+          wrap.appendChild(div);
+        });
+      });
+
+    document.getElementById('nextBtn').onclick = () => {
+      location.href = 'questions-part3.html'; // or scoring.html if last page
+    };
+  </script>
+</body>
+</html>
