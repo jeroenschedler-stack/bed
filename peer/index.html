@@ -270,14 +270,14 @@
 </head>
 <body>
   <!-- Guard: only allow when app is installed -->
-  <script>
-    (function(){
-      const installed =
-        (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
-        window.navigator.standalone === true;
-      if(!installed) location.replace('../install.html');
-    })();
-  </script>
+ <script>
+  (function(){
+    const installed =
+      (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+      window.navigator.standalone === true;
+    if(!installed) location.replace('../selection.html');
+  })();
+</script>
 
   <main class="container">
     <h1>BED HOSPITALITY 2.0</h1>
