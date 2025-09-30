@@ -1,0 +1,33 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BED – Team Scoring</title>
+<style>body{font-family:system-ui,Arial,sans-serif;margin:0;background:#F9FAFB;color:#111}
+.wrap{max-width:720px;margin:0 auto;padding:24px}h1{margin:0 0 6px;font-weight:900}
+.card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:16px;margin-top:12px}
+.kpi{font-size:28px;font-weight:900;margin:0}table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border-bottom:1px solid #eee;padding:8px 6px;text-align:left}
+.btn{display:inline-block;margin-top:14px;padding:10px 14px;border-radius:10px;background:#1E90FF;color:#fff;text-decoration:none}
+.muted{color:#666;font-size:13px}</style></head><body><main class="wrap">
+<h1>BED HOSPITALITY 2.0</h1><p class="muted">Team – Results</p>
+<div class="card"><div id="overall" class="kpi">—</div><div class="muted">overall average (1–5)</div></div>
+<div class="card"><table id="byGroup"><thead><tr><th>Group</th><th>Avg</th></tr></thead><tbody></tbody></table></div>
+<a class="btn" href="../selection.html">Back to selection</a>
+</main>
+<script>
+(async () => {
+  const answers = JSON.parse(localStorage.getItem('bed_team_answers')||'{}');
+  const res = await fetch('../data/questions_team.json'); // loads original items :contentReference[oaicite:0]{index=0}
+  const data = await res.json();
+  const qByGroup = {};
+  data.questions.forEach(q => { if(answers[q.id]) (qByGroup[q.group] ||= []).push(answers[q.id]); });
+  const avg = arr => arr.reduce((a,b)=>a+b,0)/arr.length;
+  const allVals = Object.values(answers);
+  document.getElementById('overall').textContent = allVals.length ? avg(allVals).toFixed(2) : '—';
+  const tbody = document.querySelector('#byGroup tbody');
+  Object.keys(qByGroup).forEach(g=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${g}</td><td>${avg(qByGroup[g]).toFixed(2)}</td>`;
+    tbody.appendChild(tr);
+  });
+})();
+</script></body></html>
