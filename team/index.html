@@ -664,29 +664,9 @@
                 <p class="intro">
                     Read each statement and think how you act in these situations. Then select the rating that best fits you. Be honest with yourself. The goal is to know what you're good at and what you can do better
                 </p>
-                <h2 class="section-title">RATING</h2>
-                <ul class="scale-list" style="list-style: none; padding: 0; margin: 10px 0;">
-                    <li class="scale-item" style="display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12pt;">
-                        <span class="badge" style="width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700;">1</span>
-                        <span>I am not so good at this</span>
-                    </li>
-                    <li class="scale-item" style="display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12pt;">
-                        <span class="badge" style="width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700;">2</span>
-                        <span>I need to be better at this</span>
-                    </li>
-                    <li class="scale-item" style="display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12pt;">
-                        <span class="badge" style="width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700;">3</span>
-                        <span>I normally at this</span>
-                    </li>
-                    <li class="scale-item" style="display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12pt;">
-                        <span class="badge" style="width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700;">4</span>
-                        <span>I am average at this</span>
-                    </li>
-                    <li class="scale-item" style="display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12pt;">
-                        <span class="badge" style="width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700;">5</span>
-                        <span>I am very good at this</span>
-                    </li>
-                </ul>
+              <h2 class="section-title">RATING</h2>
+<ul id="ratingList" class="scale-list" style="list-style: none; padding: 0; margin: 10px 0;"></ul>
+
                 <br />
                 <br />
                 <div class="actions">
@@ -2007,5 +1987,21 @@
                 return 0;
             })()
         </script>
+    <script>
+  function renderRatings(listEl, mode){ // mode = "team" or "peer"
+    listEl.innerHTML = CONFIG.ratings[mode]
+      .map((label,i)=>`
+        <li class="scale-item" style="display:flex;align-items:center;gap:10px;margin:8px 0;font-size:12pt;">
+          <span class="badge" style="width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-weight:700;">${i+1}</span>
+          <span>${label}</span>
+        </li>`).join('');
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const ul = document.getElementById("ratingList");
+    if(ul) renderRatings(ul,"team");
+  });
+</script>
+
     </body>
 </html>
