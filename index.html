@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>BED HOSPITALITY 2.0 — Self-Assessment</title>
+  <meta name="description" content="Choose your form: Team Member or Peer Reviewer." />
+  <style>
+    :root { --max: 720px; --radius: 16px; --pad: 20px; --gap: 16px; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, Arial, sans-serif; line-height: 1.4; background:#f7f7f7; }
+    .wrap { min-height: 100dvh; display: grid; place-items: center; padding: 24px; }
+    .card {
+      width: 100%; max-width: var(--max); background: #fff; border-radius: var(--radius);
+      padding: clamp(16px, 3vw, 32px); box-shadow: 0 6px 30px rgba(0,0,0,.08);
+    }
+    h1 { margin: 0 0 6px 0; font-size: clamp(20px, 4.2vw, 28px); letter-spacing: .2px; }
+    .sub { color: #444; margin: 0 0 22px 0; font-size: 15px; }
+    .grid { display: grid; gap: var(--gap); grid-template-columns: 1fr; }
+    @media (min-width: 640px) { .grid { grid-template-columns: 1fr 1fr; } }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 16px; border-radius: 12px; border: 2px solid #e6e6e6; background: #fafafa;
+      font-weight: 700; font-size: 16px; text-decoration: none; color: #111; cursor: pointer;
+      transition: transform .04s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+    }
+    .btn:focus { outline: 3px solid #1E90FF55; outline-offset: 2px; }
+    .btn:hover { background:#fff; border-color:#d9d9d9; box-shadow: 0 8px 22px rgba(0,0,0,.06); }
+    .btn:active { transform: translateY(1px); }
+    .hint { margin-top: 14px; font-size: 13px; color: #666; }
+    .foot { margin-top: 22px; font-size: 12px; color: #888; }
+    .emoji { font-size: 20px; line-height: 1; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <main class="card" role="main">
+      <h1>BED HOSPITALITY 2.0</h1>
+      <p class="sub">Self-assessment form — choose your role</p>
+
+      <div class="grid" role="list">
+        <a class="btn" href="#" data-target="/team/index.html" role="listitem" aria-label="I am a Team Member">
+          <span class="emoji" aria-hidden="true">👥</span>
+          <span>I am a <u>Team Member</u></span>
+        </a>
+
+        <a class="btn" href="#" data-target="/peer/index.html" role="listitem" aria-label="I am a Peer Reviewer">
+          <span class="emoji" aria-hidden="true">🧭</span>
+          <span>I am a <u>Peer Reviewer</u></span>
+        </a>
+      </div>
+
+      <p class="hint">Tip: if you update CSS/JS later and the browser caches it, this page will auto add a cache-buster so people always load the latest.</p>
+      <div class="foot">BED — Easy and Simple</div>
+    </main>
+  </div>
+
+  <script>
+    // Add a cache-busting query on click so updated assets load fresh in /team or /peer
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const url = btn.getAttribute('data-target');
+        const sep = url.includes('?') ? '&' : '?';
+        const bust = 'v=' + Date.now();
+        window.location.href = url + sep + bust;
+      });
+    });
+  </script>
+</body>
+</html>
