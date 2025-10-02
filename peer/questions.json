@@ -27,24 +27,24 @@
     {
       "id": 2,
       "statement": "Your replies are warm and personal",
-      "subtext": "You know hospitality starts with this",
+      "subtext": "You know this is where our hospitality begins",
       "group": "Hospitality skills"
     },
     {
       "id": 3,
-      "statement": "You follow up on tasks you assign",
-      "subtext": "You are responsible until it is done",
+      "statement": "You follow up when you give someone a task",
+      "subtext": "You take responsibilty until it's done",
       "group": "Taking ownership"
     },
     {
       "id": 4,
-      "statement": "You scan arriving guests to know their mood",
+      "statement": "You can see if guests are tired or relaxed",
       "subtext": "You change your check-in style accordingly",
       "group": "BED competencies"
     },
     {
       "id": 5,
-      "statement": "Your priority is making guests feel welcome",
+      "statement": "You first make sure new guests feel welcome",
       "subtext": "You never start by asking for passports",
       "group": "Hospitality skills"
     },
@@ -128,8 +128,8 @@
     },
     {
       "id": 19,
-      "statement": "You do whatever you can to help travellers",
-      "subtext": "You help if they lose a passport",
+      "statement": "You do whatever you can if people need help",
+      "subtext": "For example if a guest looses his passport",
       "group": "Taking ownership"
     },
     {
@@ -141,7 +141,7 @@
     {
       "id": 21,
       "statement": "You ask for feedback on your performance",
-      "subtext": "You make an effort to learn and grow",
+      "subtext": "You learn new things and develop yourself",
       "group": "Collaboration"
     },
     {
@@ -177,13 +177,13 @@
     {
       "id": 27,
       "statement": "You use ChatGPT for complex tasks",
-      "subtext": "You use it for research and problems",
+      "subtext": "You use it for research and solving problems",
       "group": "Taking ownership"
     },
     {
       "id": 28,
-      "statement": "You do not gossip",
-      "subtext": "You don't criticize absent people",
+      "statement": "You don't gossip",
+      "subtext": "You don't talk bad if someone's not there",
       "group": "Collaboration"
     },
     {
@@ -201,7 +201,7 @@
     {
       "id": 31,
       "statement": "You take responsibility for the whole hotel",
-      "subtext": "You check rooms and public areas",
+      "subtext": "You check rooms, buildings and public areas",
       "group": "Taking ownership"
     },
     {
@@ -213,7 +213,7 @@
     {
       "id": 33,
       "statement": "You don't pass-on problems to others",
-      "subtext": "You find solutions and follow up",
+      "subtext": "You find solutions and follow up until it's fixed",
       "group": "Taking ownership"
     },
     {
@@ -225,7 +225,7 @@
     {
       "id": 35,
       "statement": "You consider yourself a full team member",
-      "subtext": "You take responsibility like others",
+      "subtext": "You take the same responsibility as anyone else",
       "group": "Collaboration"
     }
   ]
