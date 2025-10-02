@@ -588,6 +588,33 @@
     #pdfReport .statements-table col:nth-child(4){ width:15% !important; }
   }
   </style>
+
+<script>
+  // === SINGLE SOURCE OF TRUTH — do not duplicate elsewhere ===
+  window.CONFIG = {
+    groups: [
+      { key:"hospitality", name:"Hospitality skills",
+        desc:"Standard skills for daily tasks and guest services" },
+      { key:"bed", name:"BED competencies",
+        desc:"Advanced abilities to read people and situations" },
+      { key:"ownership", name:"Taking ownership",
+        desc:"Acting independently and sharing responsibility" },
+      { key:"collab", name:"Collaboration",
+        desc:"Building trust and helping others across BED" }
+    ],
+    bands: [
+      { min:85, max:100, text:"Excellent! Your understanding of BED is an inspiration for others. Continue to lead others by example" },
+      { min:70, max:84,  text:"Great hospitality! Keep challenging yourself and help others by giving them honest and positive feedback" },
+      { min:50, max:69,  text:"Focus on self-development. Constant practice will make you better. Ask feedback from friends so you know you improve" },
+      { min:0,  max:49,  text:"Your are behind and may need more support. Please contact your coach and ask your team members for guidance" }
+    ],
+    ratings: {
+      team: ["I am not so good at this","I need to be better at this","I am average at this","I am good at this","I am very good at this"],
+      peer: ["You are not so good at this","You can be better at this","You are average at this","You are good at this","You are very good at this"]
+    }
+  };
+</script>
+
 </head>
     <body>
         <main class="container">
