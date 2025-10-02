@@ -793,86 +793,105 @@
          </div>
       </section>
       <script>
-         (function () {
-             const S = { answers: {}, questions: [], groups: [] };
-             window.__S = S;
-             const el = (id) => document.getElementById(id);
-             const sections = ["welcome", "instructions", "q1", "q2", "finish", "congrats"];
-         
-             function show(id) {
-                 sections.forEach((s) => (document.getElementById(s).style.display = s === id ? "block" : "none"));
-                 let n = 1;
-                 if (id === "instructions") n = 2;
-                 else if (id === "q1") n = 3;
-                 else if (id === "q2") n = 4;
-                 else if (id === "finish") n = 5;
-                 else if (id === "congrats") n = 6;
-                 setProgress(n);
-                 window.scrollTo({ top: 0, behavior: "smooth" });
-             }
-             function setProgress(n) {
-                 const dots = document.querySelectorAll("#progressHeader .dot");
-                 dots.forEach((d, i) => d.classList.toggle("active", i < n));
-             }
-             setProgress(1);
-         
-             function stripLeadingNumber(t) {
-                 return String(t || "").replace(/^\\s*\\d+\\.\\s*/, "");
-             }
-         
-             function makeQ(q, ord) {
-                 const wrap = document.createElement("div");
-                 wrap.className = "q-item";
-                 wrap.dataset.qid = q.id;
-                 const num = document.createElement("div");
-                 num.className = "q-num";
-                 num.textContent = ord + ".";
-                 wrap.appendChild(num);
-                 const body = document.createElement("div");
-                 body.className = "q-body";
-                 const title = document.createElement("span");
-                 title.className = "q-title";
-                 title.textContent = stripLeadingNumber(q.statement || "");
-                 body.appendChild(title);
-                 if (q.subtext) {
-                     const sub = document.createElement("span");
-                     sub.className = "q-sub";
-                     sub.textContent = q.subtext;
-                     body.appendChild(sub);
-                 }
-                 for (let v = 1; v <= 5; v++) {
-                     const p = document.createElement("span");
-                     p.className = "pill";
-                     p.textContent = v;
-                     p.dataset.val = v;
-                     p.onclick = () => {
-                         S.answers[q.id] = v;
-                         wrap.querySelectorAll(".pill").forEach((x) => x.classList.toggle("selected", x === p));
-                     };
-                     body.appendChild(p);
-                 }
-                 wrap.appendChild(body);
-                 return wrap;
-             }
-         
-         async function loadQuestions() {
-         try {
-         const res = await fetch("questions.json?v=" + Date.now(), { cache: "no-store" });
-         if (!res.ok) throw new Error("fetch failed");
-         const data = await res.json();
-         S.questions = data.questions || [];
-         S.groups = data.groups || CONFIG.groups;   // fallback to CONFIG, not hard-coded
-         } catch (e) {
-         S.questions = [];
-         S.groups = CONFIG.groups;
-         }
-         }
-         
-         
-             function validateWelcome() {
-                 const allFilled = ["nick", "email", "hotel", "peerName", "peerEmail", "peerHotel"].every((id) => el(id).value && el(id).value.trim() !== "");
-                 el("toInstructions").disabled = !allFilled;
-             }
+(function () {
+  const S = { answers: {}, questions: [], groups: [] };
+  window.__S = S;
+  const el = (id) => document.getElementById(id);
+  const sections = ["welcome", "instructions", "q1", "q2", "finish", "congrats"];
+
+  function show(id) {
+    sections.forEach((s) => (document.getElementById(s).style.display = s === id ? "block" : "none"));
+    let n = 1;
+    if (id === "instructions") n = 2;
+    else if (id === "q1") n = 3;
+    else if (id === "q2") n = 4;
+    else if (id === "finish") n = 5;
+    else if (id === "congrats") n = 6;
+    setProgress(n);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function setProgress(n) {
+    const dots = document.querySelectorAll("#progressHeader .dot");
+    dots.forEach((d, i) => d.classList.toggle("active", i < n));
+  }
+  setProgress(1);
+
+  function stripLeadingNumber(t) {
+    return String(t || "").replace(/^\s*\d+\.\s*/, "");
+  }
+
+  function makeQ(q, ord) {
+    const wrap = document.createElement("div");
+    wrap.className = "q-item";
+    wrap.dataset.qid = q.id;
+
+    const num = document.createElement("div");
+    num.className = "q-num";
+    num.textContent = ord + ".";
+    wrap.appendChild(num);
+
+    const body = document.createElement("div");
+    body.className = "q-body";
+
+    const title = document.createElement("span");
+    title.className = "q-title";
+    title.textContent = stripLeadingNumber(q.statement || "");
+    body.appendChild(title);
+
+    if (q.subtext) {
+      const sub = document.createElement("span");
+      sub.className = "q-sub";
+      sub.textContent = q.subtext;
+      body.appendChild(sub);
+    }
+
+    for (let v = 1; v <= 5; v++) {
+      const p = document.createElement("span");
+      p.className = "pill";
+      p.textContent = v;
+      p.dataset.val = v;
+      p.onclick = () => {
+        S.answers[q.id] = v;
+        wrap.querySelectorAll(".pill").forEach((x) => x.classList.toggle("selected", x === p));
+      };
+      body.appendChild(p);
+    }
+
+    wrap.appendChild(body);
+    return wrap;
+  }
+
+  async function loadQuestions() {
+    try {
+      const res = await fetch("questions.json?v=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) throw new Error("fetch failed");
+      const data = await res.json();
+      S.questions = data.questions || [];
+      S.groups = data.groups || CONFIG.groups;   // fallback to CONFIG
+    } catch (e) {
+      S.questions = [];
+      S.groups = CONFIG.groups;
+    }
+  }
+
+  // ✅ validateWelcome is top-level (not inside loadQuestions)
+  function validateWelcome() {
+    const required = ["nick", "email", "hotel", "peerName", "peerEmail", "peerHotel"];
+    let allFilled = true;
+
+    required.forEach((id) => {
+      const val = el(id).value?.trim() || "";
+      if (!val) allFilled = false;
+    });
+
+    // email format
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el("email").value?.trim() || "");
+    const peerEmailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el("peerEmail").value?.trim() || "");
+    if (!emailOk || !peerEmailOk) allFilled = false;
+
+    el("toInstructions").disabled = !allFilled;
+  }
+
          
              function computeTotals() {
                  const ids = (S.questions || []).map((q) => q.id);
@@ -1006,122 +1025,124 @@
          };
          
          
-             function formatDate() {
-                 try {
-                     const dt = new Date();
-                     const day = String(dt.getDate()).padStart(2, "0"); // 01–31
-                     const month = String(dt.getMonth() + 1).padStart(2, "0"); // 01–12
-                     const year = dt.getFullYear();
-                     return `${day}-${month}-${year}`;
-                 } catch (_) {
-                     return "";
-                 }
-             }
-         <script>
-         function buildPdfReport() {
-         // Date + score box
-         const totals = computeTotals();
-         document.getElementById("pdfDate").textContent = "assessment date " + formatDate();
-         document.getElementById("pdfTotalPct").textContent =
-         (isFinite(totals.pct) ? totals.pct : "—") + "%";
-         document.getElementById("pdfTotalRaw").textContent =
-         (totals.raw || 0) + " of " + ((S.questions || []).length * 5 || 175);
-         
-         // === PDF recommendation band (under the date) ===
-         (function () {
-         const recTarget = document.getElementById("pdfBandText");
-         if (!recTarget) return;
-         
-         // get recommendation text from CONFIG.bands
-         const rec = getRecommendation(totals.pct);
-         
-         recTarget.innerHTML =
-         "<div style='line-height:1.4; font-size:16px; color:#434343; font-weight:600;'>Your overall score is " +
-         totals.pct +
-         "% based on " +
-         totals.raw +
-         " out of " +
-         ((S.questions || []).length * 5 || 175) +
-         " points. Here's what that means:</div>" +
-         "<div style='font-size:16px; color:#434343; font-weight:600;'>" +
-         rec +
-         "</div>";
-         
-         // also inject into Congrats page
-         showRecommendation(totals.pct);
-         })();
-         
-         // Render group rows inside the PDF
-         renderPdfGroupRows();
-         
-         // Statements table
-         const tb = document.querySelector("#pdfStatements tbody");
-         tb.innerHTML = "";
-         (S.questions || []).forEach((q, i) => {
-         const tr = document.createElement("tr");
-         
-         const tdNo = document.createElement("td");
-         tdNo.textContent = i + 1;
-         tdNo.className = "st-no";
-         
-         const tdSt = document.createElement("td");
-         tdSt.innerHTML =
-         '<div class="st-title">' +
-         stripLeadingNumber(q.statement || "") +
-         "</div>" +
-         (q.subtext ? '<div class="muted">' + q.subtext + "</div>" : "");
-         
-         const tdGp = document.createElement("td");
-         tdGp.textContent = q.group || "";
-         
-         const tdRt = document.createElement("td");
-         tdRt.textContent = S.answers[q.id] != null ? S.answers[q.id] : "";
-         tdRt.className = "st-rating";
-         
-         tr.appendChild(tdNo);
-         tr.appendChild(tdSt);
-         tr.appendChild(tdGp);
-         tr.appendChild(tdRt);
-         tb.appendChild(tr);
-         });
-         }
-         
-         // === Helper: render group rows dynamically from CONFIG.groups ===
-         function renderPdfGroupRows() {
-         const gp = computeGroupPercents();
-         const body = document.getElementById("pdfGroupRows");
-         if (!body) return;
-         
-         body.innerHTML = "";
-         
-         CONFIG.groups.forEach((g) => {
-         const tr = document.createElement("tr");
-         
-         const tdName = document.createElement("td");
-         tdName.textContent = "Score " + g.name;
-         
-         const tdPct = document.createElement("td");
-         tdPct.textContent = (gp[g.name] != null ? gp[g.name] : "—") + "%";
-         
-         const tdDesc = document.createElement("td");
-         tdDesc.textContent = g.desc || "";
-         
-         tr.appendChild(tdName);
-         tr.appendChild(tdPct);
-         tr.appendChild(tdDesc);
-         body.appendChild(tr);
-         });
-         }
-         
-         // PDF button handler
-         document.getElementById("congratsPdf").onclick = () => {
-         buildPdfReport();
-         window.print();
-         };
-         
-         // Init
-         loadQuestions();
-      </script>
+  <script>
+function formatDate() {
+  try {
+    const dt = new Date();
+    const day = String(dt.getDate()).padStart(2, "0"); // 01–31
+    const month = String(dt.getMonth() + 1).padStart(2, "0"); // 01–12
+    const year = dt.getFullYear();
+    return `${day}-${month}-${year}`;
+  } catch (_) {
+    return "";
+  }
+}
+
+function buildPdfReport() {
+  const totals = computeTotals();
+
+  document.getElementById("pdfDate").textContent =
+    "assessment date " + formatDate();
+  document.getElementById("pdfTotalPct").textContent =
+    (isFinite(totals.pct) ? totals.pct : "—") + "%";
+  document.getElementById("pdfTotalRaw").textContent =
+    (totals.raw || 0) + " of " + ((S.questions || []).length * 5 || 175);
+
+  // Recommendation
+  const recTarget = document.getElementById("pdfBandText");
+  if (recTarget) {
+    const rec = getRecommendation(totals.pct);
+    recTarget.innerHTML =
+      "<div style='line-height:1.4; font-size:16px; color:#434343; font-weight:600;'>Your overall score is " +
+      totals.pct +
+      "% based on " +
+      totals.raw +
+      " out of " +
+      ((S.questions || []).length * 5 || 175) +
+      " points. Here's what that means:</div>" +
+      "<div style='font-size:16px; color:#434343; font-weight:600;'>" +
+      rec +
+      "</div>";
+    showRecommendation(totals.pct);
+  }
+
+  renderPdfGroupRows();
+
+  // Statements table
+  const tb = document.querySelector("#pdfStatements tbody");
+  if (tb) {
+    tb.innerHTML = "";
+    (S.questions || []).forEach((q, i) => {
+      const tr = document.createElement("tr");
+
+      const tdNo = document.createElement("td");
+      tdNo.textContent = i + 1;
+      tdNo.className = "st-no";
+
+      const tdSt = document.createElement("td");
+      tdSt.innerHTML =
+        '<div class="st-title">' +
+        stripLeadingNumber(q.statement || "") +
+        "</div>" +
+        (q.subtext ? '<div class="muted">' + q.subtext + "</div>" : "");
+
+      const tdGp = document.createElement("td");
+      tdGp.textContent = q.group || "";
+
+      const tdRt = document.createElement("td");
+      tdRt.textContent = S.answers[q.id] != null ? S.answers[q.id] : "";
+      tdRt.className = "st-rating";
+
+      tr.appendChild(tdNo);
+      tr.appendChild(tdSt);
+      tr.appendChild(tdGp);
+      tr.appendChild(tdRt);
+      tb.appendChild(tr);
+    });
+  }
+}
+
+function renderPdfGroupRows() {
+  const gp = computeGroupPercents();
+  const body = document.getElementById("pdfGroupRows");
+  if (!body) return;
+
+  body.innerHTML = "";
+
+  CONFIG.groups.forEach((g) => {
+    const tr = document.createElement("tr");
+
+    const tdName = document.createElement("td");
+    tdName.textContent = "Score " + g.name;
+
+    const tdPct = document.createElement("td");
+    tdPct.textContent = (gp[g.name] != null ? gp[g.name] : "—") + "%";
+
+    const tdDesc = document.createElement("td");
+    tdDesc.textContent = g.desc || "";
+
+    tr.appendChild(tdName);
+    tr.appendChild(tdPct);
+    tr.appendChild(tdDesc);
+    body.appendChild(tr);
+  });
+}
+
+// PDF button handler
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("congratsPdf");
+  if (btn) {
+    btn.onclick = () => {
+      buildPdfReport();
+      window.print();
+    };
+  }
+});
+
+// Init
+loadQuestions();
+</script>
+
       <script>
          // === Validation patch v2 (uses window.__S) ===
          (function () {
@@ -1401,13 +1422,7 @@
              }
          })();
       </script>
-      (function(){
-      // Date format: DDMMMYYYY (e.g., 24Sep2025)
-      function formatDateDDMMMYYYY(d=new Date()){
-      const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-      const dd  = String(d.getDate()).padStart(2,'0');
-      return `${dd}${mon[d.getMonth()]}${d.getFullYear()}`;
-      }
+     
       <script>
          // Try multiple sources to get overall % (robust)
          function getOverallPct() {
