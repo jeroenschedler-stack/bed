@@ -1,220 +1,214 @@
 {
-"groups": [
-  { "name": "Hospitality skills", "description": "Basic skills for daily tasks and guests services" },
-  { "name": "BED competencies", "description": "Advanced ability to read people and situations" },
-  { "name": "Taking ownership", "description": "Acting independently and sharing responsibility" },
-  { "name": "Collaboration", "description": "Building trust and helping others across BED" }
-],
   "questions": [
     {
       "id": 1,
-      "statement": "You answer very quickly to guest messages",
-      "subtext": "You often check and reply right away",
+      "statement": "I answer very fast to guest messages ",
+      "subtext": "I often check mail and reply right away",
       "group": "Hospitality skills"
     },
     {
       "id": 2,
-      "statement": "You make your replies warm and personal",
-      "subtext": "You use their name and add helpful information",
-      "group": "BED competencies"
+      "statement": "My replies are not standard but personal ",
+      "subtext": "I know this is where our hospitality begins",
+      "group": "Hospitality skills"
     },
     {
       "id": 3,
-      "statement": "You make a great first impression",
-      "subtext": "You know it starts with the first message",
-      "group": "BED competencies"
+      "statement": "I follow up when I give someone a task ",
+      "subtext": "I am responsible until the task is done",
+      "group": "Taking ownership"
     },
     {
       "id": 4,
-      "statement": "You can see if a guest is stressed or relaxed",
-      "subtext": "You adjust the way you check-in to the mood",
+      "statement": "I scan arriving guests so I know their mood",
+      "subtext": "I change the way I check-in accordingly ",
       "group": "BED competencies"
     },
     {
       "id": 5,
-      "statement": "You ask questions before you ask passports",
-      "subtext": "You welcome guests like friends",
-      "group": "BED competencies"
+      "statement": "My priority is to make guest feel welcome",
+      "subtext": "I never start with asking for passports",
+      "group": "Hospitality skills"
     },
     {
       "id": 6,
-      "statement": "You can check-in a guest in 60 seconds",
-      "subtext": "You timed three standard check-ins",
+      "statement": "I can do a standard check-in in 60 seconds",
+      "subtext": "Some travellers are tired and want the key",
       "group": "Hospitality skills"
     },
     {
       "id": 7,
-      "statement": "You check in groups differently than FIT",
-      "subtext": "You usually check-in groups with the leader",
-      "group": "BED competencies"
+      "statement": "I check-in groups with the group leader",
+      "subtext": "Others don't have to wait and can relax",
+      "group": "Hospitality skills"
     },
     {
       "id": 8,
-      "statement": "You don't say that check-in time is 14:00",
-      "subtext": "Guests can check-in when the room is ready",
-      "group": "BED competencies"
+      "statement": "I don't tell guests check-in time is 14:00",
+      "subtext": "They can check-in whenever the room is ready",
+      "group": "Hospitality skills"
     },
     {
       "id": 9,
-      "statement": "You don't show stress when there is a problem",
-      "subtext": "You know that makes guests really worry",
+      "statement": "I don't show stress when there is a problem",
+      "subtext": "I know it only makes guests nervous ",
       "group": "BED competencies"
     },
     {
       "id": 10,
-      "statement": "You show genuine interest during check-out",
-      "subtext": "You ask about their stay or next destination",
+      "statement": "I pay attention when guests check-out",
+      "subtext": "I go outside and wait until the car has left",
       "group": "BED competencies"
     },
     {
       "id": 11,
-      "statement": "You make great last impressions",
-      "subtext": "You stay outside until their car has left",
+      "statement": "I did at least one amazing thing last week ",
+      "subtext": "It was special and I am proud of it",
       "group": "BED competencies"
     },
     {
       "id": 12,
-      "statement": "You use names to connect with guests",
-      "subtext": "When it feels right you introduce yourself",
+      "statement": "I am proactive with guests and my team",
+      "subtext": "I don't wait until people tell me what to do",
       "group": "BED competencies"
     },
     {
       "id": 13,
-      "statement": "You scan every guest every time",
-      "subtext": "You don't look at a group but at each individual",
+      "statement": "I scan every guest every time",
+      "subtext": "I can see what people need before they ask",
       "group": "BED competencies"
     },
     {
       "id": 14,
-      "statement": "You are good at scanning",
-      "subtext": "You see what people need before they ask",
-      "group": "BED competencies"
+      "statement": "I actively help others to develop and grow",
+      "subtext": "I give my friends advise and suggestions",
+      "group": "Collaboration"
     },
     {
       "id": 15,
-      "statement": "You create unique surprises for guests",
-      "subtext": "You do more than offering free things",
+      "statement": "I create unique surprises for my guests",
+      "subtext": "I do more than offering free things",
       "group": "BED competencies"
     },
     {
       "id": 16,
-      "statement": "Music is an essential part of the vibe",
-      "subtext": "You listen to make sure we play the right music",
+      "statement": "I know great music creates a great vibe",
+      "subtext": "I listen and make sure our music is right",
       "group": "Hospitality skills"
     },
     {
       "id": 17,
-      "statement": "Your guests know they can go to other BED",
-      "subtext": "You offer downtown coffee, pool or breakfast",
+      "statement": "I offer guests to use other BED facilities",
+      "subtext": "I let them know about the big pool in Nimman",
       "group": "Collaboration"
     },
     {
       "id": 18,
       "statement": "It's annoying when a room key doesn't work",
-      "subtext": "You go up to make sure the new key works",
+      "subtext": "I take my master key and go up with them",
       "group": "Hospitality skills"
     },
     {
       "id": 19,
-      "statement": "When you talk with guests it's genuine",
-      "subtext": "When you force yourself it will not be real",
-      "group": "BED competencies"
+      "statement": "I do whatever I can if travellers need help ",
+      "subtext": "For example if they loose their passport",
+      "group": "Taking ownership"
     },
     {
       "id": 20,
-      "statement": "You often give your friends honest feedback",
-      "subtext": "You're happy to help them to grow",
+      "statement": "I give my friends honest feedback",
+      "subtext": "I actively help to develop our team",
       "group": "Collaboration"
     },
     {
       "id": 21,
-      "statement": "You like it when friends give you honest feedback",
-      "subtext": "You're happy they help you to grow",
+      "statement": "I ask for feedback on my performance",
+      "subtext": "I make effort to learn and develop myself",
       "group": "Collaboration"
     },
     {
       "id": 22,
-      "statement": "You can answer most questions about BED",
-      "subtext": "You have visited the rooms in all our hotels",
+      "statement": "I can answer most questions about BED",
+      "subtext": "I know the rooms and people in all hotels",
       "group": "Hospitality skills"
     },
     {
       "id": 23,
-      "statement": "You understand the meaning of showtime",
-      "subtext": "The magic happens from 07:00–10:00",
+      "statement": "I am fully focused during breakfast ",
+      "subtext": "I know the magic happens from 07:00-10:00",
       "group": "Hospitality skills"
     },
     {
       "id": 24,
-      "statement": "You have peeled your own onion",
-      "subtext": "You don't act. Usually you show your true self",
-      "group": "BED competencies"
+      "statement": "I peeled my onion",
+      "subtext": "I act like a friend instead of an employee ",
+      "group": "Taking ownership"
     },
     {
       "id": 25,
-      "statement": "You use ChatGPT or Gemini",
-      "subtext": "You ask for help with e.g., guest messages",
-      "group": "Hospitality skills"
+      "statement": "I call ahead when guests go to another BED",
+      "subtext": "I make sure they are welcomed as friends",
+      "group": "Collaboration"
     },
     {
       "id": 26,
-      "statement": "Your messages look like you wrote them",
-      "subtext": "You don't copy AI because guests will know",
-      "group": "BED competencies"
+      "statement": "I use ChatGPT in my daily work",
+      "subtext": "I use it for messages and helping guests",
+      "group": "Hospitality skills"
     },
     {
       "id": 27,
-      "statement": "You use ChatGPT or Gemini",
-      "subtext": "You ask help to analyze and solve problems",
+      "statement": "I use ChatGPT for complex tasks",
+      "subtext": "I use it for research and problem solving ",
       "group": "Taking ownership"
     },
     {
       "id": 28,
-      "statement": "You never gossip. You promised that",
-      "subtext": "You don't talk badly when someone's not here",
+      "statement": "I don't gossip",
+      "subtext": "I don't criticize people who are not here",
       "group": "Collaboration"
     },
     {
       "id": 29,
-      "statement": "You really understand that rules can be flexible",
-      "subtext": "You only apply rules when it's needed",
+      "statement": "I know that rules exist for a reason",
+      "subtext": "Without the reason I can change the rules ",
       "group": "Taking ownership"
     },
     {
       "id": 30,
-      "statement": "You are confident about your own judgment",
-      "subtext": "You make decisions without asking permission",
+      "statement": "I am confident about my own judgment",
+      "subtext": "I make my own decisions without permission ",
       "group": "Taking ownership"
     },
     {
       "id": 31,
-      "statement": "You look after the whole hotel, not only front",
-      "subtext": "You check rooms, maintenance and back areas",
+      "statement": "I take responsibility for the whole hotel",
+      "subtext": "I check rooms and public areas",
       "group": "Taking ownership"
     },
     {
       "id": 32,
-      "statement": "You look around when you arrive at the hotel",
-      "subtext": "You take responsibility for our house",
+      "statement": "I consider myself a positive person",
+      "subtext": "I don't complain but look for solutions ",
       "group": "Taking ownership"
     },
     {
       "id": 33,
-      "statement": "You fix issues yourself",
-      "subtext": "You follow up later to make sure it's fixed",
+      "statement": "I don't pass-on problems to others",
+      "subtext": "I find solutions and follow up until fixed",
       "group": "Taking ownership"
     },
     {
       "id": 34,
-      "statement": "You know you are allowed to make mistakes",
-      "subtext": "You are not afarid to get punished",
+      "statement": "I am not afraid of the CEO or my coach",
+      "subtext": "I know I am allowed to make mistakes",
       "group": "Taking ownership"
     },
     {
       "id": 35,
-      "statement": "You use passion and common sense",
-      "subtext": "You understand there are no manualsgttt",
-      "group": "Taking ownership"
+      "statement": "I consider myself a full member of the team",
+      "subtext": "I take responsibility just like the others",
+      "group": "Collaboration"
     }
   ]
 }
