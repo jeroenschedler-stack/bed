@@ -33,18 +33,18 @@
     {
       "id": 3,
       "statement": "I follow up when I give someone a task ",
-      "subtext": "I am responsible until the task is done",
+      "subtext": "I take responsibilty until it's done",
       "group": "Taking ownership"
     },
     {
       "id": 4,
-      "statement": "I scan arriving guests so I know their mood",
+      "statement": "I can see if guests are tired or relaxed",
       "subtext": "I change the way I check-in accordingly ",
       "group": "BED competencies"
     },
     {
       "id": 5,
-      "statement": "My priority is to make guest feel welcome",
+      "statement": "I first make sure new guests feel welcome",
       "subtext": "I never start with asking for passports",
       "group": "Hospitality skills"
     },
@@ -111,7 +111,7 @@
     {
       "id": 16,
       "statement": "I know great music creates a great vibe",
-      "subtext": "I listen and make sure our music is right",
+      "subtext": "I make sure the music is right",
       "group": "Hospitality skills"
     },
     {
@@ -128,8 +128,8 @@
     },
     {
       "id": 19,
-      "statement": "I do whatever I can if travellers need help ",
-      "subtext": "For example if they loose their passport",
+      "statement": "I do whatever I can if people need help ",
+      "subtext": "For example if a guest looses his passport",
       "group": "Taking ownership"
     },
     {
@@ -141,7 +141,7 @@
     {
       "id": 21,
       "statement": "I ask for feedback on my performance",
-      "subtext": "I make effort to learn and develop myself",
+      "subtext": "I learn new things and develop myself",
       "group": "Collaboration"
     },
     {
@@ -158,7 +158,7 @@
     },
     {
       "id": 24,
-      "statement": "I peeled my onion",
+      "statement": "I have peeled my onion",
       "subtext": "I act like a friend instead of an employee ",
       "group": "Taking ownership"
     },
@@ -177,13 +177,13 @@
     {
       "id": 27,
       "statement": "I use ChatGPT for complex tasks",
-      "subtext": "I use it for research and problem solving ",
+      "subtext": "I use it for research and solving problems ",
       "group": "Taking ownership"
     },
     {
       "id": 28,
       "statement": "I don't gossip",
-      "subtext": "I don't criticize people who are not here",
+      "subtext": "I don't talk bad if someone's not there",
       "group": "Collaboration"
     },
     {
@@ -201,7 +201,7 @@
     {
       "id": 31,
       "statement": "I take responsibility for the whole hotel",
-      "subtext": "I check rooms and public areas",
+      "subtext": "I check rooms buildings and public areas",
       "group": "Taking ownership"
     },
     {
@@ -213,7 +213,7 @@
     {
       "id": 33,
       "statement": "I don't pass-on problems to others",
-      "subtext": "I find solutions and follow up until fixed",
+      "subtext": "I find solutions and follow up until it's fixed",
       "group": "Taking ownership"
     },
     {
@@ -225,7 +225,7 @@
     {
       "id": 35,
       "statement": "I consider myself a full member of the team",
-      "subtext": "I take responsibility just like the others",
+      "subtext": "I take the same responsibility as anyone else",
       "group": "Collaboration"
     }
   ]
