@@ -3,48 +3,33 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>BED – bridge</title>
+  <title>BED Bridge</title>
   <style>
     html,body,iframe { height: 100%; width: 100%; margin: 0; border: 0; }
-    .hidden { display:none; }
-    .bar { position: fixed; inset: auto 0 0 0; padding:10px; background:#f2f2f2; 
-           font: 14px system-ui, sans-serif; border-top:1px solid #ddd; }
-    .bar button { padding:8px 12px; border-radius:8px; border:1px solid #ccc; cursor:pointer; }
   </style>
 </head>
 <body>
-  <iframe id="app" src="./index.html" referrerpolicy="no-referrer"></iframe>
-
-  <!-- Optional helper bar: you can hide/remove this once tested -->
-  <div class="bar">
-    <button id="saveBtn" title="Saves the current form payload to Google Sheets">Save to Sheets</button>
-    <span id="status"></span>
-  </div>
+  <!-- This loads your original form -->
+  <iframe id="app" src="./index.html"></iframe>
 
   <script>
-  // ====== CONFIG ======
-  const GS_ENDPOINT = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec'; // paste your Apps Script Web App URL
-  const TARGET_SHEET = 'submissions'; // tab name in the Google Sheet
-  // ====================
+  /* ====== CONFIG ====== */
+  const GS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwNeW_zk5Hzzxk1OmHsvREb9XCIe3Fae8-QnYroO9rhtL3nB9RuQjkHNrkOdCAC33Gj/exec';
+  /* ==================== */
 
-  const $ = (sel, root=document) => root.querySelector(sel);
+  const $ = (s, r=document) => r.querySelector(s);
   const app = $('#app');
-  const statusEl = $('#status');
 
   function collectFieldsFromIframe() {
     const doc = app.contentDocument || app.contentWindow.document;
-    // Ensure each input has a name (falls back to id)
     doc.querySelectorAll('input[id], select[id], textarea[id]').forEach(el=>{
       if (!el.name) el.name = el.id;
     });
 
     const obj = {
-      sheet: TARGET_SHEET,
-      form: '/bed/index.html',
-      version: 'v1'
+      form: location.pathname.includes('peer') ? 'peer' : 'team'
     };
 
-    // Prefer a <form> if present
     const formEl = doc.querySelector('form');
     if (formEl) {
       const fd = new FormData(formEl);
@@ -62,7 +47,7 @@
     }
 
     const scoreEl = doc.getElementById('scorePercent');
-    if (scoreEl) obj.score_text = scoreEl.textContent.trim();
+    if (scoreEl) obj.score_percent = scoreEl.textContent.trim();
 
     return obj;
   }
@@ -75,44 +60,30 @@
       headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
       body: params.toString()
     });
-    try {
-      const json = await res.json();
-      if (!json.ok) throw new Error(json.error || 'Unknown error');
-    } catch (_) {}
+    return res.json().catch(()=>({ok:true}));
   }
 
-  // Manual “Save to Sheets” button for first test
-  $('#saveBtn').addEventListener('click', async () => {
+  async function saveNow(tag='auto') {
     try {
-      statusEl.textContent = 'Saving…';
-      const payload = collectFieldsFromIframe();
-      await postToSheet(payload);
-      statusEl.textContent = 'Saved ✓';
-      setTimeout(()=> statusEl.textContent = '', 2000);
-    } catch (err) {
-      statusEl.textContent = 'Error: ' + err.message;
+      const data = collectFieldsFromIframe();
+      data._trigger = tag;
+      await postToSheet(data);
+      console.log('[bridge] saved via', tag);
+    } catch (e) {
+      console.warn('[bridge] save failed', e);
     }
-  });
+  }
 
-  // Optional: auto-save when a likely “finish/submit” is clicked inside the iframe
-  app.addEventListener('load', () => {
+  app.addEventListener('load', ()=>{
     const doc = app.contentDocument || app.contentWindow.document;
-    const maybeButtons = [
-      '#submitBtn', '#finishBtn', '#btnFinish',
-      'button[type="submit"]', '.complete', '.finish'
-    ];
-    const btn = maybeButtons.map(sel => doc.querySelector(sel)).find(Boolean);
-    if (btn) {
-      btn.addEventListener('click', async (ev) => {
-        try {
-          const payload = collectFieldsFromIframe();
-          await postToSheet(payload);
-          console.log('Saved to Sheets');
-        } catch (e) {
-          console.warn('Save failed', e);
-        }
-      }, {capture:true});
-    }
+    doc.addEventListener('click', (ev)=>{
+      const el = ev.target.closest('button, [role="button"], input[type="submit"]');
+      if (!el) return;
+      const txt = (el.textContent || el.value || '').trim().toLowerCase();
+      if (/(finish|submit|complete|done)/.test(txt)) {
+        saveNow('button-click');
+      }
+    }, {capture:true});
   });
   </script>
 </body>
