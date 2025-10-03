@@ -51,7 +51,7 @@
     {
       "id": 6,
       "statement": "I can do a standard check-in in 60 seconds",
-      "subtext": "Some travellers are tired and want the key",
+      "subtext": "I know some travellers just want the key",
       "group": "Hospitality skills"
     },
     {
@@ -69,7 +69,7 @@
     {
       "id": 9,
       "statement": "I don't show stress when there is a problem",
-      "subtext": "I know it only makes guests nervous ",
+      "subtext": "I will only makes guests more nervous ",
       "group": "BED competencies"
     },
     {
@@ -81,7 +81,7 @@
     {
       "id": 11,
       "statement": "I did at least one amazing thing last week ",
-      "subtext": "It was special and I am proud of it",
+      "subtext": "It was something special you can be proud of",
       "group": "BED competencies"
     },
     {
@@ -98,8 +98,8 @@
     },
     {
       "id": 14,
-      "statement": "I actively help others to develop and grow",
-      "subtext": "I give my friends advise and suggestions",
+      "statement": "I help my team to develop and grow",
+      "subtext": "I have ideas and make suggestions",
       "group": "Collaboration"
     },
     {
@@ -111,55 +111,55 @@
     {
       "id": 16,
       "statement": "I know great music creates a great vibe",
-      "subtext": "I make sure the music is right",
+      "subtext": "I pay attention and make sure it's right",
       "group": "Hospitality skills"
     },
     {
       "id": 17,
-      "statement": "I offer guests to use other BED facilities",
-      "subtext": "I let them know about the big pool in Nimman",
+      "statement": "I tell guests about other BED facilities",
+      "subtext": "I invite them to use the pool in BNM",
       "group": "Collaboration"
     },
     {
       "id": 18,
-      "statement": "It's annoying when a room key doesn't work",
-      "subtext": "I take my master key and go up with them",
+      "statement": "It's frustrating when keycards doesn't work",
+      "subtext": "I go up with guests with a master key",
       "group": "Hospitality skills"
     },
     {
       "id": 19,
-      "statement": "I do whatever I can if people need help ",
-      "subtext": "For example if a guest looses his passport",
+      "statement": "I do whatever I can if guests have problem ",
+      "subtext": "For example if they loose their passport",
       "group": "Taking ownership"
     },
     {
       "id": 20,
-      "statement": "I give my friends honest feedback",
-      "subtext": "I actively help to develop our team",
+      "statement": "I give my friends feedback if needed",
+      "subtext": "I know real friends should help each other",
       "group": "Collaboration"
     },
     {
       "id": 21,
       "statement": "I ask for feedback on my performance",
-      "subtext": "I learn new things and develop myself",
+      "subtext": "I want to learn and develop myself",
       "group": "Collaboration"
     },
     {
       "id": 22,
       "statement": "I can answer most questions about BED",
-      "subtext": "I know the rooms and people in all hotels",
+      "subtext": "I know all BED hotels and the people",
       "group": "Hospitality skills"
     },
     {
       "id": 23,
-      "statement": "I am fully focused during breakfast ",
-      "subtext": "I know the magic happens from 07:00-10:00",
+      "statement": "I am truly focused during breakfast ",
+      "subtext": "I know from 07:00-10:00 it's showtime",
       "group": "Hospitality skills"
     },
     {
       "id": 24,
       "statement": "I have peeled my onion",
-      "subtext": "I act like a friend instead of an employee ",
+      "subtext": "I act like a friend instead of hotel staff",
       "group": "Taking ownership"
     },
     {
@@ -170,7 +170,7 @@
     },
     {
       "id": 26,
-      "statement": "I use ChatGPT in my daily work",
+      "statement": "I use ChatGPT in  daily work",
       "subtext": "I use it for messages and helping guests",
       "group": "Hospitality skills"
     },
@@ -182,20 +182,20 @@
     },
     {
       "id": 28,
-      "statement": "I don't gossip",
-      "subtext": "I don't talk bad if someone's not there",
+      "statement": "I don't gossip and stop people who do",
+      "subtext": "I never talk bad if someone's not here",
       "group": "Collaboration"
     },
     {
       "id": 29,
       "statement": "I know that rules exist for a reason",
-      "subtext": "Without the reason I can change the rules ",
+      "subtext": "But without the reason I adapt the rule",
       "group": "Taking ownership"
     },
     {
       "id": 30,
-      "statement": "I am confident about my own judgment",
-      "subtext": "I make my own decisions without permission ",
+      "statement": "I am confident and use common sense",
+      "subtext": "I make decisions by myself",
       "group": "Taking ownership"
     },
     {
@@ -206,26 +206,26 @@
     },
     {
       "id": 32,
-      "statement": "I consider myself a positive person",
+      "statement": "I work with positive energy",
       "subtext": "I don't complain but look for solutions ",
       "group": "Taking ownership"
     },
     {
       "id": 33,
       "statement": "I don't pass-on problems to others",
-      "subtext": "I find solutions and follow up until it's fixed",
+      "subtext": "I take action and make sure it's fixed",
       "group": "Taking ownership"
     },
     {
       "id": 34,
-      "statement": "I am not afraid of the CEO or my coach",
-      "subtext": "I know I am allowed to make mistakes",
+      "statement": "I always try to do the right thing",
+      "subtext": "I not afraid to make mistakes ",
       "group": "Taking ownership"
     },
     {
       "id": 35,
-      "statement": "I consider myself a full member of the team",
-      "subtext": "I take responsibility like everyone else",
+      "statement": "I am a full and equal member of the team",
+      "subtext": "I contribute as much as everyone else",
       "group": "Collaboration"
     }
   ]
