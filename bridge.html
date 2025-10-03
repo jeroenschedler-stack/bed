@@ -5,30 +5,37 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>BED Bridge</title>
   <style>
-    html,body,iframe { height: 100%; width: 100%; margin: 0; border: 0; }
-    #status {
-      position: fixed; right: 10px; bottom: 10px;
-      padding: 8px 12px; border-radius: 6px;
-      font: 14px system-ui, sans-serif; display: none; z-index: 9999;
-    }
-    #status.ok { background:#d4edda; color:#155724; display:inline-block; }
-    #status.error { background:#f8d7da; color:#721c24; display:inline-block; }
+    html,body { height:100%; margin:0 }
+    #app { width:100%; height:100%; border:0 }
+    /* status toast */
+    #status{position:fixed;right:10px;bottom:10px;padding:8px 12px;border-radius:6px;
+      font:14px system-ui,sans-serif;display:none;z-index:9999}
+    #status.ok{background:#d4edda;color:#155724;display:inline-block}
+    #status.error{background:#f8d7da;color:#721c24;display:inline-block}
+    /* small badge to prove you are on bridge */
+    #badge{position:fixed;left:10px;bottom:10px;background:#1E90FF;color:#fff;
+      padding:6px 10px;border-radius:10px;font:12px/1 system-ui,sans-serif;z-index:9999}
   </style>
 </head>
 <body>
-  <!-- Load your existing app -->
-  <iframe id="app" src="./index.html"></iframe>
+  <iframe id="app"></iframe>
   <div id="status"></div>
+  <div id="badge">BRIDGE ON</div>
 
   <script>
   /* ====== CONFIG ====== */
   const GS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxuCs7VB4t-iSbvv_PneUs0dA8wbB3GeUR2QmaNelUEU4IbGmkrhPr_QksIaZwlvkGA/exec';
   /* ==================== */
 
-  const $ = (s, r=document) => r.querySelector(s);
-  const app = $('#app');
-  const statusEl = $('#status');
+  const params = new URLSearchParams(location.search);
+  const view = (params.get('view')||'').toLowerCase();
+  const app = document.getElementById('app');
+  // choose what to load in the iframe
+  app.src = view==='team' ? './team/index.html'
+         : view==='peer' ? './peer/index.html'
+         : './index.html';
 
+  const statusEl = document.getElementById('status');
   function showStatus(msg, ok=true){
     statusEl.textContent = msg;
     statusEl.className = ok ? 'ok' : 'error';
@@ -37,149 +44,48 @@
   }
 
   function currentFormType(doc){
-    const sub = (doc.querySelector('.subheader')?.textContent || '').toLowerCase();
-    return sub.includes('peer') ? 'peer' : 'team';
+    const t = (doc.querySelector('.subheader')?.textContent||'').toLowerCase();
+    return t.includes('peer') ? 'peer' : 'team';
   }
 
-  function collectFieldsFromIframe(){
-    const doc = app.contentDocument || app.contentWindow.document;
-    // ensure inputs have names
-    doc.querySelectorAll('input[id], select[id], textarea[id]').forEach(el=>{
-      if (!el.name) el.name = el.id;
+  function collectFields(doc){
+    // make sure inputs have "name"
+    doc.querySelectorAll('input[id],select[id],textarea[id]').forEach(el=>{
+      if(!el.name) el.name = el.id;
     });
+    const o = { form: currentFormType(doc) };
 
-    const obj = { form: currentFormType(doc) };
-
-    const formEl = doc.querySelector('form');
-    if (formEl){
-      const fd = new FormData(formEl);
-      for (const [k,v] of fd.entries()) obj[k] = v;
+    const f = doc.querySelector('form');
+    if (f){
+      const fd = new FormData(f);
+      for (const [k,v] of fd.entries()) o[k]=v;
     } else {
-      doc.querySelectorAll('input, select, textarea, [data-field]').forEach(el=>{
-        const name = el.name || el.dataset.field;
-        if (!name) return;
-        if ((el.type === 'checkbox' || el.type === 'radio')) {
-          if (el.checked) obj[name] = el.value || 'on';
-        } else {
-          obj[name] = el.value ?? '';
-        }
+      doc.querySelectorAll('input,select,textarea,[data-field]').forEach(el=>{
+        const name = el.name || el.dataset.field; if(!name) return;
+        if ((el.type==='checkbox'||el.type==='radio')) { if(el.checked) o[name]=el.value||'on'; }
+        else { o[name] = el.value ?? ''; }
       });
     }
-
     const scoreEl = doc.getElementById('scorePercent');
-    if (scoreEl) obj.score_percent = scoreEl.textContent.trim();
-
-    return obj;
+    if (scoreEl) o.score_percent = scoreEl.textContent.trim();
+    return o;
   }
 
   async function postToSheet(payload){
     const params = new URLSearchParams();
-    Object.entries(payload).forEach(([k,v]) => params.append(k, String(v)));
-    const res = await fetch(GS_ENDPOINT, {
-      method: 'POST',
-      headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
-      body: params.toString()
-    });
-    let json = null;
-    try { json = await res.json(); } catch(_){}
-    if (!res.ok || !json || json.ok !== true) {
-      const msg = json && json.error ? json.error : `HTTP ${res.status}`;
-      throw new Error(msg);
+    Object.entries(payload).forEach(([k,v])=>params.append(k,String(v)));
+    const res = await fetch(GS_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:params.toString()});
+    let json=null; try{ json=await res.json(); }catch(_){}
+    if(!res.ok || !json || json.ok!==true){
+      throw new Error((json&&json.error)||('HTTP '+res.status));
     }
   }
 
-  // ========= Custom confirm modal (same look & feel as your existing one) =========
-  function confirmSubmit(doc, text='Are you sure you want to submit? Your answers will be saved.'){
-    return new Promise((resolve, reject)=>{
+  // Confirm modal that matches your style
+  function confirmSubmit(doc, text='Are you sure you want to submit? Your answers will be saved to the spreadsheet.'){
+    return new Promise((resolve,reject)=>{
       let backdrop = doc.getElementById('bridgeConfirmBackdrop');
-      if (!backdrop){
+      if(!backdrop){
         backdrop = doc.createElement('div');
-        backdrop.id = 'bridgeConfirmBackdrop';
-        // match your modal-backdrop styling
-        backdrop.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:50;';
-        const card = doc.createElement('div');
-        // match your .modal card styling
-        card.style.cssText = 'width:min(92vw,520px);background:#fff;border-radius:18px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.25);';
-        card.innerHTML = `
-          <h3 style="margin:0 0 10px 0;font-size:18px;">please confirm</h3>
-          <p style="margin:0 0 18px 0;font-size:16px;line-height:1.5;color:#222;">${text}</p>
-          <div style="display:flex;gap:10px;justify-content:flex-end;">
-            <button id="bridgeCancel" class="btn-secondary" style="width:120px;height:42px;font-size:12pt;border:1px solid #ccc;border-radius:14px;background:#f3f4f6;color:#111;">Cancel</button>
-            <button id="bridgeOk" style="width:120px;height:42px;font-size:12pt;border:none;border-radius:14px;background:#1E90FF;color:#fff;">Submit</button>
-          </div>`;
-        backdrop.appendChild(card);
-        // close on backdrop click
-        backdrop.addEventListener('click', (e)=>{ if (e.target === backdrop) close(false); });
-        // esc to close
-        const onKey = (e)=>{ if (e.key === 'Escape') close(false); };
-        doc.body.appendChild(backdrop);
-
-        function close(ok){
-          backdrop.style.display = 'none';
-          doc.removeEventListener('keydown', onKey);
-          ok ? resolve(true) : reject(new Error('cancelled'));
-        }
-        doc.getElementById('bridgeCancel').addEventListener('click', ()=> close(false));
-        doc.getElementById('bridgeOk').addEventListener('click', ()=> close(true));
-        doc.addEventListener('keydown', onKey);
-      } else {
-        // rewire buttons each time (in case iframe reloaded)
-        const cancelBtn = backdrop.querySelector('#bridgeCancel');
-        const okBtn = backdrop.querySelector('#bridgeOk');
-        const handlers = backdrop._handlers || {};
-        if (handlers.cancel) cancelBtn.removeEventListener('click', handlers.cancel);
-        if (handlers.ok) okBtn.removeEventListener('click', handlers.ok);
-        handlers.cancel = ()=>{ backdrop.style.display='none'; reject(new Error('cancelled')); };
-        handlers.ok = ()=>{ backdrop.style.display='none'; resolve(true); };
-        cancelBtn.addEventListener('click', handlers.cancel);
-        okBtn.addEventListener('click', handlers.ok);
-        backdrop._handlers = handlers;
-      }
-      backdrop.style.display = 'flex';
-    });
-  }
-  // ==============================================================================
-
-  let savedOnce = false; // prevent accidental double writes
-
-  async function saveNow(doc, tag='submit'){
-    if (savedOnce) return;
-    savedOnce = true;
-    try {
-      const data = collectFieldsFromIframe();
-      data._trigger = tag;
-      await postToSheet(data);
-      showStatus('✔ Saved!', true);
-    } catch (e) {
-      savedOnce = false; // allow retry
-      showStatus('✖ Error: ' + e.message, false);
-    }
-  }
-
-  function attachTriggers(){
-    const doc = app.contentDocument || app.contentWindow.document;
-
-    doc.addEventListener('click', async (ev)=>{
-      const el = ev.target.closest('button, [role="button"], input[type="submit"]');
-      if (!el) return;
-      const txt = (el.textContent || el.value || '').trim().toLowerCase();
-
-      // MAIN: Submit on Q2 (id usually "submitAll"; also catch text)
-      if (el.id === 'submitAll' || /(submit)/.test(txt)) {
-        try {
-          await confirmSubmit(doc, 'Are you sure you want to submit now? Your answers will be saved to the spreadsheet.');
-          await saveNow(doc, 'submit-confirm');
-        } catch (_) { /* cancelled */ }
-      }
-
-      // FALLBACK: PDF button on the congrats screen
-      if (el.id === 'congratsPdf' || /(pdf)/.test(txt)) {
-        await saveNow(doc, 'pdf-click');
-      }
-    }, {capture:true});
-  }
-
-  app.addEventListener('load', attachTriggers);
-  </script>
-</body>
-</html>
+        backdrop.id='bridgeConfirmBackdrop';
+        backdrop.style.cssText='position
