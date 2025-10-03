@@ -1,102 +1,113 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>BED Bridge</title>
-  <style>
-    html,body,iframe { height: 100%; width: 100%; margin: 0; border: 0; }
-    #status {
-      position: fixed; bottom: 10px; right: 10px;
-      padding: 8px 12px; border-radius: 6px;
-      font: 14px system-ui, sans-serif; display: none;
-    }
-    #status.ok { background: #d4edda; color: #155724; display: inline-block; }
-    #status.error { background: #f8d7da; color: #721c24; display: inline-block; }
-  </style>
-</head>
-<body>
-  <!-- Load your original form -->
-  <iframe id="app" src="./index.html"></iframe>
-  <div id="status"></div>
+<script>
+const GS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwNeW_zk5Hzzxk1OmHsvREb9XCIe3Fae8-QnYroO9rhtL3nB9RuQjkHNrkOdCAC33Gj/exec';
 
-  <script>
-  const GS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwNeW_zk5Hzzxk1OmHsvREb9XCIe3Fae8-QnYroO9rhtL3nB9RuQjkHNrkOdCAC33Gj/exec';
+const $ = (s, r=document) => r.querySelector(s);
+const app = $('#app');
+const statusBox = (() => {
+  const el = document.createElement('div');
+  el.id = 'status';
+  el.style.cssText = 'position:fixed;right:10px;bottom:10px;padding:8px 12px;border-radius:6px;font:14px system-ui,sans-serif;display:none;z-index:9999';
+  document.body.appendChild(el);
+  return el;
+})();
+function showStatus(msg, ok=true){
+  statusBox.textContent = msg;
+  statusBox.style.display = 'inline-block';
+  statusBox.style.background = ok ? '#d4edda' : '#f8d7da';
+  statusBox.style.color = ok ? '#155724' : '#721c24';
+  setTimeout(()=> statusBox.style.display='none', 4000);
+}
 
-  const $ = (s, r=document) => r.querySelector(s);
-  const app = $('#app');
-  const statusEl = $('#status');
+function currentFormType(doc){
+  const sub = doc.querySelector('.subheader, h2')?.textContent?.toLowerCase() || '';
+  // Look for the big page title too
+  const h1 = doc.querySelector('h1')?.nextElementSibling?.textContent?.toLowerCase() || '';
+  const text = sub + ' ' + h1;
+  return text.includes('peer') ? 'peer' : 'team';
+}
 
-  function showStatus(msg, ok=true) {
-    statusEl.textContent = msg;
-    statusEl.className = ok ? 'ok' : 'error';
-    statusEl.style.display = 'inline-block';
-    setTimeout(()=> statusEl.style.display='none', 4000); // auto-hide
-  }
-
-  function collectFieldsFromIframe() {
-    const doc = app.contentDocument || app.contentWindow.document;
-    doc.querySelectorAll('input[id], select[id], textarea[id]').forEach(el=>{
-      if (!el.name) el.name = el.id;
-    });
-
-    const obj = { form: location.pathname.includes('peer') ? 'peer' : 'team' };
-
-    const formEl = doc.querySelector('form');
-    if (formEl) {
-      const fd = new FormData(formEl);
-      for (const [k,v] of fd.entries()) obj[k] = v;
-    } else {
-      doc.querySelectorAll('input, select, textarea, [data-field]').forEach(el=>{
-        const name = el.name || el.dataset.field;
-        if (!name) return;
-        if ((el.type === 'checkbox' || el.type === 'radio')) {
-          if (el.checked) obj[name] = el.value || 'on';
-        } else {
-          obj[name] = el.value ?? '';
-        }
-      });
-    }
-
-    const scoreEl = doc.getElementById('scorePercent');
-    if (scoreEl) obj.score_percent = scoreEl.textContent.trim();
-
-    return obj;
-  }
-
-  async function postToSheet(payload) {
-    const params = new URLSearchParams();
-    Object.entries(payload).forEach(([k,v]) => params.append(k, String(v)));
-    const res = await fetch(GS_ENDPOINT, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
-      body: params.toString()
-    });
-    return res.json().catch(()=>({ok:true}));
-  }
-
-  async function saveNow(tag='auto') {
-    try {
-      const data = collectFieldsFromIframe();
-      data._trigger = tag;
-      await postToSheet(data);
-      showStatus('✔ Saved!', true);
-    } catch (e) {
-      showStatus('✖ Error: not saved', false);
-    }
-  }
-
-  app.addEventListener('load', ()=>{
-    const doc = app.contentDocument || app.contentWindow.document;
-    doc.addEventListener('click', (ev)=>{
-      const el = ev.target.closest('button, [role="button"], input[type="submit"]');
-      if (!el) return;
-      const txt = (el.textContent || el.value || '').trim().toLowerCase();
-      if (/(finish|submit|complete|done)/.test(txt)) {
-        saveNow('button-click');
-      }
-    }, {capture:true});
+function collectFields(doc){
+  // ensure inputs have names
+  doc.querySelectorAll('input[id], select[id], textarea[id]').forEach(el=>{
+    if (!el.name) el.name = el.id;
   });
-  </script>
-</body>
-</html>
+
+  const obj = { form: currentFormType(doc) };
+
+  const formEl = doc.querySelector('form');
+  if (formEl){
+    const fd = new FormData(formEl);
+    for (const [k,v] of fd.entries()) obj[k] = v;
+  } else {
+    doc.querySelectorAll('input, select, textarea, [data-field]').forEach(el=>{
+      const name = el.name || el.dataset.field;
+      if (!name) return;
+      if ((el.type === 'checkbox' || el.type === 'radio')) {
+        if (el.checked) obj[name] = el.value || 'on';
+      } else {
+        obj[name] = el.value ?? '';
+      }
+    });
+  }
+
+  const scoreEl = doc.getElementById('scorePercent');
+  if (scoreEl) obj.score_percent = scoreEl.textContent.trim();
+
+  return obj;
+}
+
+async function postToSheet(payload){
+  const params = new URLSearchParams();
+  Object.entries(payload).forEach(([k,v]) => params.append(k, String(v)));
+  const res = await fetch(GS_ENDPOINT, {
+    method: 'POST',
+    headers: {'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+    body: params.toString()
+  });
+  let json = null;
+  try { json = await res.json(); } catch(_){}
+  if (!res.ok || !json || json.ok !== true) {
+    const msg = json && json.error ? json.error : `HTTP ${res.status}`;
+    throw new Error(msg);
+  }
+}
+
+async function saveNow(doc, tag='auto'){
+  const data = collectFields(doc);
+  data._trigger = tag;
+  await postToSheet(data);
+  showStatus('✔ Saved!', true);
+}
+
+function attachTriggers(){
+  const doc = app.contentDocument || app.contentWindow.document;
+
+  // 1) Submit button click (e.g. id="submitAll", text "Submit")
+  doc.addEventListener('click', (ev)=>{
+    const el = ev.target.closest('button, [role="button"], input[type="submit"]');
+    if (!el) return;
+    const txt = (el.textContent || el.value || '').trim().toLowerCase();
+    if (/(submit|finish|complete|done)/.test(txt) || el.id === 'submitAll') {
+      saveNow(doc, 'submit-click').catch(e=>showStatus('✖ Error: '+e.message,false));
+    }
+    // 3) Also save if they tap PDF on the congrats screen
+    if (/(pdf)/.test(txt) || el.id === 'congratsPdf') {
+      saveNow(doc, 'pdf-click').catch(e=>showStatus('✖ Error: '+e.message,false));
+    }
+  }, {capture:true});
+
+  // 2) When the score section (#finish) becomes visible
+  const finish = doc.getElementById('finish');
+  if (finish){
+    const obs = new MutationObserver(()=>{
+      const visible = finish.style.display !== 'none';
+      if (visible) {
+        saveNow(doc, 'finish-visible').catch(e=>showStatus('✖ Error: '+e.message,false));
+      }
+    });
+    obs.observe(finish, {attributes:true, attributeFilter:['style']});
+  }
+}
+
+app.addEventListener('load', attachTriggers);
+</script>
