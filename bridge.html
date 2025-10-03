@@ -6,19 +6,33 @@
   <title>BED Bridge</title>
   <style>
     html,body,iframe { height: 100%; width: 100%; margin: 0; border: 0; }
+    #status {
+      position: fixed; bottom: 10px; right: 10px;
+      padding: 8px 12px; border-radius: 6px;
+      font: 14px system-ui, sans-serif; display: none;
+    }
+    #status.ok { background: #d4edda; color: #155724; display: inline-block; }
+    #status.error { background: #f8d7da; color: #721c24; display: inline-block; }
   </style>
 </head>
 <body>
-  <!-- This loads your original form -->
+  <!-- Load your original form -->
   <iframe id="app" src="./index.html"></iframe>
+  <div id="status"></div>
 
   <script>
-  /* ====== CONFIG ====== */
   const GS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwNeW_zk5Hzzxk1OmHsvREb9XCIe3Fae8-QnYroO9rhtL3nB9RuQjkHNrkOdCAC33Gj/exec';
-  /* ==================== */
 
   const $ = (s, r=document) => r.querySelector(s);
   const app = $('#app');
+  const statusEl = $('#status');
+
+  function showStatus(msg, ok=true) {
+    statusEl.textContent = msg;
+    statusEl.className = ok ? 'ok' : 'error';
+    statusEl.style.display = 'inline-block';
+    setTimeout(()=> statusEl.style.display='none', 4000); // auto-hide
+  }
 
   function collectFieldsFromIframe() {
     const doc = app.contentDocument || app.contentWindow.document;
@@ -26,9 +40,7 @@
       if (!el.name) el.name = el.id;
     });
 
-    const obj = {
-      form: location.pathname.includes('peer') ? 'peer' : 'team'
-    };
+    const obj = { form: location.pathname.includes('peer') ? 'peer' : 'team' };
 
     const formEl = doc.querySelector('form');
     if (formEl) {
@@ -68,9 +80,9 @@
       const data = collectFieldsFromIframe();
       data._trigger = tag;
       await postToSheet(data);
-      console.log('[bridge] saved via', tag);
+      showStatus('✔ Saved!', true);
     } catch (e) {
-      console.warn('[bridge] save failed', e);
+      showStatus('✖ Error: not saved', false);
     }
   }
 
