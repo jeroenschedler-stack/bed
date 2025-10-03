@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BED – bridge</title>
+  <style>
+    html,body,iframe { height: 100%; width: 100%; margin: 0; border: 0; }
+    .hidden { display:none; }
+    .bar { position: fixed; inset: auto 0 0 0; padding:10px; background:#f2f2f2; 
+           font: 14px system-ui, sans-serif; border-top:1px solid #ddd; }
+    .bar button { padding:8px 12px; border-radius:8px; border:1px solid #ccc; cursor:pointer; }
+  </style>
+</head>
+<body>
+  <iframe id="app" src="./index.html" referrerpolicy="no-referrer"></iframe>
+
+  <!-- Optional helper bar: you can hide/remove this once tested -->
+  <div class="bar">
+    <button id="saveBtn" title="Saves the current form payload to Google Sheets">Save to Sheets</button>
+    <span id="status"></span>
+  </div>
+
+  <script>
+  // ====== CONFIG ======
+  const GS_ENDPOINT = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec'; // paste your Apps Script Web App URL
+  const TARGET_SHEET = 'submissions'; // tab name in the Google Sheet
+  // ====================
+
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const app = $('#app');
+  const statusEl = $('#status');
+
+  function collectFieldsFromIframe() {
+    const doc = app.contentDocument || app.contentWindow.document;
+    // Ensure each input has a name (falls back to id)
+    doc.querySelectorAll('input[id], select[id], textarea[id]').forEach(el=>{
+      if (!el.name) el.name = el.id;
+    });
+
+    const obj = {
+      sheet: TARGET_SHEET,
+      form: '/bed/index.html',
+      version: 'v1'
+    };
+
+    // Prefer a <form> if present
+    const formEl = doc.querySelector('form');
+    if (formEl) {
+      const fd = new FormData(formEl);
+      for (const [k,v] of fd.entries()) obj[k] = v;
+    } else {
+      doc.querySelectorAll('input, select, textarea, [data-field]').forEach(el=>{
+        const name = el.name || el.dataset.field;
+        if (!name) return;
+        if ((el.type === 'checkbox' || el.type === 'radio')) {
+          if (el.checked) obj[name] = el.value || 'on';
+        } else {
+          obj[name] = el.value ?? '';
+        }
+      });
+    }
+
+    const scoreEl = doc.getElementById('scorePercent');
+    if (scoreEl) obj.score_text = scoreEl.textContent.trim();
+
+    return obj;
+  }
+
+  async function postToSheet(payload) {
+    const params = new URLSearchParams();
+    Object.entries(payload).forEach(([k,v]) => params.append(k, String(v)));
+    const res = await fetch(GS_ENDPOINT, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
+      body: params.toString()
+    });
+    try {
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error || 'Unknown error');
+    } catch (_) {}
+  }
+
+  // Manual “Save to Sheets” button for first test
+  $('#saveBtn').addEventListener('click', async () => {
+    try {
+      statusEl.textContent = 'Saving…';
+      const payload = collectFieldsFromIframe();
+      await postToSheet(payload);
+      statusEl.textContent = 'Saved ✓';
+      setTimeout(()=> statusEl.textContent = '', 2000);
+    } catch (err) {
+      statusEl.textContent = 'Error: ' + err.message;
+    }
+  });
+
+  // Optional: auto-save when a likely “finish/submit” is clicked inside the iframe
+  app.addEventListener('load', () => {
+    const doc = app.contentDocument || app.contentWindow.document;
+    const maybeButtons = [
+      '#submitBtn', '#finishBtn', '#btnFinish',
+      'button[type="submit"]', '.complete', '.finish'
+    ];
+    const btn = maybeButtons.map(sel => doc.querySelector(sel)).find(Boolean);
+    if (btn) {
+      btn.addEventListener('click', async (ev) => {
+        try {
+          const payload = collectFieldsFromIframe();
+          await postToSheet(payload);
+          console.log('Saved to Sheets');
+        } catch (e) {
+          console.warn('Save failed', e);
+        }
+      }, {capture:true});
+    }
+  });
+  </script>
+</body>
+</html>
