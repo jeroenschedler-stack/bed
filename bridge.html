@@ -5,20 +5,19 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>BED Bridge</title>
   <style>
-    html,body { height:100%; margin:0 }
-    #app { width:100%; height:100%; border:0 }
-    /* status toast */
+    html,body{height:100%;margin:0}
+    #app{width:100%;height:100%;border:0}
     #status{position:fixed;right:10px;bottom:10px;padding:8px 12px;border-radius:6px;
       font:14px system-ui,sans-serif;display:none;z-index:9999}
     #status.ok{background:#d4edda;color:#155724;display:inline-block}
     #status.error{background:#f8d7da;color:#721c24;display:inline-block}
-    /* small badge to prove you are on bridge */
     #badge{position:fixed;left:10px;bottom:10px;background:#1E90FF;color:#fff;
       padding:6px 10px;border-radius:10px;font:12px/1 system-ui,sans-serif;z-index:9999}
   </style>
 </head>
 <body>
-  <iframe id="app"></iframe>
+  <!-- Default to TEAM so it never shows blank -->
+  <iframe id="app" src="team/index.html"></iframe>
   <div id="status"></div>
   <div id="badge">BRIDGE ON</div>
 
@@ -27,15 +26,32 @@
   const GS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxuCs7VB4t-iSbvv_PneUs0dA8wbB3GeUR2QmaNelUEU4IbGmkrhPr_QksIaZwlvkGA/exec';
   /* ==================== */
 
+  const app = document.getElementById('app');
+  const statusEl = document.getElementById('status');
   const params = new URLSearchParams(location.search);
   const view = (params.get('view')||'').toLowerCase();
-  const app = document.getElementById('app');
-  // choose what to load in the iframe
-  app.src = view==='team' ? './team/index.html'
-         : view==='peer' ? './peer/index.html'
-         : './index.html';
 
-  const statusEl = document.getElementById('status');
+  // Robust URL resolver (avoids blank if relative paths act weird)
+  const teamURL = new URL('team/index.html', location.href).href;
+  const peerURL = new URL('peer/index.html', location.href).href;
+
+  // Force correct target (TEAM default; ?view=peer switches)
+  app.src = view === 'peer' ? peerURL : teamURL;
+
+  // If load fails, show hint
+  app.addEventListener('error', ()=> showStatus('✖ Could not load form', false));
+  // If body is empty after load, retry alternate target once
+  app.addEventListener('load', ()=>{
+    try {
+      const doc = app.contentDocument || app.contentWindow.document;
+      if (!doc || !doc.body || !doc.body.children.length) {
+        app.src = (app.src === teamURL) ? peerURL : teamURL;
+      } else {
+        attachBridge();
+      }
+    } catch (_) { /* ignore */ }
+  });
+
   function showStatus(msg, ok=true){
     statusEl.textContent = msg;
     statusEl.className = ok ? 'ok' : 'error';
@@ -49,12 +65,10 @@
   }
 
   function collectFields(doc){
-    // make sure inputs have "name"
     doc.querySelectorAll('input[id],select[id],textarea[id]').forEach(el=>{
       if(!el.name) el.name = el.id;
     });
     const o = { form: currentFormType(doc) };
-
     const f = doc.querySelector('form');
     if (f){
       const fd = new FormData(f);
@@ -72,20 +86,75 @@
   }
 
   async function postToSheet(payload){
-    const params = new URLSearchParams();
-    Object.entries(payload).forEach(([k,v])=>params.append(k,String(v)));
-    const res = await fetch(GS_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},body:params.toString()});
+    const p = new URLSearchParams();
+    Object.entries(payload).forEach(([k,v])=>p.append(k,String(v)));
+    const res = await fetch(GS_ENDPOINT,{
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8'},
+      body:p.toString()
+    });
     let json=null; try{ json=await res.json(); }catch(_){}
     if(!res.ok || !json || json.ok!==true){
       throw new Error((json&&json.error)||('HTTP '+res.status));
     }
   }
 
-  // Confirm modal that matches your style
+  // Confirm modal (matches your style)
   function confirmSubmit(doc, text='Are you sure you want to submit? Your answers will be saved to the spreadsheet.'){
     return new Promise((resolve,reject)=>{
       let backdrop = doc.getElementById('bridgeConfirmBackdrop');
       if(!backdrop){
         backdrop = doc.createElement('div');
         backdrop.id='bridgeConfirmBackdrop';
-        backdrop.style.cssText='position
+        backdrop.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:50;';
+        const card = doc.createElement('div');
+        card.style.cssText='width:min(92vw,520px);background:#fff;border-radius:18px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.25);';
+        card.innerHTML = `
+          <h3 style="margin:0 0 10px 0;font-size:18px;">please confirm</h3>
+          <p style="margin:0 0 18px 0;font-size:16px;line-height:1.5;color:#222;">${text}</p>
+          <div style="display:flex;gap:10px;justify-content:flex-end;">
+            <button id="bridgeCancel" style="width:120px;height:42px;font-size:12pt;border:1px solid #ccc;border-radius:14px;background:#f3f4f6;color:#111;">Cancel</button>
+            <button id="bridgeOk" style="width:120px;height:42px;font-size:12pt;border:none;border-radius:14px;background:#1E90FF;color:#fff;">Submit</button>
+          </div>`;
+        backdrop.addEventListener('click',(e)=>{ if(e.target===backdrop){ backdrop.remove(); reject(new Error('cancelled')); }});
+        doc.body.appendChild(backdrop);
+        doc.getElementById('bridgeCancel').addEventListener('click',()=>{ backdrop.remove(); reject(new Error('cancelled')); });
+        doc.getElementById('bridgeOk').addEventListener('click',()=>{ backdrop.remove(); resolve(true); });
+      } else {
+        doc.body.appendChild(backdrop); // ensure on top
+      }
+    });
+  }
+
+  let savedOnce=false;
+  async function saveNow(doc, tag='submit'){
+    if(savedOnce) return;
+    savedOnce=true;
+    try{
+      const data = collectFields(doc);
+      data._trigger = tag;
+      await postToSheet(data);
+      showStatus('✔ Saved!', true);
+    }catch(e){
+      savedOnce=false;
+      showStatus('✖ Error: '+e.message, false);
+    }
+  }
+
+  function attachBridge(){
+    const doc = app.contentDocument || app.contentWindow.document;
+    doc.addEventListener('click', async (ev)=>{
+      const el = ev.target.closest('button,[role="button"],input[type="submit"]'); if(!el) return;
+      const txt = (el.textContent||el.value||'').trim().toLowerCase();
+
+      if (el.id==='submitAll' || /(^|\b)submit(\b|$)/.test(txt)) {
+        try { await confirmSubmit(doc); await saveNow(doc,'submit-confirm'); } catch(_){}
+      }
+      if (el.id==='congratsPdf' || /(^|\b)pdf(\b|$)/.test(txt)) {
+        await saveNow(doc,'pdf-click');
+      }
+    }, {capture:true});
+  }
+  </script>
+</body>
+</html>
