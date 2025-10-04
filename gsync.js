@@ -1,5 +1,5 @@
 /* ===== CONFIG ===== */
-var GS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxuCs7VB4t-iSbvv_PneUs0dA8wbB3GeUR2QmaNelUEU4IbGmkrhPr_QksIaZwlvkGA/exec';
+var GS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbytTVOr2w_I5szx8-64rdeQ7en8SW3FbGP_1Fyjhyv1rbWJYDtSliAbCqwboB9xTKMz/exec';
 var TOKEN = ''; // optional shared secret; keep '' to disable
 /* ================== */
 
