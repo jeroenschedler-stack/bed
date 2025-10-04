@@ -1,5 +1,5 @@
 /* ---- BED → Google Sheets sync (TEAM & PEER) ---- */
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxU2_7T89zPHQ31wLNWP63a9zHKlTM4lGdMdmisJnEthFqi0XzZy6bW09Y0Fh6xtTXf6A/exec';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzhiipmEv2JtXXKiDsAP1INYauerugYUl4ukr7kp-5JoqkRVa20PBb0ROMaqNBoJlDYsg/exec';
 
 (function () {
   // Run after DOM is ready
@@ -44,69 +44,70 @@ const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxU2_7T89zPHQ31wLNWP
 
       // Build answers from the canonical S() structure if available; fallback to DOM
 function collectAnswers() {
-  // Preferred: use S().questions + S().answers
   try {
+    // S() is defined in your page; contains { questions:[{id:"Q1",...},...], answers:{Q1:4,...} }
     const S = (window.__S || window.S || (()=>({})));
-    const s = typeof S === 'function' ? S() : S;
+    const s = (typeof S === 'function') ? S() : S;
     if (s && Array.isArray(s.questions) && s.answers) {
       const out = Array(35).fill(0);
       for (const q of s.questions) {
-        // Expect q.id like "Q1", "Q2", ...
-        const m = String(q.id || '').match(/^Q(\d{1,2})$/i);
+        const id = String(q.id || '');
+        const m = id.match(/^Q(\d{1,2})$/i);
         if (!m) continue;
         const idx = parseInt(m[1], 10); // 1..35
         if (idx >= 1 && idx <= 35) {
-          const v = parseInt((s.answers || {})[q.id], 10);
+          const v = parseInt(s.answers[id], 10);
           out[idx - 1] = isNaN(v) ? 0 : v;
         }
       }
       return out;
     }
-  } catch (_) {}
+  } catch (e) {
+    console.warn('collectAnswers via S() failed', e);
+  }
 
-  // Fallback: previous DOM-based collector
+  // Fallback: your existing DOM-based collector (kept as backup)
   function getAnswer(n) {
-    // 1) radios by common name patterns
+    // 1) radios by name
     const nameCandidates = [`q${n}`, `Q${n}`, `r${n}`, `R${n}`, `question${n}`];
     for (const nm of nameCandidates) {
       const r = document.querySelector(`input[name="${nm}"]:checked`);
       if (r) return parseInt(r.value, 10) || 0;
     }
-    // 2) direct inputs by id
+    // 2) inputs by id
     const idCandidates = [`q${n}`, `Q${n}`, `ans${n}`, `a${n}`, `score${n}`];
     for (const id of idCandidates) {
       const el = document.getElementById(id);
       if (el && el.value != null) return parseInt(el.value, 10) || 0;
     }
-    // 3) hidden/data-backed widgets
+    // 3) data attrs
     const dataEl = document.querySelector(
       `[data-q="${n}"][data-value], input[type="hidden"][data-q="${n}"]`
     );
     if (dataEl) return parseInt(dataEl.dataset.value || dataEl.value, 10) || 0;
-
-    // 4) sliders (range)
+    // 4) sliders
     const slider = document.querySelector(
       `input[type="range"][name="q${n}"], input[type="range"]#q${n}`
     );
     if (slider) return parseInt(slider.value, 10) || 0;
-
-    // 5) “pill” UI (selected span in the nth .q-body)
+    // 5) pill UI (nth .q-body)
     const qBodies = document.querySelectorAll('.q-body');
     if (qBodies[n - 1]) {
       const selected = qBodies[n - 1].querySelector('.pill.selected');
-      if (selected && selected.dataset.val) {
-        return parseInt(selected.dataset.val, 10) || 0;
-      }
+      if (selected && selected.dataset.val) return parseInt(selected.dataset.val, 10) || 0;
     }
-
     return 0;
   }
 
   return Array.from({ length: 35 }, (_, i) => getAnswer(i + 1));
 }
 
+// Use it right before fetch:
 const answers = collectAnswers();
 payload.answers = answers;
+
+// (Optional) quick sanity print in Console:
+console.log('Sending answers[0..9]=', payload.answers.slice(0, 10));
 
       try {
         const res = await fetch(WEBAPP_URL, {
