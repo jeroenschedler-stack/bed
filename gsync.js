@@ -67,6 +67,11 @@ const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby-8gGzklaOLbkwtbf1s
           `input[type="range"][name="q${n}"], input[type="range"]#q${n}`
         );
         if (slider) return parseInt(slider.value, 10) || 0;
+  // 5) selected "pill" buttons (span with data-val and .selected)
+  const pill = document.querySelector(
+    `.q-body:nth-of-type(${n}) .pill.selected, [data-q="${n}"].pill.selected`
+  );
+  if (pill && pill.dataset.val) return parseInt(pill.dataset.val, 10) || 0;
 
         return 0;
       }
