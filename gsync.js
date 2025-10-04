@@ -42,46 +42,71 @@ const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby-8gGzklaOLbkwtbf1s
         locationPeerReviewer: getVal(['locationPeerReviewer','peerLocation'])
       };
 
-      // Robust Q1..Q35 collector
-      function getAnswer(n) {
-        // 1) radios by common name patterns
-        const nameCandidates = [`q${n}`, `Q${n}`, `r${n}`, `R${n}`, `question${n}`];
-        for (const nm of nameCandidates) {
-          const r = document.querySelector(`input[name="${nm}"]:checked`);
-          if (r) return parseInt(r.value, 10) || 0;
+      // Build answers from the canonical S() structure if available; fallback to DOM
+function collectAnswers() {
+  // Preferred: use S().questions + S().answers
+  try {
+    const S = (window.__S || window.S || (()=>({})));
+    const s = typeof S === 'function' ? S() : S;
+    if (s && Array.isArray(s.questions) && s.answers) {
+      const out = Array(35).fill(0);
+      for (const q of s.questions) {
+        // Expect q.id like "Q1", "Q2", ...
+        const m = String(q.id || '').match(/^Q(\d{1,2})$/i);
+        if (!m) continue;
+        const idx = parseInt(m[1], 10); // 1..35
+        if (idx >= 1 && idx <= 35) {
+          const v = parseInt((s.answers || {})[q.id], 10);
+          out[idx - 1] = isNaN(v) ? 0 : v;
         }
-        // 2) direct inputs by id
-        const idCandidates = [`q${n}`, `Q${n}`, `ans${n}`, `a${n}`, `score${n}`];
-        for (const id of idCandidates) {
-          const el = document.getElementById(id);
-          if (el && el.value != null) return parseInt(el.value, 10) || 0;
-        }
-        // 3) hidden/data-backed widgets
-        const dataEl = document.querySelector(
-          `[data-q="${n}"][data-value], input[type="hidden"][data-q="${n}"]`
-        );
-        if (dataEl) return parseInt(dataEl.dataset.value || dataEl.value, 10) || 0;
+      }
+      return out;
+    }
+  } catch (_) {}
 
-   // 4) sliders (range)
-const slider = document.querySelector(
-  `input[type="range"][name="q${n}"], input[type="range"]#q${n}`
-);
-if (slider) return parseInt(slider.value, 10) || 0;
+  // Fallback: previous DOM-based collector
+  function getAnswer(n) {
+    // 1) radios by common name patterns
+    const nameCandidates = [`q${n}`, `Q${n}`, `r${n}`, `R${n}`, `question${n}`];
+    for (const nm of nameCandidates) {
+      const r = document.querySelector(`input[name="${nm}"]:checked`);
+      if (r) return parseInt(r.value, 10) || 0;
+    }
+    // 2) direct inputs by id
+    const idCandidates = [`q${n}`, `Q${n}`, `ans${n}`, `a${n}`, `score${n}`];
+    for (const id of idCandidates) {
+      const el = document.getElementById(id);
+      if (el && el.value != null) return parseInt(el.value, 10) || 0;
+    }
+    // 3) hidden/data-backed widgets
+    const dataEl = document.querySelector(
+      `[data-q="${n}"][data-value], input[type="hidden"][data-q="${n}"]`
+    );
+    if (dataEl) return parseInt(dataEl.dataset.value || dataEl.value, 10) || 0;
 
-// 5) selected "pill" buttons (span with data-val and .selected)
-const qBodies = document.querySelectorAll('.q-body');
-if (qBodies[n - 1]) {
-  const selected = qBodies[n - 1].querySelector('.pill.selected');
-  if (selected && selected.dataset.val) {
-    return parseInt(selected.dataset.val, 10) || 0;
+    // 4) sliders (range)
+    const slider = document.querySelector(
+      `input[type="range"][name="q${n}"], input[type="range"]#q${n}`
+    );
+    if (slider) return parseInt(slider.value, 10) || 0;
+
+    // 5) “pill” UI (selected span in the nth .q-body)
+    const qBodies = document.querySelectorAll('.q-body');
+    if (qBodies[n - 1]) {
+      const selected = qBodies[n - 1].querySelector('.pill.selected');
+      if (selected && selected.dataset.val) {
+        return parseInt(selected.dataset.val, 10) || 0;
+      }
+    }
+
+    return 0;
   }
+
+  return Array.from({ length: 35 }, (_, i) => getAnswer(i + 1));
 }
 
-return 0;
-}
-
-      const answers = Array.from({ length: 35 }, (_, i) => getAnswer(i + 1));
-      payload.answers = answers; // attach to payload
+const answers = collectAnswers();
+payload.answers = answers;
 
       try {
         const res = await fetch(WEBAPP_URL, {
