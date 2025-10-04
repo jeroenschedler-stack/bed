@@ -1,5 +1,5 @@
 /* ---- BED → Google Sheets sync (no edits to index.html) ---- */
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxxu02EWLmWu9k4aOzfS1TWree205wsCy8uJTqCI1cY12Zu0fXgaF34YWxiYKeitnWVtQ/exec';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby-8gGzklaOLbkwtbf1s078QZbuYy6zyXZL2FFTqVc84I85yg17Xip9R_oKrC2M5btr6w/exec';
 
 (function () {
   // run after DOM is ready
