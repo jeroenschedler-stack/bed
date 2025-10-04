@@ -1,117 +1,135 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BED HOSPITALITY 2.0</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BED HOSPITALITY 2.0 — Launcher</title>
   <style>
-    :root{
-      --text-dark:#434343;
-      --brand-blue:#1E90FF;
-      --muted:#999999;
-      --card-bg:#ffffff;
-      --page-bg:#f5f5f5;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; background:var(--page-bg); color:var(--text-dark);
-      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-    }
-
-    .wrap{max-width:720px; margin:40px auto; padding:0 16px}
-    .card{
-      background:var(--card-bg);
-      border-radius:24px; /* round all corners */
-      box-shadow:0 8px 24px rgba(0,0,0,.08);
-      padding:28px 24px;
-    }
-
-    /* Header sizes */
-    h1{
-      margin:0 0 6px 0;
-      font-weight:900;
-      font-size:28px;
-      line-height:1.1;
-      color:#666666;
-      word-break:break-word; /* ensures no overflow */
-    }
-    .subhead{
-      margin:0 0 20px 0;
-      font-weight:800;
-      text-transform:uppercase;
-      font-size:20px;
-      color:#666666;
-    }
-
-    /* Buttons */
-    .btn{
-      appearance:none; border:1.5px solid #E5E7EB; background:#fff; color:var(--text-dark);
-      width:100%; border-radius:20px; cursor:pointer; display:block;
-      transition:transform .05s ease, border-color .15s ease, box-shadow .15s ease;
-      margin:14px 0; padding:16px 18px;
-    }
-    .btn:hover{border-color:var(--brand-blue)}
-    .btn:focus-visible{outline:none; box-shadow:0 0 0 4px rgba(30,144,255,.2); border-color:var(--brand-blue)}
-    .btn:active{transform:scale(.997)}
-
-    .btn-grid{
-      display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center;
-    }
-    .title{font-weight:700; font-size:18px; line-height:1.2; text-align:left}
-    .subtitle{font-size:14px; color:var(--muted); margin-top:3px; line-height:1.2; text-align:left}
-
-    /* Prominent icons */
-    .icon{
-      width:50px; height:50px; flex:none; border-radius:12px; background:var(--brand-blue);
-      display:inline-block;
-    }
-    .icon svg{width:100%; height:100%}
+    body { font-family: system-ui, Arial, sans-serif; margin: 0; padding: 16px; }
+    .nav { display: flex; gap: 12px; margin-bottom: 12px; }
+    .nav button { padding: 10px 14px; border-radius: 10px; border: 1px solid #ddd; cursor: pointer; }
+    .hint { font-size: 12px; color: #666; margin-bottom: 10px; }
+    iframe { width: 100%; height: 88vh; border: 1px solid #eee; border-radius: 12px; }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <section class="card" role="region" aria-labelledby="title">
-      <h1 id="title">BED HOSPITALITY 2.0</h1>
-      <div class="subhead">Self Assessment Form</div>
+  <div class="nav">
+    <button id="btnTeam">Open TEAM form</button>
+    <button id="btnPeer">Open PEER form</button>
+  </div>
+  <div class="hint">Complete the form to the final summary; data syncs automatically.</div>
+  <iframe id="formFrame" src="" referrerpolicy="no-referrer"></iframe>
 
-      <!-- Button 1: Team (single person) -->
-      <button class="btn" onclick="location.href='./team/';"
-        aria-label="I am a team member. I want to assess myself.">
-        <div class="btn-grid">
-          <span class="icon" aria-hidden="true">
-            <svg viewBox="0 0 48 48" fill="none">
-              <circle cx="24" cy="16" r="9" fill="#ffffff"/>
-              <path d="M8 38c0-8 7.6-13 16-13s16 5 16 13" fill="#ffffff" opacity=".9"/>
-            </svg>
-          </span>
-          <div>
-            <div class="title">I am a team member</div>
-            <div class="subtitle">I want to assess myself</div>
-          </div>
-        </div>
-      </button>
+  <script>
+  const WEB_APP_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
 
-      <!-- Button 2: Peer (two persons simplified) -->
-      <button class="btn" onclick="location.href='./peer/';"
-        aria-label="I am a peer reviewer. I want to review my friend.">
-        <div class="btn-grid">
-          <span class="icon" aria-hidden="true">
-            <svg viewBox="0 0 48 48" fill="none">
-              <!-- left person -->
-              <circle cx="18" cy="18" r="7" fill="#ffffff"/>
-              <!-- right person -->
-              <circle cx="30" cy="18" r="7" fill="#ffffff" opacity="0.95"/>
-              <!-- base (shared shoulders) -->
-              <path d="M10 38c0-7 6-12 12-12s12 5 12 12" fill="#ffffff" opacity="0.9"/>
-            </svg>
-          </span>
-          <div>
-            <div class="title">I am a peer reviewer</div>
-            <div class="subtitle">I want to review my friend</div>
-          </div>
-        </div>
-      </button>
-    </section>
-  </main>
+  const qs  = (doc, s) => doc.querySelector(s);
+  const txt = (el) => el ? (('value' in el) ? String(el.value).trim() : String(el.textContent).trim()) : '';
+  const pick = (doc, arr) => { for (const s of arr) { const el = qs(doc, s); if (el) return el; } return null; };
+  const pct = (doc, s) => { const t = txt(qs(doc, s)); const m = t.match(/(\d+(?:\.\d+)?)\s*%/); return m ? +m[1] : (t ? +t.replace(/[^\d.]/g,'') : ''); };
+
+  function collectRow(doc) {
+    const ts = new Date().toISOString();
+    const nick = txt(qs(doc, '#nick'));
+    const email = txt(qs(doc, '#email')).toLowerCase();
+    const loc = txt(pick(doc, ['#location', '#loc', 'select[name="location"]']));
+
+    const answers = [];
+    for (let i = 1; i <= 35; i++) {
+      const el = qs(doc, `input[name="q${i}"]:checked, [data-q="${i}"][aria-checked="true"]`);
+      answers.push(el ? (el.value ?? el.textContent ?? '').toString().trim() : '');
+    }
+
+    const g1 = pct(doc, '#group1Percent, #g1Pct, [data-g1]');
+    const g2 = pct(doc, '#group2Percent, #g2Pct, [data-g2]');
+    const g3 = pct(doc, '#group3Percent, #g3Pct, [data-g3]');
+    const g4 = pct(doc, '#group4Percent, #g4Pct, [data-g4]');
+    const overall = pct(doc, '#scorePercent');
+    const recommendation = txt(qs(doc, '#recText'));
+
+    return [
+      ts,
+      nick, email, loc,     // NAME TEAM MEMBER (NICKNAME), EMAIL TEAM MEMBER, LOCATION TEAM MEMBER
+      nick, email, loc,     // NAME PEER REVIEWER (NICKNAME), EMAIL PEER REVIEWER, LOCATION PEER REVIEWER
+      ...answers,
+      g1, g2, g3, g4,
+      overall,
+      recommendation
+    ];
+  }
+
+  async function postRow(type, row) {
+    try {
+      const r = await fetch(WEB_APP_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ type, row })
+      });
+      console.log('posted:', await r.text());
+    } catch (e) { console.error('post error:', e); }
+  }
+
+  async function enhanceChild(win, type) {
+    const doc = win.document;
+
+    // Email validation
+    const emailInput = qs(doc, '#email');
+    const form = emailInput ? (emailInput.closest('form') || qs(doc, 'form')) : null;
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+    function validate() {
+      if (!emailInput) return;
+      const v = (emailInput.value || '').trim();
+      emailInput.setCustomValidity?.(re.test(v) ? '' : 'Please enter a valid email address.');
+    }
+    if (emailInput && form) {
+      emailInput.addEventListener('input', validate);
+      form.addEventListener('submit', (e) => {
+        validate();
+        if (!form.checkValidity?.() || emailInput.validationMessage) {
+          e.preventDefault(); form.reportValidity?.(); emailInput.focus();
+        }
+      });
+    }
+
+    // Nickname → email autofill (uses /team|/peer/emails.json)
+    try {
+      const path = type === 'peer' ? 'peer/emails.json' : 'team/emails.json';
+      const res = await fetch(path);
+      const list = await res.json();
+      const nameInput = qs(doc, '#nick');
+      if (nameInput && emailInput) {
+        const fill = () => {
+          const nick = (nameInput.value || '').trim().toLowerCase();
+          const m = list.find(p => (p.nickname || '').toLowerCase() === nick);
+          if (m?.email) emailInput.value = m.email;
+        };
+        nameInput.addEventListener('change', fill);
+        nameInput.addEventListener('blur', fill);
+      }
+    } catch {}
+
+    // When summary is visible, send
+    const finish = qs(doc, '#finish');
+    if (!finish) return;
+    const visible = () => finish && getComputedStyle(finish).display !== 'none' && finish.style.display !== 'none';
+    if (visible()) { await postRow(type, collectRow(doc)); return; }
+    const mo = new win.MutationObserver(async () => {
+      if (visible()) { mo.disconnect(); await postRow(type, collectRow(doc)); }
+    });
+    mo.observe(finish, { attributes: true, attributeFilter: ['style','class'] });
+  }
+
+  const frame = document.getElementById('formFrame');
+  document.getElementById('btnTeam').onclick = () => { frame.src = 'team/index.html'; };
+  document.getElementById('btnPeer').onclick = () => { frame.src = 'peer/index.html'; };
+
+  frame.addEventListener('load', () => {
+    try {
+      const win = frame.contentWindow;
+      const type = /\/peer\/?/.test(new URL(frame.src, location.href).pathname) ? 'peer' : 'team';
+      enhanceChild(win, type);
+    } catch (e) { console.error('iframe access error:', e); }
+  });
+  </script>
 </body>
 </html>
