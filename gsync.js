@@ -138,9 +138,15 @@ async function postToSheet(payload) {
 
 /* Public manual trigger (optional) */
 window.syncToSheet = async function() {
-  try { await postToSheet(buildPayload()); console.log('BED sync: posted'); }
-  catch(e){ console.error('BED sync failed', e); }
+  try {
+    await postToSheet(buildPayload());
+    alert('Saved to Google Sheet'); // simple confirmation popup
+  } catch (e) {
+    alert('Sync failed. Please try again.');
+    console.error('BED sync failed', e);
+  }
 };
+
 
 /* Auto-trigger when the Finish/Report section becomes visible (minimal intrusion) */
 document.addEventListener('DOMContentLoaded', () => {
