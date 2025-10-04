@@ -62,19 +62,23 @@ const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby-8gGzklaOLbkwtbf1s
         );
         if (dataEl) return parseInt(dataEl.dataset.value || dataEl.value, 10) || 0;
 
-        // 4) sliders (range)
-        const slider = document.querySelector(
-          `input[type="range"][name="q${n}"], input[type="range"]#q${n}`
-        );
-        if (slider) return parseInt(slider.value, 10) || 0;
-  // 5) selected "pill" buttons (span with data-val and .selected)
-  const pill = document.querySelector(
-    `.q-body:nth-of-type(${n}) .pill.selected, [data-q="${n}"].pill.selected`
-  );
-  if (pill && pill.dataset.val) return parseInt(pill.dataset.val, 10) || 0;
+   // 4) sliders (range)
+const slider = document.querySelector(
+  `input[type="range"][name="q${n}"], input[type="range"]#q${n}`
+);
+if (slider) return parseInt(slider.value, 10) || 0;
 
-        return 0;
-      }
+// 5) selected "pill" buttons (span with data-val and .selected)
+const qBodies = document.querySelectorAll('.q-body');
+if (qBodies[n - 1]) {
+  const selected = qBodies[n - 1].querySelector('.pill.selected');
+  if (selected && selected.dataset.val) {
+    return parseInt(selected.dataset.val, 10) || 0;
+  }
+}
+
+return 0;
+}
 
       const answers = Array.from({ length: 35 }, (_, i) => getAnswer(i + 1));
       payload.answers = answers; // attach to payload
