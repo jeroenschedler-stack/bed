@@ -606,6 +606,7 @@
     type="email" 
     required 
     autocomplete="email" 
+    inputmode="email"  
   />
 </div>
                 <div class="row">
@@ -1987,7 +1988,8 @@
                 return 0;
             })()
         </script>
-     
+        <script src="../validate-email.js"></script>
+        <script defer src="/bed/gsync.js"></script>
         <script>
   // === Final hot-fix mapping & order (override globally) ===
   window.MAP = {
@@ -2004,34 +2006,5 @@
     "Collaboration",
   ];
 </script>
-      <script>
-(function () {
-  const emailInput = document.querySelector('#email, #teamEmail, #peerEmail, input[name="email"], input[type="email"]');
-  const form = emailInput ? (emailInput.closest('form') || document.querySelector('form')) : null;
-  if (!emailInput || !form) return;
-
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
-
-  function validate() {
-    const v = (emailInput.value || '').trim();
-    if (!re.test(v)) {
-      emailInput.setCustomValidity('Please enter a valid email address.');
-    } else {
-      emailInput.setCustomValidity('');
-    }
-  }
-
-  emailInput.addEventListener('input', validate);
-  form.addEventListener('submit', function (e) {
-    validate();
-    if (!form.checkValidity()) {
-      e.preventDefault();
-      if (form.reportValidity) form.reportValidity();
-      emailInput.focus();
-    }
-  });
-})();
-</script>
-  
     </body>
 </html>
