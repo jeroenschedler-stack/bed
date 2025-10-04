@@ -2009,5 +2009,24 @@
     "Collaboration",
   ];
 </script>
+        <script>
+document.addEventListener('DOMContentLoaded', () => {
+  const el = document.getElementById('peerEmail');
+  if (!el) return;
+  el.type = 'email';
+  el.required = true;
+  el.autocomplete = 'email';
+  el.setAttribute('inputmode','email');
+  let msg = document.createElement('small');
+  msg.id = 'emailMsg';
+  msg.style.display = 'block';
+  msg.style.marginTop = '4px';
+  el.after(msg);
+  const show = () => { msg.textContent = el.checkValidity() ? '' : 'Please enter a valid email address'; };
+  el.addEventListener('input', show);
+  el.addEventListener('blur', show);
+});
+</script>
+
     </body>
 </html>
