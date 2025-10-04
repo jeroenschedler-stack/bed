@@ -30,31 +30,44 @@ var TOKEN = ''; // optional shared secret; keep '' to disable
 
   // Collect current inputs
   function collect() {
-    var o = { form: formType() };
-    if (TOKEN) o.token = TOKEN;
+  var o = { form: formType() };
+  if (TOKEN) o.token = TOKEN;
 
-    // ensure names for FormData
-    var named = document.querySelectorAll('input[id],select[id],textarea[id]');
-    for (var i=0;i<named.length;i++){ if (!named[i].name) named[i].name = named[i].id; }
+  // 1) Ensure names so FormData can see fields
+  var els = document.querySelectorAll('input[id],select[id],textarea[id]');
+  for (var i=0;i<els.length;i++){ if (!els[i].name) els[i].name = els[i].id; }
 
-    var f = document.querySelector('form');
-    if (f && window.FormData) {
-      var fd = new FormData(f), it = fd.entries ? fd.entries() : null, e;
-      if (it && it.next) while(!(e = it.next()).done) o[e.value[0]] = e.value[1];
-    } else {
-      var inputs = document.querySelectorAll('input,select,textarea,[data-field]');
-      for (var j=0;j<inputs.length;j++){
-        var el = inputs[j], name = el.name || el.getAttribute('data-field'); if (!name) continue;
-        if ((el.type==='checkbox'||el.type==='radio')) { if (el.checked) o[name] = el.value || 'on'; }
-        else { o[name] = el.value || ''; }
-      }
-    }
-
-    var scoreEl = document.getElementById('scorePercent');
-    if (scoreEl) o.score_percent = String(scoreEl.textContent || '').trim();
-
-    return o;
+  // 2) Pull everything the page already exposes via <form>
+  var f = document.querySelector('form');
+  if (f && window.FormData) {
+    var fd = new FormData(f), it = fd.entries ? fd.entries() : null, e;
+    if (it && it.next) while(!(e = it.next()).done) o[e.value[0]] = e.value[1];
   }
+
+  // 3) Explicitly collect ratings
+  // 3a) Native radios
+  var r = document.querySelectorAll('input[type="radio"]:checked');
+  for (i=0;i<r.length;i++){
+    var key = r[i].name || r[i].id || r[i].getAttribute('data-qid');
+    var val = r[i].value || r[i].getAttribute('data-value') || (r[i].getAttribute('aria-label')||'').trim();
+    if (key) o[key] = val || '1';
+  }
+
+  // 3b) Common custom patterns (role=radio / .selected[data-qid])
+  var custom = document.querySelectorAll('[role="radio"][aria-checked="true"], .selected[data-qid], .active[data-qid]');
+  for (i=0;i<custom.length;i++){
+    var el = custom[i];
+    var k = el.getAttribute('data-qid') || el.id;
+    var v = el.getAttribute('data-value') || (el.textContent||'').trim();
+    if (k && !(k in o)) o[k] = v;
+  }
+
+  // Optional: group & overall already shown on your results page
+  var scoreEl = document.getElementById('scorePercent');
+  if (scoreEl) o.score_percent = String(scoreEl.textContent||'').trim();
+
+  return o;
+}
 
   function encode(obj){
     var s=[]; for (var k in obj) if (Object.prototype.hasOwnProperty.call(obj,k))
