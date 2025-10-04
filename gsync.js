@@ -51,7 +51,7 @@ const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby-8gGzklaOLbkwtbf1s
       try {
         const res = await fetch(WEBAPP_URL, {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: {'Content-Type': 'text/plain'},
           body: JSON.stringify(payload)
         });
         const data = await res.json();
