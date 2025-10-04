@@ -1,9 +1,10 @@
 /* ===== CONFIG ===== */
 var GS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxuCs7VB4t-iSbvv_PneUs0dA8wbB3GeUR2QmaNelUEU4IbGmkrhPr_QksIaZwlvkGA/exec';
-var TOKEN = ''; // optional
+var TOKEN = ''; // optional shared secret; keep '' to disable
 /* ================== */
 
 (function () {
+  // --- Small toast (green OK / red error)
   function toast(msg, ok) {
     var el = document.getElementById('gsync_status');
     if (!el) {
@@ -16,63 +17,42 @@ var TOKEN = ''; // optional
     el.style.background = ok === false ? '#f8d7da' : '#d4edda';
     el.style.color = ok === false ? '#721c24' : '#155724';
     el.style.display = 'inline-block';
-    setTimeout(function(){ el.style.display='none'; }, 4000);
+    setTimeout(function(){ el.style.display = 'none'; }, 4000);
   }
 
-  function confirmBox(text, onYes, onNo) {
-    var back = document.getElementById('gsync_confirm');
-    if (!back) {
-      back = document.createElement('div');
-      back.id = 'gsync_confirm';
-      back.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:99998';
-      var card = document.createElement('div');
-      card.style.cssText = 'width:min(92vw,520px);background:#fff;border-radius:18px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.25)';
-      card.innerHTML =
-        '<h3 style="margin:0 0 10px 0;font-size:18px;">please confirm</h3>' +
-        '<p style="margin:0 0 18px 0;font-size:16px;line-height:1.5;color:#222;">' + text + '</p>' +
-        '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
-        '  <button id="gsync_cancel" style="width:120px;height:42px;font-size:12pt;border:1px solid #ccc;border-radius:14px;background:#f3f4f6;color:#111;">Cancel</button>' +
-        '  <button id="gsync_ok" style="width:120px;height:42px;font-size:12pt;border:none;border-radius:14px;background:#1E90FF;color:#fff;">Submit</button>' +
-        '</div>';
-      back.addEventListener('click', function (e) { if (e.target === back) close(false); });
-      document.body.appendChild(back);
-      document.getElementById('gsync_cancel').onclick = function(){ close(false); };
-      document.getElementById('gsync_ok').onclick = function(){ close(true); };
-    } else {
-      document.body.appendChild(back);
-    }
-    function close(ok){ back.parentNode.removeChild(back); ok ? onYes&&onYes() : onNo&&onNo(); }
-  }
-
+  // Identify form type for routing to TEAM / PEER tab
   function formType() {
     if (location.pathname.indexOf('/peer/') > -1) return 'peer';
     var sub = document.querySelector('.subheader');
-    if (sub && /peer/i.test(sub.textContent||'')) return 'peer';
+    if (sub && /peer/i.test(sub.textContent || '')) return 'peer';
     return 'team';
   }
 
+  // Collect current inputs
   function collect() {
     var o = { form: formType() };
     if (TOKEN) o.token = TOKEN;
 
-    var els = document.querySelectorAll('input[id],select[id],textarea[id]');
-    for (var i=0;i<els.length;i++){ if(!els[i].name) els[i].name = els[i].id; }
+    // ensure names for FormData
+    var named = document.querySelectorAll('input[id],select[id],textarea[id]');
+    for (var i=0;i<named.length;i++){ if (!named[i].name) named[i].name = named[i].id; }
 
     var f = document.querySelector('form');
     if (f && window.FormData) {
       var fd = new FormData(f), it = fd.entries ? fd.entries() : null, e;
-      if (it && it.next) while(!(e=it.next()).done) o[e.value[0]] = e.value[1];
-    }
-    if (!f || !window.FormData) {
+      if (it && it.next) while(!(e = it.next()).done) o[e.value[0]] = e.value[1];
+    } else {
       var inputs = document.querySelectorAll('input,select,textarea,[data-field]');
       for (var j=0;j<inputs.length;j++){
-        var el = inputs[j], name = el.name || el.getAttribute('data-field'); if(!name) continue;
-        if ((el.type==='checkbox'||el.type==='radio')) { if(el.checked) o[name]=el.value||'on'; }
+        var el = inputs[j], name = el.name || el.getAttribute('data-field'); if (!name) continue;
+        if ((el.type==='checkbox'||el.type==='radio')) { if (el.checked) o[name] = el.value || 'on'; }
         else { o[name] = el.value || ''; }
       }
     }
+
     var scoreEl = document.getElementById('scorePercent');
-    if (scoreEl) o.score_percent = String(scoreEl.textContent||'').trim();
+    if (scoreEl) o.score_percent = String(scoreEl.textContent || '').trim();
+
     return o;
   }
 
@@ -83,46 +63,74 @@ var TOKEN = ''; // optional
   }
 
   function post(payload, okCb, errCb){
-    var xhr=new XMLHttpRequest();
+    var xhr = new XMLHttpRequest();
     xhr.open('POST', GS_ENDPOINT, true);
     xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded;charset=UTF-8');
-    xhr.onreadystatechange=function(){
-      if (xhr.readyState!==4) return;
-      if (xhr.status>=200 && xhr.status<300){
-        var ok=true; try{ ok=JSON.parse(xhr.responseText||'{}').ok===true; }catch(e){}
-        ok ? okCb() : errCb(new Error('Server error'));
-      } else errCb(new Error('HTTP '+xhr.status));
+    xhr.onreadystatechange = function(){
+      if (xhr.readyState !== 4) return;
+      if (xhr.status >= 200 && xhr.status < 300) {
+        var json = null, ok = false, errMsg = 'Server error';
+        try { json = JSON.parse(xhr.responseText || '{}'); ok = (json.ok === true); if (json.error) errMsg = json.error; } catch(e) { ok = true; } // treat non-JSON as success
+        ok ? okCb() : errCb(new Error(errMsg));
+      } else {
+        errCb(new Error('HTTP ' + xhr.status));
+      }
     };
     xhr.send(encode(payload));
   }
 
-  var savedOnce=false;
+  // Duplicate guard per form (TEAM/PEER) across page hops (PDF/back etc.)
+  function savedKey(){ return 'gsync_saved_' + formType(); }
+  function alreadySaved(){ try { return sessionStorage.getItem(savedKey()) === '1'; } catch(_) { return false; } }
+  function markSaved(){ try { sessionStorage.setItem(savedKey(), '1'); } catch(_) {} }
+
   function save(tag){
-    if (savedOnce) return;
-    savedOnce=true;
-    var data=collect(); data._trigger=tag||'submit';
-    post(data,function(){ toast('✔ Saved!', true); },
-             function(err){ savedOnce=false; toast('✖ Error: '+err.message, false); });
+    if (alreadySaved()) return; // skip duplicate attempts in same session for this form
+    var data = collect();
+    data._trigger = tag || 'submit';
+    post(data, function(){
+      markSaved();
+      toast('✔ Saved!', true);
+    }, function(err){
+      toast('✖ Error: ' + err.message, false);
+    });
   }
 
+  // Click handler: use native confirm (no custom overlay), don’t block page unless user cancels
   function onClick(ev){
-    var t=ev.target;
-    while (t && t!==document && !(t.matches && t.matches('button,[role="button"],input[type="submit"]'))) t=t.parentNode;
-    if (!t || t===document) return;
-    var txt=String(t.textContent||t.value||'').toLowerCase().trim();
+    var t = ev.target;
+    // find a clickable button-ish ancestor
+    while (t && t !== document && !(t.matches && t.matches('button,[role="button"],input[type="submit"]'))) t = t.parentNode;
+    if (!t || t === document) return;
 
-    if (t.id==='submitAll' || /(^|\b)submit(\b|$)/.test(txt)) {
-      confirmBox('Are you sure you want to submit now? Your answers will be saved to the spreadsheet.',
-        function(){ save('submit-confirm'); }, function(){});
+    var txt = String(t.textContent || t.value || '').toLowerCase().trim();
+
+    // MAIN hook: Submit on Q2 (often id="submitAll")
+    if (t.id === 'submitAll' || /(^|\b)submit(\b|$)/.test(txt)) {
+      if (!window.confirm('Are you sure you want to submit now? Your answers will be saved to the spreadsheet.')) {
+        // User cancelled: block the app’s own click
+        ev.preventDefault(); ev.stopPropagation();
+        return;
+      }
+      // User confirmed: let the app proceed normally, and save in parallel
+      save('submit-confirm');
+      return; // do not block the app
     }
-    if (t.id==='congratsPdf' || /(^|\b)pdf(\b|$)/.test(txt)) {
+
+    // FALLBACK: PDF on final page → if not saved yet, save once
+    if (t.id === 'congratsPdf' || /(^|\b)pdf(\b|$)/.test(txt)) {
       save('pdf-click');
+      // don’t block; let PDF open
+      return;
     }
   }
 
-  if (document.readyState==='loading') {
+  if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function(){ document.addEventListener('click', onClick, true); });
   } else {
     document.addEventListener('click', onClick, true);
   }
+
+  // expose for quick manual test in console: gsync.save()
+  window.gsync = { save: function(){ save('manual'); } };
 })();
