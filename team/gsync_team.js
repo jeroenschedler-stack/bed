@@ -1,5 +1,5 @@
 /* gsync.js — posts the already-rendered report values to Google Sheets */
-const WEB_APP_URL = 'YOUR_WEB_APP_URL_HERE';
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz0ajD4RXhjsLhKKrWM8pbw3NDMJKYKhwCuNcA54fSxUknez9dPnr6WSHZDwSnzzIfl/exec';
 
 /* ===== Selector map (edit only if your IDs differ) ===== */
 const SEL = {
