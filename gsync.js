@@ -33,41 +33,84 @@ var TOKEN = ''; // optional shared secret; keep '' to disable
   var o = { form: formType() };
   if (TOKEN) o.token = TOKEN;
 
-  // 1) Ensure names so FormData can see fields
+  // 0) Make sure basic inputs have names so FormData can see them
   var els = document.querySelectorAll('input[id],select[id],textarea[id]');
   for (var i=0;i<els.length;i++){ if (!els[i].name) els[i].name = els[i].id; }
 
-  // 2) Pull everything the page already exposes via <form>
+  // 1) Everything that the form already exposes
   var f = document.querySelector('form');
   if (f && window.FormData) {
     var fd = new FormData(f), it = fd.entries ? fd.entries() : null, e;
     if (it && it.next) while(!(e = it.next()).done) o[e.value[0]] = e.value[1];
   }
 
-  // 3) Explicitly collect ratings
-  // 3a) Native radios
-  var r = document.querySelectorAll('input[type="radio"]:checked');
-  for (i=0;i<r.length;i++){
-    var key = r[i].name || r[i].id || r[i].getAttribute('data-qid');
-    var val = r[i].value || r[i].getAttribute('data-value') || (r[i].getAttribute('aria-label')||'').trim();
-    if (key) o[key] = val || '1';
+  // 2) Ratings — robust and order-aware
+  var groups = [];             // {key, els[], selectedEl}
+  var seenNames = Object.create(null);
+
+  // 2a) Native radios → group by name
+  var radios = document.querySelectorAll('input[type="radio"]');
+  for (var i=0;i<radios.length;i++){
+    var r = radios[i];
+    var nm = r.name || r.id || '';
+    if (!nm) continue;
+    if (!seenNames[nm]) { seenNames[nm] = { key:nm, els:[] }; groups.push(seenNames[nm]); }
+    seenNames[nm].els.push(r);
   }
 
-  // 3b) Common custom patterns (role=radio / .selected[data-qid])
-  var custom = document.querySelectorAll('[role="radio"][aria-checked="true"], .selected[data-qid], .active[data-qid]');
-  for (i=0;i<custom.length;i++){
-    var el = custom[i];
-    var k = el.getAttribute('data-qid') || el.id;
-    var v = el.getAttribute('data-value') || (el.textContent||'').trim();
-    if (k && !(k in o)) o[k] = v;
+  // 2b) Custom radio controls (role=radio or elements with data-qid/value)
+  var customs = document.querySelectorAll('[role="radio"], [data-qid], [data-value]');
+  for (i=0;i<customs.length;i++){
+    var el = customs[i];
+
+    // find a container that has multiple radio-like children
+    var p = el.closest('[role="radiogroup"], .radio-group, .question, section, div');
+    if (!p) p = el.parentElement;
+    if (!p) continue;
+
+    // collect children in this container that look like radio options
+    var opts = p.querySelectorAll('[role="radio"], [data-value], .selected, .active, input[type="radio"]');
+    if (opts.length < 3) continue; // avoid random containers
+
+    // choose a stable key: prefer explicit data-qid/id on container; else index
+    var key = p.getAttribute('data-qid') || p.id;
+    if (!key) {
+      key = 'q' + String(groups.length + 1).padStart(2,'0');
+    }
+    // ensure a single group object for each key
+    var g = groups.find(function(G){ return G.key === key; });
+    if (!g) { g = { key:key, els:[] }; groups.push(g); }
+
+    // push option elements
+    for (var j=0;j<opts.length;j++){ g.els.push(opts[j]); }
   }
 
-  // Optional: group & overall already shown on your results page
+  // 2c) Determine selected value per group
+  for (i=0;i<groups.length;i++){
+    var G = groups[i], picked = null, val = '';
+    for (j=0;j<G.els.length;j++){
+      var e = G.els[j];
+      if (e.matches && e.matches('input[type="radio"]')) {
+        if (e.checked) { picked = e; break; }
+      } else {
+        var isOn = (e.getAttribute('aria-checked') === 'true') || e.classList.contains('selected') || e.classList.contains('active');
+        if (isOn) { picked = e; break; }
+      }
+    }
+    if (picked) {
+      val = picked.value || picked.getAttribute('data-value') || (picked.getAttribute('aria-label')||'').trim() || (picked.textContent||'').trim();
+      if (!val && picked.dataset && picked.dataset.value) val = picked.dataset.value;
+      if (val) o[G.key] = val;
+    }
+  }
+
+  // 3) Overall score (if present on the results page)
   var scoreEl = document.getElementById('scorePercent');
   if (scoreEl) o.score_percent = String(scoreEl.textContent||'').trim();
 
   return o;
 }
+
 
   function encode(obj){
     var s=[]; for (var k in obj) if (Object.prototype.hasOwnProperty.call(obj,k))
