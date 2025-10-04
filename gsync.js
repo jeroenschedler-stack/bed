@@ -71,8 +71,124 @@ var TOKEN = ''; // optional shared secret; keep '' to disable
       if (it && it.next) while(!(e = it.next()).done) o[e.value[0]] = e.value[1];
     }
 
-    // Ratings – robust and order-aware
-    var usedKeys = {};
-    function put(k, v) { if (k && v != null && !(k in o)) { o[k] = String(v); usedKeys[k] = 1; } }
-    function nextKey() {
-      var n=1; while (usedKeys['q'+Strin]()
+    // A) Your main pattern: .q-item[data-qid] with .pill.selected[data-val]
+    var items = document.querySelectorAll('.q-item');
+    for (var j=0; j<items.length; j++) {
+      var ci   = items[j];
+      var qid  = ci.getAttribute('data-qid') || ci.id || ('q'+String(j+1).padStart(2,'0'));
+      var picked = ci.querySelector('.pill.selected, [role="radio"][aria-checked="true"], .active, .is-selected, input[type="radio"]:checked');
+      var val = '';
+      if (picked) {
+        if (picked.matches && picked.matches('input[type="radio"]')) {
+          val = picked.value || picked.getAttribute('data-value') || (picked.getAttribute('aria-label')||'').trim();
+        }
+        if (!val) {
+          val = picked.getAttribute('data-val') || picked.getAttribute('data-value') ||
+                (picked.getAttribute('aria-label')||'').trim() || (picked.textContent||'').trim();
+        }
+      }
+      if (!val) {
+        var chk = ci.querySelector('input[type="radio"]:checked');
+        if (chk) val = chk.value || chk.getAttribute('data-value') || (chk.getAttribute('aria-label')||'').trim();
+      }
+      if (qid && val && !(qid in o)) o[qid] = String(val);
+    }
+
+    // B) Fallbacks: any other checked radios on the page
+    var radios = document.querySelectorAll('input[type="radio"]:checked');
+    for (i=0;i<radios.length;i++){
+      var key = radios[i].name || radios[i].id || radios[i].getAttribute('data-qid');
+      var val2 = radios[i].value || radios[i].getAttribute('data-value') || (radios[i].getAttribute('aria-label')||'').trim();
+      if (key && !(key in o) && val2) o[key] = val2;
+    }
+
+    // C) Fallback for custom widgets with data-qid + selected class
+    var customs = document.querySelectorAll('.selected[data-qid], .active[data-qid], [role="radio"][aria-checked="true"][data-qid]');
+    for (i=0;i<customs.length;i++){
+      var el = customs[i], k = el.getAttribute('data-qid') || el.id;
+      var v = el.getAttribute('data-val') || el.getAttribute('data-value') ||
+              (el.getAttribute('aria-label')||'').trim() || (el.textContent||'').trim();
+      if (k && !(k in o) && v) o[k] = v;
+    }
+
+    // Overall score (if present on the results page)
+    var scoreEl = document.getElementById('scorePercent');
+    if (scoreEl) o.score_percent = String(scoreEl.textContent||'').trim();
+
+    return o;
+  }
+
+  // ---------- one-time duplicate guard per form ----------
+  function savedKey(){ return 'gsync_saved_' + formType(); }
+  function alreadySaved(){ try { return sessionStorage.getItem(savedKey()) === '1'; } catch(_) { return false; } }
+  function markSaved(){ try { sessionStorage.setItem(savedKey(), '1'); } catch(_) {} }
+
+  function save(tag){
+    if (alreadySaved()) return;
+    var data = collect();
+    data._trigger = tag || 'submit';
+    post(data, function(){
+      markSaved();
+      var count = 0; for (var k in data) if (Object.prototype.hasOwnProperty.call(data,k)) count++;
+      toast('✔ Saved! (' + (count-1) + ' fields)', true); // minus _trigger
+      if (window.console) console.log('[gsync] payload', data);
+    }, function(err){
+      toast('✖ Error: ' + err.message, false);
+      if (window.console) console.error('[gsync] error', err);
+    });
+  }
+
+  // ---------- find submit/pdf from any clicked element ----------
+  function _findAction(el){
+    var SUBMIT_PAT = /(submit|finish|done|complete|confirm)/i;
+    var PDF_PAT    = /(pdf|download)/i;
+    while (el && el !== document) {
+      var id  = (el.id || '').toLowerCase();
+      var cls = (el.className || '').toString().toLowerCase();
+      var txt = (el.textContent || el.value || '').toString().trim().toLowerCase();
+      var role= (el.getAttribute && el.getAttribute('role') || '').toLowerCase();
+      var isButtonish =
+        el.tagName === 'BUTTON' ||
+        (el.tagName === 'INPUT' && (el.type === 'submit' || el.type === 'button')) ||
+        role === 'button' ||
+        cls.indexOf('btn') > -1 || cls.indexOf('button') > -1 ||
+        el.tagName === 'A' || (el.hasAttribute && el.hasAttribute('data-action'));
+      if (isButtonish) {
+        if (SUBMIT_PAT.test(id) || SUBMIT_PAT.test(cls) || SUBMIT_PAT.test(txt) || (el.getAttribute && el.getAttribute('data-action') === 'submit')) {
+          return { type: 'submit', el: el };
+        }
+        if (PDF_PAT.test(id) || PDF_PAT.test(cls) || PDF_PAT.test(txt) || (el.getAttribute && el.getAttribute('data-action') === 'pdf')) {
+          return { type: 'pdf', el: el };
+        }
+      }
+      el = el.parentNode;
+    }
+    return null;
+  }
+
+  function onClick(ev){
+    var act = _findAction(ev.target);
+    if (!act) return;
+    if (act.type === 'submit') {
+      if (!window.confirm('Are you sure you want to submit now? Your answers will be saved to the spreadsheet.')) {
+        ev.preventDefault(); ev.stopPropagation(); return;
+      }
+      save('submit-confirm');   // do not block app navigation
+      return;
+    }
+    if (act.type === 'pdf') {
+      save('pdf-click');        // save once before opening PDF
+      return;
+    }
+  }
+
+  // attach
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){ document.addEventListener('click', onClick, true); });
+  } else {
+    document.addEventListener('click', onClick, true);
+  }
+
+  // expose for quick manual tests
+  window.gsync = { save: function(){ save('manual'); }, collect: collect };
+})();
