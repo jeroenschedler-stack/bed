@@ -1,5 +1,5 @@
 /* === BED → Google Sheets sync (no recompute) === */
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyziNsD3aixSAFK8lEh8DOQ950WyuO4VnH8NMSd37A6OwaImZviYp9SNjmgo_9irjWA/exec'; // <-- replace
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbw9H2ym5NFEZfhO3AU0fUdphhorYv3KuxbS6z4qjAqrdVtDuGWLo0_qLmD-0WPf5uMK/exec'; // <-- replace
 
 const GROUP_LABELS = [
   'Hospitality skills',
