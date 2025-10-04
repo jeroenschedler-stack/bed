@@ -1,5 +1,5 @@
 /* ---- BED → Google Sheets sync (TEAM & PEER) ---- */
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby-8gGzklaOLbkwtbf1s078QZbuYy6zyXZL2FFTqVc84I85yg17Xip9R_oKrC2M5btr6w/exec';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwOKaYkpPgk96i8Uld1mgsngFMx5K8lga7ObOIj3BD04uJEgOtG5cOpBX3RHX8MB2gqNA/exec';
 
 (function () {
   // Run after DOM is ready
