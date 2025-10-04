@@ -39,14 +39,33 @@ const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycby-8gGzklaOLbkwtbf1s
         namePeerReviewer:     getVal(['namePeerReviewer','peerName']),
         emailPeerReviewer:    getVal(['emailPeerReviewer','peerEmail']),
         locationPeerReviewer: getVal(['locationPeerReviewer','peerLocation']),
-        // Collect Q1..Q35 (supports radio name="qX" or input id="qX")
-        answers: Array.from({length:35}, (_, i) => {
-          const n = i + 1;
-          const r = document.querySelector(`[name="q${n}"]:checked`);
-          const el = r || document.getElementById(`q${n}`);
-          return Number(el?.value || 0);
-        })
-      };
+  // Collect Q1..Q35 (robust: supports radios by name, inputs by id, hidden/data attrs, sliders)
+const getAnswer = (n) => {
+  const nameCandidates = [`q${n}`, `Q${n}`, `r${n}`, `R${n}`, `question${n}`];
+  for (const nm of nameCandidates) {
+    const r = document.querySelector(`input[name="${nm}"]:checked`);
+    if (r) return parseInt(r.value, 10) || 0;
+  }
+  const idCandidates = [`q${n}`, `Q${n}`, `ans${n}`, `a${n}`, `score${n}`];
+  for (const id of idCandidates) {
+    const el = document.getElementById(id);
+    if (el && el.value != null) return parseInt(el.value, 10) || 0;
+  }
+  const dataEl = document.querySelector(
+    `[data-q="${n}"][data-value], input[type="hidden"][data-q="${n}"]`
+  );
+  if (dataEl) return parseInt(dataEl.dataset.value || dataEl.value, 10) || 0;
+
+  const slider = document.querySelector(
+    `input[type="range"][name="q${n}"], input[type="range"]#q${n}`
+  );
+  if (slider) return parseInt(slider.value, 10) || 0;
+
+  return 0;
+};
+
+const answers = Array.from({ length: 35 }, (_, i) => getAnswer(i + 1));
+payload.answers = answers; // <— attach to payload
 
       try {
         const res = await fetch(WEBAPP_URL, {
