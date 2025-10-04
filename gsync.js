@@ -107,13 +107,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }, true);
   }
 
-  // 2) Also observe #pdfReport in case it’s built without the print button
-  const pdf = document.querySelector('#pdfReport');
-  if (pdf) {
-    const mo = new MutationObserver(async () => {
-      const ok = await waitForPDFReady(8000);
-      if (ok) setTimeout(() => window.syncToSheet(), 200);
-    });
-    mo.observe(pdf, { childList: true, subtree: true });
-  }
 });
