@@ -1,6 +1,8 @@
-/* === BED → Google Sheets sync (no recompute) === */
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbw9H2ym5NFEZfhO3AU0fUdphhorYv3KuxbS6z4qjAqrdVtDuGWLo0_qLmD-0WPf5uMK/exec'; // <-- replace
+/* === gsync.js — BED → Google Sheets (no recompute) === */
+/* Replace with your deployed Apps Script Web App URL */
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbw9H2ym5NFEZfhO3AU0fUdphhorYv3KuxbS6z4qjAqrdVtDuGWLo0_qLmD-0WPf5uMK/exec';
 
+/* Fixed group labels (exact spelling) */
 const GROUP_LABELS = [
   'Hospitality skills',
   'BED competencies',
@@ -8,106 +10,123 @@ const GROUP_LABELS = [
   'Collaboration'
 ];
 
-function text(el) { return el ? (el.textContent || '').trim() : ''; }
-function numFrom(str) { const m = (str||'').match(/-?\d+(\.\d+)?/); return m ? Number(m[0]) : ''; }
+/* ---------- helpers ---------- */
+function text(el){ return el ? (el.textContent || '').trim() : ''; }
+function numFrom(str){ const m = (str||'').match(/-?\d+(\.\d+)?/); return m ? Number(m[0]) : ''; }
+function getMode(){ return location.pathname.toLowerCase().includes('/peer/') ? 'peer' : 'team'; }
 
-/* mode: infer from path */
-function getMode() {
-  const p = location.pathname.toLowerCase();
-  return p.includes('/peer/') ? 'peer' : 'team';
-}
+/* ---------- read info already shown in the report (no recompute) ---------- */
+function readInfo(){
+  // Team member (employee)
+  const teamMemberName     = text(document.querySelector('#pdfEmpName, #pdfTMName, #pdfTeamName, [data-k="team.name"]'));
+  const teamMemberEmail    = text(document.querySelector('#pdfEmpEmail, #pdfTMEmail, #pdfTeamEmail, [data-k="team.email"]'));
+  const teamMemberLocation = text(document.querySelector('#pdfEmpHotel, #pdfTMHotel, #pdfTeamHotel, #pdfEmpLocation, [data-k="team.location"]'));
 
-/* --- INFO: read from the PDF section (already rendered values) --- */
-function readInfo() {
-  // Personal (team member)
-  const teamMemberName     = text(document.querySelector('#pdfEmpName, #pdfTMName, #pdfTeamName'));
-  const teamMemberEmail    = text(document.querySelector('#pdfEmpEmail, #pdfTMEmail, #pdfTeamEmail'));
-  const teamMemberLocation = text(document.querySelector('#pdfEmpHotel, #pdfTMHotel, #pdfTeamHotel, #pdfEmpLocation'));
-
-  // Peer
-  const peerName     = text(document.querySelector('#pdfPeerName, #pdfPRName, #pdfReviewerName'));
-  const peerEmail    = text(document.querySelector('#pdfPeerEmail, #pdfPREmail, #pdfReviewerEmail'));
-  const peerLocation = text(document.querySelector('#pdfPeerHotel, #pdfPRHotel, #pdfReviewerLocation'));
+  // Peer / Reviewer
+  const peerName     = text(document.querySelector('#pdfPeerName, #pdfPRName, #pdfReviewerName, [data-k="peer.name"]'));
+  const peerEmail    = text(document.querySelector('#pdfPeerEmail, #pdfPREmail, #pdfReviewerEmail, [data-k="peer.email"]'));
+  const peerLocation = text(document.querySelector('#pdfPeerHotel, #pdfPRHotel, #pdfReviewerLocation, [data-k="peer.location"]'));
 
   return { teamMemberName, teamMemberEmail, teamMemberLocation, peerName, peerEmail, peerLocation };
 }
 
-/* --- OVERALL % --- */
-function readOverall() {
-  // try live screen
+function readOverall(){
+  // live screen
   let v = numFrom(text(document.querySelector('#scorePercent, .score-box .pct, .overall .pct')));
   if (v === '') {
-    // try PDF printed node
-    v = numFrom(text(document.querySelector('#pdfOverallPct, #pdfScorePct, .pdf-overall .pct')));
+    // pdf nodes
+    v = numFrom(text(document.querySelector('#pdfOverallPct, #pdfScorePct, .pdf-overall .pct, [data-k="overall.pct"]')));
   }
   return v;
 }
 
-/* --- GROUP % (by label) --- */
-function readGroups() {
+function readGroups(){
   const out = {};
-  // 1) PDF table rows (preferred)
-  const pdfRows = document.querySelectorAll('#pdfGroupRows tr');
-  if (pdfRows.length) {
-    pdfRows.forEach(tr => {
-      const cells = tr.querySelectorAll('td,th');
-      if (cells.length >= 2) {
-        const label = text(cells[0]);
-        const pct   = numFrom(text(cells[1]));
-        if (label) out[label] = pct;
+
+  // A) PDF table rows: first cell label, second cell %
+  document.querySelectorAll('#pdfGroupRows tr').forEach(tr => {
+    const td = tr.querySelectorAll('td,th');
+    if (td.length >= 2) {
+      const label = text(td[0]);
+      const pct   = numFrom(text(td[1]));
+      if (label) out[label] = pct;
+    }
+  });
+
+  // B) Inline group lines like “Hospitality skills — 78%”
+  document.querySelectorAll('.group-line').forEach(el => {
+    const t = text(el);
+    GROUP_LABELS.forEach(L => {
+      if (t.toLowerCase().includes(L.toLowerCase()) && out[L] === undefined) {
+        out[L] = numFrom(t);
       }
     });
-  }
+  });
 
-  // 2) Fallback: scan visible “group-line” blocks like “Hospitality skills — 78%”
-  if (!GROUP_LABELS.every(l => out[l] !== undefined)) {
-    document.querySelectorAll('.group-line').forEach(el => {
-      const t = text(el);
-      const label = GROUP_LABELS.find(L => t.toLowerCase().includes(L.toLowerCase()));
-      if (label && out[label] === undefined) out[label] = numFrom(t);
-    });
-  }
+  // C) Any element tagged with data-group containing a %
+  document.querySelectorAll('[data-group]').forEach(el => {
+    const L = el.getAttribute('data-group');
+    if (L && out[L] === undefined) out[L] = numFrom(text(el));
+  });
 
-  // return only the four required keys
+  // Only return the required four keys
   const cleaned = {};
   GROUP_LABELS.forEach(L => cleaned[L] = (out[L] ?? ''));
   return cleaned;
 }
 
-/* --- RECOMMENDATION --- */
-function readRecommendation() {
-  // screen id
-  let t = text(document.querySelector('#recText, .recommendation, #pdfRecText'));
-  return t;
+function readRecommendation(){
+  return text(document.querySelector('#recText, .recommendation, #pdfRecText, [data-k="recommendation"]'));
 }
 
-/* --- ANSWERS Q1..Q35 (from PDF statements table) --- */
-function readAnswers() {
-  const answers = [];
-  // Preferred: PDF statements table, 4th column is score
-  const rows = document.querySelectorAll('#pdfStatements tbody tr');
-  if (rows.length) {
-    rows.forEach(tr => {
-      const td = tr.querySelectorAll('td');
-      if (td.length >= 4) answers.push(numFrom(text(td[3])));
+/* Answers Q1..Q35 in order */
+function readAnswers(){
+  const out = [];
+
+  // 1) Preferred: PDF statements table (4th column)
+  const pdfRows = document.querySelectorAll('#pdfStatements tbody tr');
+  if (pdfRows.length) {
+    pdfRows.forEach(tr => {
+      const cells = tr.querySelectorAll('td,th');
+      if (cells.length >= 4) out.push(numFrom((cells[3].textContent || '').trim()));
     });
   }
 
-  // Fallback: any element carrying data-q / selected pill value (keep order)
-  if (answers.length < 35) {
-    for (let i = 1; i <= 35; i++) {
-      let v = '';
-      const sel = document.querySelector(`[data-q="${i}"].selected, .q[data-q="${i}"] .pill.selected`);
-      if (sel) v = numFrom(sel.getAttribute('data-val') || sel.getAttribute('data-value') || text(sel));
-      answers.push(v);
+  // 2) Fallbacks per question
+  for (let i = 1; i <= 35; i++) {
+    if (out[i-1] !== undefined) continue;
+    let v = '';
+
+    // a) radios: <input type="radio" name="q1" value="...">
+    let r = document.querySelector(`input[type="radio"][name="q${i}"]:checked, input[type="radio"][name="Q${i}"]:checked`);
+    if (r) v = numFrom(r.value);
+
+    // b) pill buttons with data-q and .selected/.active
+    if (v === '') {
+      const sel = document.querySelector(
+        `[data-q="${i}"].selected, [data-q="${i}"].active,
+         .q[data-q="${i}"] .pill.selected, .q[data-q="${i}"] .pill.active,
+         .q-item[data-q="${i}"] .pill.selected, .q-item[data-q="${i}"] .pill.active`
+      );
+      if (sel) v = numFrom(sel.getAttribute('data-val') || sel.getAttribute('data-value') || sel.textContent);
     }
+
+    // c) aria-pressed
+    if (v === '') {
+      const pressed = document.querySelector(
+        `[data-q="${i}"][aria-pressed="true"], .q[data-q="${i}"] [aria-pressed="true"]`
+      );
+      if (pressed) v = numFrom(pressed.getAttribute('data-val') || pressed.textContent);
+    }
+
+    out[i-1] = (v === '' ? '' : v);
   }
 
-  return answers.slice(0, 35);
+  return out.slice(0, 35);
 }
 
-/* --- Build payload --- */
-function buildPayload() {
+/* ---------- payload ---------- */
+function buildPayload(){
   const info = readInfo();
   return {
     mode: getMode(),
@@ -125,46 +144,45 @@ function buildPayload() {
   };
 }
 
-/* --- POST --- */
-async function postToSheet(payload) {
-  const res = await fetch(WEBAPP_URL, {
+/* ---------- send ---------- */
+async function postToSheet(payload){
+  // no-cors: we can’t read the response; Apps Script will accept the POST
+  await fetch(WEBAPP_URL, {
     method: 'POST',
-    mode: 'no-cors',            // Apps Script accepts without CORS preflight
+    mode: 'no-cors',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
-  // no-cors: cannot read response; assume success
 }
 
-/* Public manual trigger (optional) */
-window.syncToSheet = async function() {
+/* Public manual trigger */
+window.syncToSheet = async function(){
   try {
     await postToSheet(buildPayload());
-    alert('Saved to Google Sheet'); // simple confirmation popup
+    alert('Saved to Google Sheet');
   } catch (e) {
     alert('Sync failed. Please try again.');
     console.error('BED sync failed', e);
   }
 };
 
-
-/* Auto-trigger when the Finish/Report section becomes visible (minimal intrusion) */
+/* ---------- auto-trigger on final screen ---------- */
 document.addEventListener('DOMContentLoaded', () => {
   const finish = document.getElementById('finish') || document.querySelector('#pdfReport');
   if (!finish) return;
 
-  // If already visible (e.g., after scoring)
-  const isShown = () => finish.style.display !== 'none';
+  const isShown = () => {
+    // visible if style is not display:none or element has a visible layout
+    if (finish.style && finish.style.display === 'none') return false;
+    return finish.offsetParent !== null || getComputedStyle(finish).display !== 'none';
+  };
+
+  const trigger = () => setTimeout(() => window.syncToSheet(), 800); // small delay to ensure DOM is final
 
   // Observe visibility changes
-  const mo = new MutationObserver(() => {
-    if (isShown()) {
-      // small debounce to ensure DOM has final values
-      setTimeout(() => window.syncToSheet(), 200);
-    }
-  });
+  const mo = new MutationObserver(() => { if (isShown()) trigger(); });
   mo.observe(finish, { attributes: true, attributeFilter: ['style', 'class'] });
 
-  // Also try once after a delay (safety)
-  setTimeout(() => { if (isShown()) window.syncToSheet(); }, 600);
+  // Safety: also try once after a short delay
+  setTimeout(() => { if (isShown()) trigger(); }, 1200);
 });
