@@ -1,5 +1,5 @@
 /* ===== CONFIG (your live web app URL) ===== */
-var GS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbytTVOr2w_I5szx8-64rdeQ7en8SW3FbGP_1Fyjhyv1rbWJYDtSliAbCqwboB9xTKMz/exec';
+var GS_ENDPOINT = 'https://script.google.com/macros/s/AKfycbyFjCslDd1O6WF_lVlNwFRbuFVhxIfrmj1EnCBgvmF7qdCRORjQsI0jB8_9XkknYfZP/exec';
 var TOKEN = ''; // optional shared secret; keep '' to disable
 /* ========================================= */
 
