@@ -2117,5 +2117,34 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
-    </body>
+        <script defer src="/bed/gsync.js?vS3"></script>
+<script>
+document.addEventListener("bed:pdf-ready", () => {
+  // find the finish section
+  const finish = document.getElementById("finish");
+  if (!finish) return;
+
+  // check if message already exists to prevent duplicates
+  if (!finish.querySelector("#recordMsg")) {
+    const p = document.createElement("p");
+    p.id = "recordMsg";
+    p.textContent = "Your assessment is recorded.";
+    p.style.marginTop = "12px";
+    p.style.fontSize = "16px";
+    p.style.color = "#434343";
+    p.style.textAlign = "left";
+
+    // find PDF instruction text
+    const pdfHint = Array.from(finish.querySelectorAll("p, div"))
+      .find(el => el.textContent && el.textContent.includes("Click PDF"));
+
+    if (pdfHint) {
+      pdfHint.parentNode.insertBefore(p, pdfHint);
+    } else {
+      finish.appendChild(p);
+    }
+  }
+});
+</script>
+</body>
 </html>
