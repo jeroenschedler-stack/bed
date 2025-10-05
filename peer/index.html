@@ -1048,7 +1048,9 @@
                     renderGroupResults();
 buildPdfReport();                                    // build PDF DOM now
 document.dispatchEvent(new Event('bed:pdf-ready'));  // signal PDF is ready
-show("finish");
+show("finish"); 
+                    const recMsg = document.getElementById("recordMsg");
+if (recMsg) recMsg.style.display = "block"; // only show message on completion page
                 };
 
                 el("backToQ2").onclick = () => show("q2");
