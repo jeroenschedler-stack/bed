@@ -93,7 +93,7 @@ window.syncToSheet = async function(){
 };
 
 /* wait until PDF statements rows exist (built by buildPdfReport) */
-function waitForPDFReady(timeoutMs=8000) {
+function waitForPDFReady(timeoutMs = 8000) {
   return new Promise(resolve => {
     const start = Date.now();
     const tick = () => {
@@ -106,17 +106,8 @@ function waitForPDFReady(timeoutMs=8000) {
   });
 }
 
-/* === FINAL triggers (once) === */
+/* === FINAL trigger (once) — no duplicates === */
 document.addEventListener('bed:pdf-ready', async () => {
   const ok = await waitForPDFReady(8000);
   setTimeout(() => window.syncToSheet(), ok ? 200 : 800);
 }, { once: true });
-
-document.addEventListener('DOMContentLoaded', () => {
-  const btn = document.getElementById('congratsPdf');
-  if (!btn) return;
-  btn.addEventListener('click', async () => {
-    const ok = await waitForPDFReady(8000);
-    setTimeout(() => window.syncToSheet(), ok ? 200 : 800);
-  }, { once: true });
-});
