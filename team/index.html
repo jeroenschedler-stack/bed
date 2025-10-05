@@ -102,7 +102,7 @@
               select:invalid{color:#aaa}
 
               .actions{padding-left:calc(var(--label-w) + var(--gap)); margin-top:14px; display:flex; gap:10px; justify-content:flex-end}
-              button{width:120px; height:42px; font-size:12pt; border:none; border-radius:14px; text-align:center;}
+              button { width: 100px; height: 42px; font-size: 12pt; border: none; border-radius: 14px; text-align: center; }
             button:enabled{background:var(--blue); color:#fff; cursor:pointer;}
             button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 
@@ -536,12 +536,13 @@
                 margin-right: 10px; /* space between circle and text */
             }
             .step {
-                display: flex;
-                align-items: center;
-                margin-top: 8px;
-                font-size: 18px;
-                color: #374151;
-            }
+  display: flex;
+  align-items: center;
+  margin: 6px 0;
+  font-size: 17px;
+  font-weight: 600; /* increased from 500 */
+  color: #444;
+}
         </style>
         <style>
             /* Final vFinal: scoring page group line layout */
@@ -750,10 +751,11 @@
 <br />
 <br />
 
-                <div class="page-actions" style="display: flex; gap: 14px; justify-content: center; margin-top: 10px;">
-                    <button class="btn-secondary btn-wide" id="congratsBack">Back</button>
-                    <button class="btn-wide" id="congratsPdf">PDF</button>
-                </div>
+               <div class="page-actions" style="display: flex; gap: 14px; justify-content: flex-end; margin-top: 10px;">
+  <button class="btn-secondary btn-wide" id="congratsBack">Back</button>
+  <button class="btn-wide" id="congratsPdf">PDF</button>
+</div>
+
             </section>
         </main>
         <!-- Modal -->
