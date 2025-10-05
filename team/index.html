@@ -2088,7 +2088,7 @@ document.addEventListener('DOMContentLoaded', () => {
       Are you sure you want to submit now?<br />
       Your assessment scores will be automatically saved.
     </div>
-<!-- Custom "Are you sure?" confirmation modal (white, left text, right buttons) -->
+<!-- Custom "Are you sure?" confirmation modal (white, left text, right buttons) v3 -->
 <style>
   #confirmModal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:9999}
   #confirmModal .modal-box{background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.25);padding:22px 24px;width:86%;max-width:380px;font-family:system-ui,Arial,sans-serif;text-align:left}
@@ -2102,15 +2102,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <div id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
   <div class="modal-box">
-    <div id="confirmTitle" class="title">are you sure?</div>
-    <div id="confirmText" class="text">your assessment scores will be automatically saved.</div>
+    <div id="confirmTitle" class="title">Are you sure?</div>
+    <div id="confirmText" class="text">Your assessment scores will be automatically saved.</div>
     <div class="actions">
-      <button id="cancelConfirm" class="btn-cancel" type="button">no</button>
-      <button id="okConfirm" class="btn-ok" type="button">yes</button>
+      <button id="cancelConfirm" class="btn-cancel" type="button">No</button>
+      <button id="okConfirm" class="btn-ok" type="button">Yes</button>
     </div>
   </div>
 </div>
 
+<script src="gsync.js?v=3"></script>
 <script>
 (function () {
   const modal = document.getElementById("confirmModal");
@@ -2119,21 +2120,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const submitBtn = document.getElementById("submitAll");
   if (!submitBtn || !modal) return;
 
-  // open modal instead of submitting
-  function intercept(e){ e.preventDefault(); modal.style.display = "flex"; setTimeout(()=>cancel.focus(),100); }
+  // intercept click to show modal
+  function intercept(e){
+    e.preventDefault();
+    modal.style.display = "flex";
+    setTimeout(()=>cancel.focus(),100);
+  }
   submitBtn.addEventListener("click", intercept);
 
-  // close
+  // close on "No"
   cancel.addEventListener("click", () => { modal.style.display = "none"; });
 
-  // proceed
+  // proceed on "Yes"
   ok.addEventListener("click", () => {
     modal.style.display = "none";
-    submitBtn.removeEventListener("click", intercept); // prevent loop
+    submitBtn.removeEventListener("click", intercept);
     submitBtn.disabled = true;
-    submitBtn.click(); // runs your existing submit logic
+    submitBtn.click(); // runs existing submit logic
   });
 })();
 </script>
+</body>
+</html>
     </body>
 </html>
