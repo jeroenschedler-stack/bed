@@ -1054,9 +1054,14 @@ if (recMsg) recMsg.style.display = "block"; // only show message on completion p
                 };
 
                 el("backToQ2").onclick = () => show("q2");
-                el("nextToPeer").onclick = () => show("congrats");
+               el("nextToPeer").onclick = () => {
+          show("congrats");
+          const recMsg = document.getElementById("recordMsg");
+          if (recMsg) recMsg.style.display = "block"; // show only when on completion page
+        };
 
-                el("congratsBack").onclick = () => show("finish");
+            el("congratsBack").onclick = () => show("finish");
+
 
                 // Validation
                 ["nick", "email", "hotel", "peerName", "peerEmail", "peerHotel"].forEach((id) => {
@@ -2127,32 +2132,30 @@ document.addEventListener('DOMContentLoaded', () => {
         <script defer src="/bed/gsync.js"></script>
 <script>
 document.addEventListener("bed:pdf-ready", () => {
-  // find the finish section
-  const finish = document.getElementById("finish");
-  if (!finish) return;
+  // target the COMPLETION page, not the scoring page
+  const congrats = document.getElementById("congrats");
+  if (!congrats) return;
 
   // check if message already exists to prevent duplicates
-  if (!finish.querySelector("#recordMsg")) {
+  if (!congrats.querySelector("#recordMsg")) {
     const p = document.createElement("p");
     p.id = "recordMsg";
     p.textContent = "Your assessment is recorded.";
-    p.style.marginTop = "12px";
-    p.style.fontSize = "16px";
-    p.style.color = "#434343";
-    p.style.textAlign = "left";
+    p.style.margin = "6px 0 8px 0"; // subtle spacing; inherits font/size/color
 
-    // find PDF instruction text
-    const pdfHint = Array.from(finish.querySelectorAll("p, div"))
-      .find(el => el.textContent && el.textContent.includes("Click PDF"));
+    // find "Click PDF" line (case-insensitive)
+    const pdfHint = Array.from(congrats.querySelectorAll("p, div"))
+      .find(el => /click\s*pdf/i.test(el.textContent || ""));
 
-    if (pdfHint) {
-      pdfHint.parentNode.insertBefore(p, pdfHint);
+    if (pdfHint && pdfHint.parentNode) {
+      pdfHint.parentNode.insertBefore(p, pdfHint); // insert ABOVE the line
     } else {
-      finish.appendChild(p);
+      congrats.appendChild(p); // fallback: add at end of completion section
     }
   }
 });
 </script>
+
         <script>
 document.addEventListener("DOMContentLoaded", () => {
   // Wait until the completion (congrats) page is shown
