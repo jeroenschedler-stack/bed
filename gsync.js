@@ -76,9 +76,20 @@ async function postToSheet(payload) {
   });
 }
 
-window.syncToSheet = async function () {
-  try { await postToSheet(buildPayload()); alert('Saved to Google Sheet'); }
-  catch (e) { alert('Sync failed'); console.error(e); }
+/* === FINAL: no alerts, save-once, notify page === */
+window.__bedSaved = false;
+
+window.syncToSheet = async function(){
+  if (window.__bedSaved) return;          // prevent duplicates
+  try {
+    await postToSheet(buildPayloadPDF()); // your existing send
+    window.__bedSaved = true;
+    if (window.onBedSaved) {              // triggers "Your assessment is recorded."
+      try { window.onBedSaved(); } catch(_) {}
+    }
+  } catch (e) {
+    console.error('BED sync failed', e);  // no alerts
+  }
 };
 
 /* wait until PDF statements rows exist (built by buildPdfReport) */
@@ -95,16 +106,17 @@ function waitForPDFReady(timeoutMs=8000) {
   });
 }
 
-/* trigger on “Print/Report” action and when pdfReport mutates */
-document.addEventListener('DOMContentLoaded', () => {
-  // 1) If user clicks the “PDF/Print” button, sync after the PDF DOM builds
-  const printBtn = document.getElementById('congratsPdf');
-  if (printBtn) {
-    printBtn.addEventListener('click', async () => {
-      // buildPdfReport() runs inside your page’s handler; we just wait for rows then sync
-      const ok = await waitForPDFReady(8000);
-      setTimeout(() => window.syncToSheet(), ok ? 200 : 800); // small delay to let text settle
-    }, true);
-  }
+/* === FINAL triggers (once) === */
+document.addEventListener('bed:pdf-ready', async () => {
+  const ok = await waitForPDFReady(8000);
+  setTimeout(() => window.syncToSheet(), ok ? 200 : 800);
+}, { once: true });
 
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('congratsPdf');
+  if (!btn) return;
+  btn.addEventListener('click', async () => {
+    const ok = await waitForPDFReady(8000);
+    setTimeout(() => window.syncToSheet(), ok ? 200 : 800);
+  }, { once: true });
 });
