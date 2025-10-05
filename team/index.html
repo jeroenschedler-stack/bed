@@ -729,11 +729,14 @@
                     <h3 style="font-size: 32px; margin: 8px 0 6px 0; color: #444;">
                         self-assessment<br />
                         completed
-                    </h3>
-                    <p style="font-size: 17px; font-weight: 500; color: #444; line-height: 1.4;">
-                        click PDF to download the report<br />
-                        you can now request your peer review
-                    </p>
+                    <h3>Congratulations!</h3>
+<p id="recordedMsg" style="font-size:17px; font-weight:500; color:#444; line-height:1.4; margin-bottom:4px;">
+  Your assessment is recorded.
+</p>
+<p style="font-size:17px; font-weight:500; color:#444; line-height:1.4;">
+  Click PDF to download the report<br />
+  You can now request your peer review
+</p>
                 </div>
                 <br />
                 <br />
@@ -2135,7 +2138,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.onBedSaved = () => { showRecorded(); };
 })();
 </script>
-        <script defer src="/bed/gsync.js?vS3"></script>
+        <script defer src="/bed/gsync.js></script>
 <script>
 document.addEventListener("bed:pdf-ready", () => {
   // find the finish section
