@@ -2024,10 +2024,94 @@ document.addEventListener('DOMContentLoaded', () => {
   el.addEventListener('blur', show);
 });
 </script>
-   // OK continues normal submit
-  ok.addEventListener('click', () => {
-    modal.style.display = 'none';
-    submitBtn.removeEventListener('click', () => {}); // guard
+   <!-- Custom "Are you sure?" confirmation modal -->
+<style>
+  #confirmModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  #confirmModal .modal-box {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    padding: 22px 24px;
+    width: 86%;
+    max-width: 380px;
+    font-family: "Roboto", sans-serif;
+    text-align: left;
+  }
+  #confirmModal h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+    margin: 0 0 10px 0;
+  }
+  #confirmModal p {
+    font-size: 16px;
+    font-weight: 400;
+    color: #333;
+    margin: 0 0 18px 0;
+    line-height: 1.4;
+  }
+  #confirmModal .btn-row {
+    text-align: right;
+  }
+  #confirmModal button {
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    margin-left: 10px;
+  }
+  #confirmModal .btn-cancel {
+    background: #e0e0e0;
+    color: #333;
+  }
+  #confirmModal .btn-ok {
+    background: #1E90FF;
+    color: #fff;
+  }
+</style>
+
+<div id="confirmModal">
+  <div class="modal-box">
+    <h3>Are you sure?</h3>
+    <p>Your assessment scores will be automatically saved.</p>
+    <div class="btn-row">
+      <button class="btn-cancel" id="cancelConfirm">No</button>
+      <button class="btn-ok" id="okConfirm">Yes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const modal = document.getElementById("confirmModal");
+  const cancel = document.getElementById("cancelConfirm");
+  const ok = document.getElementById("okConfirm");
+  const submitBtn = document.getElementById("submitAll");
+
+  if (!submitBtn) return;
+
+  submitBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    modal.style.display = "flex";
+    // Auto-focus "No" button for accessibility
+    setTimeout(() => cancel.focus(), 100);
+  });
+
+  cancel.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+
+  ok.addEventListener("click", () => {
+    modal.style.display = "none";
     submitBtn.disabled = true;
     submitBtn.click();
   });
