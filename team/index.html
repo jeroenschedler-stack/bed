@@ -2093,60 +2093,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 })();
 </script>
-<script>
-/* BED completion status line: auto-insert above "click PDF..." */
-(function () {
-  const STATUS_TEXT = 'your assessment is recorded';
 
-  function findPdfNoteTarget() {
-    // Prefer explicit ids/classes if you add them later
-    let t = document.querySelector('#completionNote, #pdfNote, .pdf-note, .completion-note');
-    if (t) return t;
-
-    // Fallback: look for the "click PDF" sentence on the finish/congrats page
-    const scope = document.querySelector('#finish, #congrats') || document;
-    const candidates = scope.querySelectorAll('p, div, span');
-    for (const el of candidates) {
-      if (/click\s*pdf/i.test(el.textContent || '')) return el;
-    }
-    return null;
-  }
-
-  function ensureStatusLine() {
-    const target = findPdfNoteTarget();
-    if (!target) return null;
-
-    let line = document.getElementById('saveStatus');
-    if (!line) {
-      line = document.createElement('div');
-      line.id = 'saveStatus';
-      line.style.display = 'none';                // inherit type/spacing from parent
-      line.className = target.className || '';    // mirror target classes for same look
-      target.parentNode.insertBefore(line, target); // insert above the "click PDF..." line
-    }
-    return line;
-  }
-
-  function showRecorded() {
-    const el = ensureStatusLine();
-    if (!el) return;
-    el.textContent = STATUS_TEXT;
-    el.style.display = 'block';
-  }
-
-  // Show right after Submit builds the PDF
-  document.addEventListener('bed:pdf-ready', () => { showRecorded(); }, { once: true });
-
-  // Fallback: if user clicks PDF later without seeing the line yet
-  document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('congratsPdf');
-    if (btn) btn.addEventListener('click', () => { showRecorded(); }, { once: true });
-  });
-
-  // Allow gsync.js to confirm after save (optional double assurance)
-  window.onBedSaved = () => { showRecorded(); };
-})();
-</script>
         <script defer src="/bed/gsync.js></script>
 <script>
 document.addEventListener("bed:pdf-ready", () => {
