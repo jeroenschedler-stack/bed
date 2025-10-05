@@ -1043,7 +1043,9 @@
                     else rec = "Awesome! Your understanding of BED is an inspiration for others. Continue to lead others by example";
                     document.getElementById("recText").textContent = rec;
                     renderGroupResults();
-                    show("finish");
+buildPdfReport();                                    // build PDF DOM now
+document.dispatchEvent(new Event('bed:pdf-ready'));  // signal PDF is ready
+show("finish");
                 };
 
                 el("backToQ2").onclick = () => show("q2");
