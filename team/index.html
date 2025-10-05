@@ -2088,97 +2088,94 @@ document.addEventListener('DOMContentLoaded', () => {
       Are you sure you want to submit now?<br />
       Your assessment scores will be automatically saved.
     </div>
-<!-- === BED Custom Confirm Modal (Refined version) === -->
+<!-- Custom "Are you sure?" confirmation modal -->
 <style>
-.modal-backdrop {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.45);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-.modal-box {
-  background: #fff;
-  border-radius: 14px;
-  width: 90%;
-  max-width: 360px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.25);
-  overflow: hidden;
-  font-family: system-ui, sans-serif;
-  padding: 20px;
-  animation: fadeIn .25s ease;
-}
-.modal-header {
-  font-weight: 700;
-  font-size: 17px;
-  color: #111;
-  text-align: left;
-  margin-bottom: 6px;
-}
-.modal-body {
-  text-align: left;
-  color: #333;
-  font-size: 15px;
-  line-height: 1.5;
-  margin-bottom: 18px;
-}
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-.modal-actions button {
-  border: none;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  padding: 8px 22px;
-  cursor: pointer;
-}
-.btn-primary { background:#1E90FF; color:#fff; }
-.btn-secondary { background:#ddd; color:#333; }
-@keyframes fadeIn { from {opacity:0; transform:scale(.95);} to {opacity:1; transform:scale(1);} }
+  #confirmModal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+  #confirmModal .modal-box {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    padding: 22px 24px;
+    width: 86%;
+    max-width: 380px;
+    font-family: "Roboto", sans-serif;
+    text-align: left;
+  }
+  #confirmModal h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+    margin: 0 0 10px 0;
+  }
+  #confirmModal p {
+    font-size: 16px;
+    font-weight: 400;
+    color: #333;
+    margin: 0 0 18px 0;
+    line-height: 1.4;
+  }
+  #confirmModal .btn-row {
+    text-align: right;
+  }
+  #confirmModal button {
+    font-size: 15px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    margin-left: 10px;
+  }
+  #confirmModal .btn-cancel {
+    background: #e0e0e0;
+    color: #333;
+  }
+  #confirmModal .btn-ok {
+    background: #1E90FF;
+    color: #fff;
+  }
 </style>
 
-<div id="confirmModal" class="modal-backdrop">
+<div id="confirmModal">
   <div class="modal-box">
-    <div class="modal-header">Are you sure?</div>
-    <div class="modal-body">
-      Your assessment scores will be automatically saved.
-    </div>
-    <div class="modal-actions">
-      <button id="cancelConfirm" class="btn-secondary">Cancel</button>
-      <button id="okConfirm" class="btn-primary">OK</button>
+    <h3>Are you sure?</h3>
+    <p>Your assessment scores will be automatically saved.</p>
+    <div class="btn-row">
+      <button class="btn-cancel" id="cancelConfirm">No</button>
+      <button class="btn-ok" id="okConfirm">Yes</button>
     </div>
   </div>
 </div>
 
 <script>
-(function(){
-  const modal = document.getElementById('confirmModal');
-  const ok = document.getElementById('okConfirm');
-  const cancel = document.getElementById('cancelConfirm');
-  const submitBtn = document.getElementById('submitAll');
+(function () {
+  const modal = document.getElementById("confirmModal");
+  const cancel = document.getElementById("cancelConfirm");
+  const ok = document.getElementById("okConfirm");
+  const submitBtn = document.getElementById("submitAll");
 
-  if(!modal || !submitBtn) return;
+  if (!submitBtn) return;
 
-  // Intercept Submit click
-  submitBtn.addEventListener('click', function(e){
+  submitBtn.addEventListener("click", (e) => {
     e.preventDefault();
-    modal.style.display = 'flex';
+    modal.style.display = "flex";
+    // Auto-focus "No" button for accessibility
+    setTimeout(() => cancel.focus(), 100);
   });
 
-  // Cancel hides modal
-  cancel.addEventListener('click', () => {
-    modal.style.display = 'none';
+  cancel.addEventListener("click", () => {
+    modal.style.display = "none";
   });
 
-  // OK continues normal submit
-  ok.addEventListener('click', () => {
-    modal.style.display = 'none';
-    submitBtn.removeEventListener('click', () => {}); // guard
+  ok.addEventListener("click", () => {
+    modal.style.display = "none";
     submitBtn.disabled = true;
     submitBtn.click();
   });
