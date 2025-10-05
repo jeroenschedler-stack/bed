@@ -2146,5 +2146,30 @@ document.addEventListener("bed:pdf-ready", () => {
   }
 });
 </script>
+        <script>
+document.addEventListener("DOMContentLoaded", () => {
+  // Wait until the completion (congrats) page is shown
+  const targetNode = document.getElementById("congrats");
+  if (!targetNode) return;
+
+  const observer = new MutationObserver(() => {
+    const pdfText = targetNode.querySelector("p");
+    if (pdfText && pdfText.textContent.toLowerCase().includes("click pdf")) {
+      // Only add once
+      if (!document.getElementById("recordedMsg")) {
+        const msg = document.createElement("p");
+        msg.id = "recordedMsg";
+        msg.textContent = "Your assessment is recorded.";
+        msg.style.fontSize = "16px";
+        msg.style.color = "#434343";
+        msg.style.marginBottom = "4px";
+        pdfText.parentNode.insertBefore(msg, pdfText);
+      }
+    }
+  });
+
+  observer.observe(targetNode, { childList: true, subtree: true });
+});
+</script>
 </body>
 </html>
