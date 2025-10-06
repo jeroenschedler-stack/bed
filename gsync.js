@@ -1,54 +1,67 @@
-/* === gsync.js — PDF-only export for your current HTML === */
+/* === gsync.js — BED → Google Sheets (PDF-driven sync) === */
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyY_cImcU9Vq8fVEOP2qCrCzH6l4www99IcZo3oUyWyTPl53fhQ-ygQjJqIjoXnRxm7/exec';
 
-/* helpers */
+/* ---------- helpers ---------- */
 const T = el => el ? (el.textContent || '').trim() : '';
-const N = s => { const m = (s||'').match(/-?\d+(\.\d+)?/); return m ? Number(m[0]) : ''; };
-const MODE = () => location.pathname.toLowerCase().includes('/peer/') ? 'peer' : 'team';
+const N = s => { const m = (s || '').match(/-?\d+(\.\d+)?/); return m ? Number(m[0]) : ''; };
+const MODE = () => {
+  if (location.pathname.toLowerCase().includes('/peer/')) return 'peer';
+  return /PEER REVIEW FORM/i.test(document.body.innerText) ? 'peer' : 'team';
+};
 
-/* read strictly from #pdfReport */
+/* ---------- read the rendered PDF content ---------- */
 function readPDF() {
-  const root = document.querySelector('#pdfReport');
+  const root = document.querySelector('#pdfReport') || document;
+
+  // person fields (use PDF ids, fall back to info panel ids if present)
+  const teamMemberName  = T(root.querySelector('#pdfEmpName, #infoTeamName'));
+  const teamMemberEmail = T(root.querySelector('#pdfEmpEmail, #infoTeamEmail'));
+  const teamMemberLoc   = T(root.querySelector('#pdfEmpHotel, #infoTeamLoc'));
+  const peerName        = T(root.querySelector('#pdfPeerName, #infoPeerName'));
+  const peerEmail       = T(root.querySelector('#pdfPeerEmail, #infoPeerEmail'));
+  const peerLoc         = T(root.querySelector('#pdfPeerHotel, #infoPeerLoc'));
+
+  // overall %
+  const overallPct = N(T(root.querySelector('#pdfTotalPct, #pdfScorePct, #pdfOverallPct, #scorePercent')));
+
+  // groups: support either “Score X” label or plain group name
+  const groups = (() => {
+    const out = { 'Hospitality skills':'', 'BED competencies':'', 'Taking ownership':'', 'Collaboration':'' };
+    root.querySelectorAll('#pdfGroupRows tr, .group-scores tr').forEach(tr => {
+      const td = tr.querySelectorAll('td,th');
+      if (td.length >= 2) {
+        const labelRaw = T(td[0]);                // e.g., "Score BED competencies"
+        const label = labelRaw.replace(/^Score\s+/i,'').trim();
+        const pct = N(T(td[1]));
+        if (label in out) out[label] = pct;
+      }
+    });
+    return out;
+  })();
+
+  // recommendation
+  const recommendation = T(root.querySelector('#pdfBandText, .rec-text, #recText'));
+
+  // Q1..Q35 (4th column in statements table)
+  const answers = (() => {
+    const arr = [];
+    const rows = root.querySelectorAll('#pdfStatements tbody tr, #pdfStatementRows tr');
+    rows.forEach(tr => {
+      const c = tr.querySelectorAll('td,th');
+      if (c.length >= 4) arr.push(N(T(c[3])));
+    });
+    while (arr.length < 35) arr.push('');
+    return arr.slice(0, 35);
+  })();
+
   return {
-    // info
-    teamMemberName:  T(root.querySelector('#pdfEmpName')),
-    teamMemberEmail: T(root.querySelector('#pdfEmpEmail')),
-    teamMemberLocation: T(root.querySelector('#pdfEmpHotel')),
-    peerName:        T(root.querySelector('#pdfPeerName')),
-    peerEmail:       T(root.querySelector('#pdfPeerEmail')),
-    peerLocation:    T(root.querySelector('#pdfPeerHotel')),
-    // overall %
-    overallPct: N(T(root.querySelector('#pdfTotalPct, #pdfScorePct, #pdfOverallPct'))),
-    // groups table: first cell is label text “Score X”, second cell is %
-    groups: (() => {
-      const out = { 'Hospitality skills':'', 'BED competencies':'', 'Taking ownership':'', 'Collaboration':'' };
-      root.querySelectorAll('#pdfGroupRows tr').forEach(tr => {
-        const td = tr.querySelectorAll('td,th');
-        if (td.length >= 2) {
-          const labelRaw = T(td[0]);           // e.g., "Score Hospitality skills"
-          const label = labelRaw.replace(/^Score\s+/i,'').trim();
-          const pct = N(T(td[1]));
-          if (label in out) out[label] = pct;
-        }
-      });
-      return out;
-    })(),
-    // recommendation: band text block under SCORE SUMMARY
-    recommendation: T(root.querySelector('#pdfBandText')),
-    // Q1..Q35 from statements table (4th column = score)
-    answers: (() => {
-      const arr = [];
-      const rows = root.querySelectorAll('#pdfStatements tbody tr, #pdfStatementRows tr');
-      rows.forEach(tr => {
-        const c = tr.querySelectorAll('td,th');
-        if (c.length >= 4) arr.push(N(T(c[3])));
-      });
-      while (arr.length < 35) arr.push('');
-      return arr.slice(0,35);
-    })()
+    teamMemberName, teamMemberEmail, teamMemberLocation: teamMemberLoc,
+    peerName, peerEmail, peerLocation: peerLoc,
+    overallPct, groups, recommendation, answers
   };
 }
 
+/* ---------- payload + post ---------- */
 function buildPayload() {
   const d = readPDF();
   return {
@@ -73,108 +86,72 @@ async function postToSheet(payload) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
-  const json = await res.json().catch(()=>null);
+  const json = await res.json().catch(() => null);
   console.log('[BED] POST result', res.status, json);
 }
-function getPayload(){
+
+/* prefer repo-native builders, else our PDF reader */
+function getPayload() {
   if (typeof window.buildPayloadPDF === 'function') return window.buildPayloadPDF();
   if (typeof window.buildPayloadFromPdf === 'function') return window.buildPayloadFromPdf();
-  return buildPayloadFromDom(); // fallback
+  return buildPayload();
 }
 
-/* === FINAL: no alerts, save-once, notify page === */
+/* ---------- single-run sync orchestration ---------- */
 window.__bedSaved = false;
 
-window.syncToSheet = async function(){
+window.syncToSheet = async function () {
   if (window.__bedSaved) return;
   try {
-    const payload = getPayload();          // <— use wrapper
+    const payload = getPayload();
     await postToSheet(payload);
     window.__bedSaved = true;
-    if (window.onBedSaved) { try { window.onBedSaved(); } catch(_) {} }
+    if (window.onBedSaved) { try { window.onBedSaved(); } catch (_) {} }
   } catch (e) {
     console.error('BED sync failed', e);
   }
 };
 
-
-/* wait until PDF statements rows exist (built by buildPdfReport) */
+/* ---------- triggers: event + DOM watch + timeout ---------- */
 function waitForPDFReady(timeoutMs = 8000) {
   return new Promise(resolve => {
     const start = Date.now();
-    const tick = () => {
+    (function tick() {
       const ready = document.querySelector('#pdfStatementRows tr, #pdfStatements tbody tr');
       if (ready) return resolve(true);
       if (Date.now() - start > timeoutMs) return resolve(false);
       setTimeout(tick, 120);
-    };
-    tick();
+    })();
   });
 }
+
 function triggerWhenPdfReady() {
-  const found = document.querySelector(
-    '#pdfStatementRows tr, #pdfStatements tbody tr, #statementsTable tr'
-  );
+  const found = document.querySelector('#pdfStatementRows tr, #pdfStatements tbody tr, #statementsTable tr');
   if (found) {
     console.log('[BED] PDF detected → syncing…');
-    window.syncToSheet();     // guarded by __bedSaved
+    window.syncToSheet();
     return true;
   }
   return false;
 }
 
-// log when event fires
+/* fire when your code dispatches the event */
 document.addEventListener('bed:pdf-ready', async () => {
   console.log('[BED] event bed:pdf-ready received');
   const ok = await waitForPDFReady(8000);
   setTimeout(() => triggerWhenPdfReady(), ok ? 200 : 800);
 }, { once: true });
 
-// universal fallback: watch DOM for PDF rows (fires once)
+/* universal fallback: watch for PDF rows appearing */
 const __bedMo = new MutationObserver(() => {
   if (triggerWhenPdfReady()) __bedMo.disconnect();
 });
 __bedMo.observe(document.body, { childList: true, subtree: true });
 
-// final timeout fallback (does nothing if already saved)
+/* last-resort timeout (no duplicate due to __bedSaved) */
 setTimeout(() => {
   if (!window.__bedSaved) {
     console.warn('[BED] timeout fallback → trying sync once');
     triggerWhenPdfReady();
   }
 }, 9000);
-
-function triggerWhenPdfReady() {
-  const found = document.querySelector(
-    '#pdfStatementRows tr, #pdfStatements tbody tr, #statementsTable tr'
-  );
-  if (found) {
-    console.log('[BED] PDF detected → syncing…');
-    window.syncToSheet();     // guarded by __bedSaved
-    return true;
-  }
-  return false;
-}
-
-// log when event fires
-document.addEventListener('bed:pdf-ready', async () => {
-  console.log('[BED] event bed:pdf-ready received');
-  const ok = await waitForPDFReady(8000);
-  setTimeout(() => triggerWhenPdfReady(), ok ? 200 : 800);
-}, { once: true });
-
-// universal fallback: watch DOM for PDF rows (fires once)
-const __bedMo = new MutationObserver(() => {
-  if (triggerWhenPdfReady()) __bedMo.disconnect();
-});
-__bedMo.observe(document.body, { childList: true, subtree: true });
-
-// final timeout fallback (does nothing if already saved)
-setTimeout(() => {
-  if (!window.__bedSaved) {
-    console.warn('[BED] timeout fallback → trying sync once');
-    triggerWhenPdfReady();
-  }
-}, 9000);
-
-
