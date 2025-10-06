@@ -82,14 +82,19 @@ function buildPayload() {
 }
 
 async function postToSheet(payload) {
-  const res = await fetch(WEBAPP_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  const json = await res.json().catch(() => null);
-  console.log('[BED] POST result', res.status, json);
+  try {
+    const res = await fetch(WEBAPP_URL, {
+      method: 'POST',
+      mode: 'no-cors',                // TEMP bypass for CORS
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    console.log('[BED] POST sent (no-cors mode)', res.status || 'OK');
+  } catch (e) {
+    console.error('BED sync failed', e);
+  }
 }
+
 
 /* prefer repo-native builders, else our PDF reader */
 function getPayload() {
