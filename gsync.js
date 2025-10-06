@@ -1,5 +1,5 @@
 /* === gsync.js — PDF-only export for your current HTML === */
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbw9H2ym5NFEZfhO3AU0fUdphhorYv3KuxbS6z4qjAqrdVtDuGWLo0_qLmD-0WPf5uMK/exec';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyY_cImcU9Vq8fVEOP2qCrCzH6l4www99IcZo3oUyWyTPl53fhQ-ygQjJqIjoXnRxm7/exec';
 
 /* helpers */
 const T = el => el ? (el.textContent || '').trim() : '';
@@ -68,13 +68,15 @@ function buildPayload() {
 }
 
 async function postToSheet(payload) {
-  await fetch(WEBAPP_URL, {
+  const res = await fetch(WEBAPP_URL, {
     method: 'POST',
-    mode: 'no-cors',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
   });
+  const json = await res.json().catch(()=>null);
+  console.log('[BED] POST result', res.status, json);
 }
+
 
 /* === FINAL: no alerts, save-once, notify page === */
 window.__bedSaved = false;
