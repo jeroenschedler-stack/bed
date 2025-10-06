@@ -1,4 +1,4 @@
-/* === gsync.js — BED → Google Sheets (PDF-driven sync) === */
+/* === gsync.js — BED → Google Sheets (PDF-driven sync, TEMP with payload log) === */
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyY_cImcU9Vq8fVEOP2qCrCzH6l4www99IcZo3oUyWyTPl53fhQ-ygQjJqIjoXnRxm7/exec';
 
 /* ---------- helpers ---------- */
@@ -24,15 +24,16 @@ function readPDF() {
   // overall %
   const overallPct = N(T(root.querySelector('#pdfTotalPct, #pdfScorePct, #pdfOverallPct, #scorePercent')));
 
-  // groups: support either “Score X” label or plain group name
+  // groups (supports "Score X" labels; robust % cell index)
   const groups = (() => {
     const out = { 'Hospitality skills':'', 'BED competencies':'', 'Taking ownership':'', 'Collaboration':'' };
     root.querySelectorAll('#pdfGroupRows tr, .group-scores tr').forEach(tr => {
       const td = tr.querySelectorAll('td,th');
       if (td.length >= 2) {
-        const labelRaw = T(td[0]);                // e.g., "Score BED competencies"
-        const label = labelRaw.replace(/^Score\s+/i,'').trim();
-        const pct = N(T(td[1]));
+        const labelRaw = T(td[0]);                           // e.g., "Score BED competencies"
+        const label = labelRaw.replace(/^Score\s+/i, '').trim();
+        const idx = td.length >= 3 ? 2 : 1;                  // prefer 3rd cell if present
+        const pct = N(T(td[idx]));
         if (label in out) out[label] = pct;
       }
     });
@@ -104,6 +105,7 @@ window.syncToSheet = async function () {
   if (window.__bedSaved) return;
   try {
     const payload = getPayload();
+    if (!window.__bedSaved) console.log('[BED] payload', payload); // TEMP: log once for verification
     await postToSheet(payload);
     window.__bedSaved = true;
     if (window.onBedSaved) { try { window.onBedSaved(); } catch (_) {} }
