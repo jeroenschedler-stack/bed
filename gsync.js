@@ -76,23 +76,27 @@ async function postToSheet(payload) {
   const json = await res.json().catch(()=>null);
   console.log('[BED] POST result', res.status, json);
 }
-
+function getPayload(){
+  if (typeof window.buildPayloadPDF === 'function') return window.buildPayloadPDF();
+  if (typeof window.buildPayloadFromPdf === 'function') return window.buildPayloadFromPdf();
+  return buildPayloadFromDom(); // fallback
+}
 
 /* === FINAL: no alerts, save-once, notify page === */
 window.__bedSaved = false;
 
 window.syncToSheet = async function(){
-  if (window.__bedSaved) return;          // prevent duplicates
+  if (window.__bedSaved) return;
   try {
-    await postToSheet(buildPayloadPDF()); // your existing send
+    const payload = getPayload();          // <— use wrapper
+    await postToSheet(payload);
     window.__bedSaved = true;
-    if (window.onBedSaved) {              // triggers "Your assessment is recorded."
-      try { window.onBedSaved(); } catch(_) {}
-    }
+    if (window.onBedSaved) { try { window.onBedSaved(); } catch(_) {} }
   } catch (e) {
-    console.error('BED sync failed', e);  // no alerts
+    console.error('BED sync failed', e);
   }
 };
+
 
 /* wait until PDF statements rows exist (built by buildPdfReport) */
 function waitForPDFReady(timeoutMs = 8000) {
@@ -139,4 +143,38 @@ setTimeout(() => {
     triggerWhenPdfReady();
   }
 }, 9000);
+
+function triggerWhenPdfReady() {
+  const found = document.querySelector(
+    '#pdfStatementRows tr, #pdfStatements tbody tr, #statementsTable tr'
+  );
+  if (found) {
+    console.log('[BED] PDF detected → syncing…');
+    window.syncToSheet();     // guarded by __bedSaved
+    return true;
+  }
+  return false;
+}
+
+// log when event fires
+document.addEventListener('bed:pdf-ready', async () => {
+  console.log('[BED] event bed:pdf-ready received');
+  const ok = await waitForPDFReady(8000);
+  setTimeout(() => triggerWhenPdfReady(), ok ? 200 : 800);
+}, { once: true });
+
+// universal fallback: watch DOM for PDF rows (fires once)
+const __bedMo = new MutationObserver(() => {
+  if (triggerWhenPdfReady()) __bedMo.disconnect();
+});
+__bedMo.observe(document.body, { childList: true, subtree: true });
+
+// final timeout fallback (does nothing if already saved)
+setTimeout(() => {
+  if (!window.__bedSaved) {
+    console.warn('[BED] timeout fallback → trying sync once');
+    triggerWhenPdfReady();
+  }
+}, 9000);
+
 
