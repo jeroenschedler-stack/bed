@@ -107,9 +107,36 @@ function waitForPDFReady(timeoutMs = 8000) {
     tick();
   });
 }
+function triggerWhenPdfReady() {
+  const found = document.querySelector(
+    '#pdfStatementRows tr, #pdfStatements tbody tr, #statementsTable tr'
+  );
+  if (found) {
+    console.log('[BED] PDF detected → syncing…');
+    window.syncToSheet();     // guarded by __bedSaved
+    return true;
+  }
+  return false;
+}
 
-/* === FINAL trigger (once) — no duplicates === */
+// log when event fires
 document.addEventListener('bed:pdf-ready', async () => {
+  console.log('[BED] event bed:pdf-ready received');
   const ok = await waitForPDFReady(8000);
-  setTimeout(() => window.syncToSheet(), ok ? 200 : 800);
+  setTimeout(() => triggerWhenPdfReady(), ok ? 200 : 800);
 }, { once: true });
+
+// universal fallback: watch DOM for PDF rows (fires once)
+const __bedMo = new MutationObserver(() => {
+  if (triggerWhenPdfReady()) __bedMo.disconnect();
+});
+__bedMo.observe(document.body, { childList: true, subtree: true });
+
+// final timeout fallback (does nothing if already saved)
+setTimeout(() => {
+  if (!window.__bedSaved) {
+    console.warn('[BED] timeout fallback → trying sync once');
+    triggerWhenPdfReady();
+  }
+}, 9000);
+
