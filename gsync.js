@@ -26,23 +26,23 @@ function readPDF() {
   const overallPct = N(T(root.querySelector('#pdfTotalPct, #pdfScorePct, #pdfOverallPct, #scorePercent')));
 
   // groups — full-page text scan for SCORE BY GROUP block
-  const groups = (() => {
-    const out = {
-      'Hospitality skills': '',
-      'BED competencies': '',
-      'Taking ownership': '',
-      'Collaboration': ''
-    };
-    const text = (document.body.innerText || '').replace(/\s+/g, ' ');
-    const regex = /(Hospitality skills|BED competencies|Taking ownership|Collaboration)\s*:?[\s\-]*?(\d+)\s*%/gi;
-    let match;
-    while ((match = regex.exec(text))) {
-      const name = match[1].trim();
-      const pct = Number(match[2]);
-      if (name in out) out[name] = pct;
-    }
-    return out;
-  })();
+const groups = (() => {
+  const out = {
+    'Hospitality skills': '',
+    'BED competencies': '',
+    'Taking ownership': '',
+    'Collaboration': ''
+  };
+  const text = (document.body.innerText || '').replace(/\s+/g, ' ');
+  const regex = /(Hospitality skills|BED[\s\-]*competencies|Taking ownership|Collaboration)\s*:?[\s\-]*?(\d+)\s*%/gi;
+  let match;
+  while ((match = regex.exec(text))) {
+    const name = match[1].trim().replace(/\s+/g, ' ');
+    const pct = Number(match[2]);
+    if (name in out) out[name] = pct;
+  }
+  return out;
+})();
 
   // recommendation
   const recommendation = T(root.querySelector('#pdfBandText, .rec-text, #recText'));
