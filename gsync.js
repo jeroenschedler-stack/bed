@@ -1,11 +1,14 @@
-/* === gsync.js — BED → Google Sheets (Final, text-based group extraction) === */
+/* === gsync.js — BED → Google Sheets (FINAL VERIFIED BUILD) === */
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyY_cImcU9Vq8fVEOP2qCrCzH6l4www99IcZo3oUyWyTPl53fhQ-ygQjJqIjoXnRxm7/exec';
 
 /* ---------- helpers ---------- */
 const T = el => el ? (el.textContent || '').trim() : '';
 const N = s => { const m = (s || '').match(/-?\d+(\.\d+)?/); return m ? Number(m[0]) : ''; };
-const MODE = () => location.pathname.toLowerCase().includes('/peer/') ||
-                    /PEER REVIEW FORM/i.test(document.body.innerText) ? 'peer' : 'team';
+const MODE = () =>
+  location.pathname.toLowerCase().includes('/peer/') ||
+  /PEER REVIEW FORM/i.test(document.body.innerText)
+    ? 'peer'
+    : 'team';
 
 /* ---------- read the rendered PDF content ---------- */
 function readPDF() {
@@ -22,9 +25,14 @@ function readPDF() {
   // overall %
   const overallPct = N(T(root.querySelector('#pdfTotalPct, #pdfScorePct, #pdfOverallPct, #scorePercent')));
 
-  // groups — text-based fallback for SCORE BY GROUP block
+  // groups — text-based extraction for SCORE BY GROUP block
   const groups = (() => {
-    const out = { 'Hospitality skills': '', 'BED competencies': '', 'Taking ownership': '', 'Collaboration': '' };
+    const out = {
+      'Hospitality skills': '',
+      'BED competencies': '',
+      'Taking ownership': '',
+      'Collaboration': ''
+    };
     const section = document.querySelector('#pdfReport')?.innerText || document.body.innerText;
     const regex = /(Hospitality skills|BED competencies|Taking ownership|Collaboration)\s+(\d+)%/gi;
     let match;
@@ -88,7 +96,7 @@ async function postToSheet(payload) {
   console.log('[BED] POST result', res.status, json);
 }
 
-/* prefer repo-native builders, else our PDF reader */
+/* ---------- choose builder ---------- */
 function getPayload() {
   if (typeof window.buildPayloadPDF === 'function') return window.buildPayloadPDF();
   if (typeof window.buildPayloadFromPdf === 'function') return window.buildPayloadFromPdf();
@@ -98,6 +106,7 @@ function getPayload() {
 /* ---------- single-run sync orchestration (de-dupe) ---------- */
 window.__bedSaved = false;
 window.__bedSaving = false;
+let __bedMo;
 
 function markSaving() {
   window.__bedSaving = true;
@@ -106,14 +115,14 @@ function markSaving() {
 
 window.syncToSheet = async function () {
   if (window.__bedSaved || window.__bedSaving) return;
-  markSaving(); // prevent doubles
+  markSaving();
   try {
     const payload = getPayload();
     await postToSheet(payload);
     window.__bedSaved = true;
   } catch (e) {
     console.error('BED sync failed', e);
-    window.__bedSaving = false; // allow one retry if needed
+    window.__bedSaving = false;
   }
 };
 
@@ -141,15 +150,15 @@ function triggerWhenPdfReady() {
   return false;
 }
 
-/* fire when your code dispatches the event */
+/* fired when PDF generation finishes */
 document.addEventListener('bed:pdf-ready', async () => {
   console.log('[BED] event bed:pdf-ready received');
   const ok = await waitForPDFReady(8000);
   setTimeout(() => triggerWhenPdfReady(), ok ? 200 : 800);
 }, { once: true });
 
-/* universal fallback: watch for PDF rows appearing */
-let __bedMo = new MutationObserver(() => {
+/* fallback: watch DOM for PDF rows */
+__bedMo = new MutationObserver(() => {
   if (triggerWhenPdfReady()) { try { __bedMo.disconnect(); } catch (_) {} }
 });
 __bedMo.observe(document.body, { childList: true, subtree: true });
