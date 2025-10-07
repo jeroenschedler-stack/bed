@@ -39,9 +39,10 @@ function readPDF() {
         const name = normalizeGroup(label);
         if (!name) return;
         // % might be in 2nd or 3rd cell, sometimes with a trailing '%'
-        const idx = td.length >= 3 ? 2 : 1;
-        const pct = N(T(td[idx]));
-        if (!Number.isNaN(pct) && pct !== '') out[name] = pct;
+        // use the *last* cell for % (handles both 2- and 3-column tables)
+const lastCell = td[td.length - 1];
+const pct = N(T(lastCell));
+if (name && pct !== '') out[name] = pct;
       });
       // if all four are filled, stop scanning
       if (Object.values(out).every(v => v !== '')) break;
