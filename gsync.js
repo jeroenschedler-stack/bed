@@ -1,4 +1,4 @@
-/* === gsync.js — BED → Google Sheets (FINAL VERIFIED BUILD) === */
+/* === gsync.js — BED → Google Sheets (FINAL FULL-PAGE PARSER BUILD) === */
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyY_cImcU9Vq8fVEOP2qCrCzH6l4www99IcZo3oUyWyTPl53fhQ-ygQjJqIjoXnRxm7/exec';
 
 /* ---------- helpers ---------- */
@@ -25,7 +25,7 @@ function readPDF() {
   // overall %
   const overallPct = N(T(root.querySelector('#pdfTotalPct, #pdfScorePct, #pdfOverallPct, #scorePercent')));
 
-  // groups — text-based extraction for SCORE BY GROUP block
+  // groups — full-page text scan for SCORE BY GROUP block
   const groups = (() => {
     const out = {
       'Hospitality skills': '',
@@ -33,10 +33,10 @@ function readPDF() {
       'Taking ownership': '',
       'Collaboration': ''
     };
-    const section = document.querySelector('#pdfReport')?.innerText || document.body.innerText;
-    const regex = /(Hospitality skills|BED competencies|Taking ownership|Collaboration)\s+(\d+)%/gi;
+    const text = (document.body.innerText || '').replace(/\s+/g, ' ');
+    const regex = /(Hospitality skills|BED competencies|Taking ownership|Collaboration)\s*:?[\s\-]*?(\d+)\s*%/gi;
     let match;
-    while ((match = regex.exec(section))) {
+    while ((match = regex.exec(text))) {
       const name = match[1].trim();
       const pct = Number(match[2]);
       if (name in out) out[name] = pct;
