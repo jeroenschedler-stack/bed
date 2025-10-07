@@ -99,53 +99,47 @@ function buildPayload() {
   };
 }
 
+// --- POST (permanent, CORS-safe, expect 200 + JSON)
 async function postToSheet(payload) {
-  // TEMP: use no-cors to bypass preflight; response is opaque
-  try {
-    const res = await fetch(WEBAPP_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    console.log('[BED] POST sent (no-cors)', res.status || 'OK');
-  } catch (e) {
-    console.error('BED POST failed', e);
-  }
+  const res = await fetch(WEBAPP_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids preflight
+    body: JSON.stringify(payload)
+  });
+  const json = await res.json().catch(() => null);
+  console.log('[BED] POST result', res.status, json);
 }
 
-/* prefer repo-native builders, else our PDF reader */
+// prefer repo-native builders, else our PDF reader
 function getPayload() {
   if (typeof window.buildPayloadPDF === 'function') return window.buildPayloadPDF();
   if (typeof window.buildPayloadFromPdf === 'function') return window.buildPayloadFromPdf();
   return buildPayload();
 }
 
-/* ---------- single-run sync orchestration (de-dupe) ---------- */
+// ---------- single-run sync orchestration (de-dupe) ----------
 window.__bedSaved = false;
 window.__bedSaving = false;
 
 function markSaving() {
   window.__bedSaving = true;
-  try { __bedMo && __bedMo.disconnect && __bedMo.disconnect(); } catch(_) {}
+  try { __bedMo && __bedMo.disconnect && __bedMo.disconnect(); } catch (_) {}
 }
 
 window.syncToSheet = async function () {
   if (window.__bedSaved || window.__bedSaving) return;
-  markSaving(); // set immediately to avoid double fire
+  markSaving(); // prevent doubles
   try {
     const payload = getPayload();
-    console.log('[BED] payload', payload); // TEMP
     await postToSheet(payload);
     window.__bedSaved = true;
   } catch (e) {
     console.error('BED sync failed', e);
-    // allow retry once if needed
-    window.__bedSaving = false;
+    window.__bedSaving = false; // allow one retry if needed
   }
 };
 
-/* ---------- triggers: event + DOM watch + timeout ---------- */
+// ---------- triggers: event + DOM watch + timeout ----------
 function waitForPDFReady(timeoutMs = 8000) {
   return new Promise(resolve => {
     const start = Date.now();
@@ -178,7 +172,7 @@ document.addEventListener('bed:pdf-ready', async () => {
 
 /* universal fallback: watch for PDF rows appearing */
 let __bedMo = new MutationObserver(() => {
-  if (triggerWhenPdfReady()) { try { __bedMo.disconnect(); } catch(_) {} }
+  if (triggerWhenPdfReady()) { try { __bedMo.disconnect(); } catch (_) {} }
 });
 __bedMo.observe(document.body, { childList: true, subtree: true });
 
