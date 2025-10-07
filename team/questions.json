@@ -1,1 +1,233 @@
+{
+  "groups": [
+    {
+      "name": "Hospitality skills",
+      "description": "Basic skills for daily tasks and guests services"
+    },
+    {
+      "name": "BED competencies",
+      "description": "Advanced ability to read people and situations"
+    },
+    {
+      "name": "Taking ownership",
+      "description": "Acting independently and sharing responsibility"
+    },
+    {
+      "name": "Collaboration",
+      "description": "Building trust and helping others across BED"
+    }
+  ],
+  "questions": [
+    {
+      "id": 1,
+      "statement": "I answer very fast to guest messages ",
+      "subtext": "I often check mail and reply right away",
+      "group": "Hospitality skills"
+    },
+    {
+      "id": 2,
+      "statement": "My replies are not standard but personal ",
+      "subtext": "I know this is where hospitality begins",
+      "group": "Hospitality skills"
+    },
+    {
+      "id": 3,
+      "statement": "I follow up when I give someone a task ",
+      "subtext": "I take responsibilty until it's done",
+      "group": "Taking ownership"
+    },
+    {
+      "id": 4,
+      "statement": "I can see if guests are tired or relaxed",
+      "subtext": "I change the way I check-in accordingly ",
+      "group": "BED competencies"
+    },
+    {
+      "id": 5,
+      "statement": "I first make sure new guests feel welcome",
+      "subtext": "I never start with asking for passports",
+      "group": "Hospitality skills"
+    },
+    {
+      "id": 6,
+      "statement": "I can do a standard check-in in 60 seconds",
+      "subtext": "I know some travellers just want the key",
+      "group": "Hospitality skills"
+    },
+    {
+      "id": 7,
+      "statement": "I check-in groups with the group leader",
+      "subtext": "Others don't have to wait and can relax",
+      "group": "Hospitality skills"
+    },
+    {
+      "id": 8,
+      "statement": "I don't tell guests check-in time is 14:00",
+      "subtext": "They can check-in whenever the room is ready",
+      "group": "Hospitality skills"
+    },
+    {
+      "id": 9,
+      "statement": "I don't show stress when there is a problem",
+      "subtext": "I will only makes guests more nervous ",
+      "group": "BED competencies"
+    },
+    {
+      "id": 10,
+      "statement": "I pay attention when guests check-out",
+      "subtext": "I go outside and wait until the car has left",
+      "group": "BED competencies"
+    },
+    {
+      "id": 11,
+      "statement": "I did at least one amazing thing last week ",
+      "subtext": "It was something special you can be proud of",
+      "group": "BED competencies"
+    },
+    {
+      "id": 12,
+      "statement": "I am proactive with guests and my team",
+      "subtext": "I don't wait until people tell me what to do",
+      "group": "BED competencies"
+    },
+    {
+      "id": 13,
+      "statement": "I scan every guest every time",
+      "subtext": "I can see what people need before they ask",
+      "group": "BED competencies"
+    },
+    {
+      "id": 14,
+      "statement": "I help my team to develop and grow",
+      "subtext": "I have ideas and make suggestions",
+      "group": "Collaboration"
+    },
+    {
+      "id": 15,
+      "statement": "I create unique surprises for my guests",
+      "subtext": "I do more than offering free things",
+      "group": "BED competencies"
+    },
+    {
+      "id": 16,
+      "statement": "I know great music creates a great vibe",
+      "subtext": "I pay attention and make sure it's right",
+      "group": "Hospitality skills"
+    },
+    {
+      "id": 17,
+      "statement": "I tell guests about other BED facilities",
+      "subtext": "I invite them to use the pool in BNM",
+      "group": "Collaboration"
+    },
+    {
+      "id": 18,
+      "statement": "It's frustrating when keycards doesn't work",
+      "subtext": "I go up with guests with a master key",
+      "group": "Hospitality skills"
+    },
+    {
+      "id": 19,
+      "statement": "I do whatever I can if guests have problem ",
+      "subtext": "For example if they loose their passport",
+      "group": "Taking ownership"
+    },
+    {
+      "id": 20,
+      "statement": "I give my friends feedback if needed",
+      "subtext": "I know real friends should help each other",
+      "group": "Collaboration"
+    },
+    {
+      "id": 21,
+      "statement": "I ask for feedback on my performance",
+      "subtext": "I want to learn and develop myself",
+      "group": "Collaboration"
+    },
+    {
+      "id": 22,
+      "statement": "I can answer most questions about BED",
+      "subtext": "I know all BED hotels and the people",
+      "group": "Hospitality skills"
+    },
+    {
+      "id": 23,
+      "statement": "I am truly focused during breakfast ",
+      "subtext": "I know 07:00-10:00 is showtime",
+      "group": "Hospitality skills"
+    },
+    {
+      "id": 24,
+      "statement": "I have peeled my onion",
+      "subtext": "I act like a friend instead of hotel staff",
+      "group": "Taking ownership"
+    },
+    {
+      "id": 25,
+      "statement": "I call ahead when guests go to another BED",
+      "subtext": "I make sure they are welcomed as friends",
+      "group": "Collaboration"
+    },
+    {
+      "id": 26,
+      "statement": "I use ChatGPT in  daily work",
+      "subtext": "I use it for messages and helping guests",
+      "group": "Hospitality skills"
+    },
+    {
+      "id": 27,
+      "statement": "I use ChatGPT for complex tasks",
+      "subtext": "I use it for research and solving problems ",
+      "group": "Taking ownership"
+    },
+    {
+      "id": 28,
+      "statement": "I don't gossip and stop people who do",
+      "subtext": "I never talk bad if someone's not here",
+      "group": "Collaboration"
+    },
+    {
+      "id": 29,
+      "statement": "I know that rules exist for a reason",
+      "subtext": "But without the reason I adapt the rule",
+      "group": "Taking ownership"
+    },
+    {
+      "id": 30,
+      "statement": "I am confident and use common sense",
+      "subtext": "I make decisions by myself",
+      "group": "Taking ownership"
+    },
+    {
+      "id": 31,
+      "statement": "I take responsibility for the whole hotel",
+      "subtext": "I check rooms buildings and public areas",
+      "group": "Taking ownership"
+    },
+    {
+      "id": 32,
+      "statement": "I work with positive energy",
+      "subtext": "I don't complain but look for solutions ",
+      "group": "Taking ownership"
+    },
+    {
+      "id": 33,
+      "statement": "I don't pass-on problems to others",
+      "subtext": "I take action and make sure it's fixed",
+      "group": "Taking ownership"
+    },
+    {
+      "id": 34,
+      "statement": "I always try to do the right thing",
+      "subtext": "I not afraid to make mistakes ",
+      "group": "Taking ownership"
+    },
+    {
+      "id": 35,
+      "statement": "I am a full and equal member of the team",
+      "subtext": "I contribute as much as everyone else",
+      "group": "Collaboration"
+    }
+  ]
+}
 
