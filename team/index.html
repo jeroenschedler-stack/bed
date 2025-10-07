@@ -1062,6 +1062,13 @@
 buildPdfReport();                                   // build PDF DOM now
 document.dispatchEvent(new Event('bed:pdf-ready')); // signal: PDF is ready for export
 show("finish");
+        // === Trigger BED → Google Sheet Sync ===
+if (typeof window.syncToSheet === 'function') {
+  console.log('[BED] Manual sync trigger after PDF build');
+  setTimeout(() => {
+    window.syncToSheet();
+  }, 500);
+}
                 };
 
                 el("backToQ2").onclick = () => show("q2");
