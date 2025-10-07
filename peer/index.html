@@ -1057,6 +1057,13 @@
 buildPdfReport();                                    // build PDF DOM now
 document.dispatchEvent(new Event('bed:pdf-ready'));  // signal PDF is ready
 show("finish"); 
+            // === Trigger BED → Google Sheet Sync ===
+if (typeof window.syncToSheet === 'function') {
+  console.log('[BED] Manual sync trigger after PDF build');
+  setTimeout(() => {
+    window.syncToSheet();
+  }, 500);
+}
                     const recMsg = document.getElementById("recordMsg");
 if (recMsg) recMsg.style.display = "block"; // only show message on completion page
                 };
