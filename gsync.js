@@ -1,4 +1,4 @@
-/* === gsync.js — BED → Google Sheets (FINAL, FULL-PAGE, ULTRA-ROBUST BUILD) === */
+/* === gsync.js — BED → Google Sheets (FINAL VERIFIED DOM-TARGET BUILD) === */
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyY_cImcU9Vq8fVEOP2qCrCzH6l4www99IcZo3oUyWyTPl53fhQ-ygQjJqIjoXnRxm7/exec';
 
 /* ---------- helpers ---------- */
@@ -25,7 +25,7 @@ function readPDF() {
   // overall %
   const overallPct = N(T(root.querySelector('#pdfTotalPct, #pdfScorePct, #pdfOverallPct, #scorePercent')));
 
-  // groups — ultra-robust parser for SCORE BY GROUP block
+  // --- groups: read the SCORE BY GROUP section robustly ---
   const groups = (() => {
     const out = {
       'Hospitality skills': '',
@@ -34,22 +34,29 @@ function readPDF() {
       'Collaboration': ''
     };
 
-    // scan full-page text (handles all line breaks, hidden chars)
-    let text = document.body.innerText || '';
-    text = text.replace(/\s+/g, ' '); // normalize whitespace
+    // Find the SCORE BY GROUP section text block
+    const section = Array.from(document.querySelectorAll('*'))
+      .find(el => /SCORE BY GROUP/i.test(el.textContent || ''));
 
-    // match "BED competencies" with any hidden chars between words
-    const regex = /(Hospitality skills|BED[\s\S]{0,10}?competencies|Taking ownership|Collaboration)\s*:?[\s\-]*?(\d+)\s*%/gi;
+    if (section) {
+      // Collect nearby text nodes within the same parent or next few siblings
+      let text = '';
+      let next = section.nextElementSibling;
+      for (let i = 0; i < 8 && next; i++, next = next.nextElementSibling) {
+        text += ' ' + (next.textContent || '');
+      }
+      text = text.replace(/\s+/g, ' ');
 
-    let match;
-    while ((match = regex.exec(text))) {
-      let name = match[1]
-        .replace(/BED[\s\S]{0,10}?competencies/i, 'BED competencies')
-        .replace(/\s+/g, ' ')
-        .trim();
-      const pct = Number(match[2]);
-      if (name in out) out[name] = pct;
+      // Extract groups and percentages
+      const regex = /(Hospitality skills|BED[\s\-]*competencies|Taking ownership|Collaboration)\s*:?[\s\-]*?(\d+)\s*%/gi;
+      let match;
+      while ((match = regex.exec(text))) {
+        const name = match[1].trim().replace(/BED[\s\-]*competencies/i, 'BED competencies');
+        const pct = Number(match[2]);
+        if (name in out) out[name] = pct;
+      }
     }
+
     return out;
   })();
 
