@@ -1,4 +1,4 @@
-/* === gsync.js — BED → Google Sheets (FINAL FULL-PAGE PARSER BUILD) === */
+/* === gsync.js — BED → Google Sheets (FINAL, FULL-PAGE, ULTRA-ROBUST BUILD) === */
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyY_cImcU9Vq8fVEOP2qCrCzH6l4www99IcZo3oUyWyTPl53fhQ-ygQjJqIjoXnRxm7/exec';
 
 /* ---------- helpers ---------- */
@@ -25,24 +25,33 @@ function readPDF() {
   // overall %
   const overallPct = N(T(root.querySelector('#pdfTotalPct, #pdfScorePct, #pdfOverallPct, #scorePercent')));
 
-  // groups — full-page text scan for SCORE BY GROUP block
-const groups = (() => {
-  const out = {
-    'Hospitality skills': '',
-    'BED competencies': '',
-    'Taking ownership': '',
-    'Collaboration': ''
-  };
-  const text = (document.body.innerText || '').replace(/\s+/g, ' ');
-  const regex = /(Hospitality skills|BED[\s\-]*competencies|Taking ownership|Collaboration)\s*:?[\s\-]*?(\d+)\s*%/gi;
-  let match;
-  while ((match = regex.exec(text))) {
-    const name = match[1].trim().replace(/\s+/g, ' ');
-    const pct = Number(match[2]);
-    if (name in out) out[name] = pct;
-  }
-  return out;
-})();
+  // groups — ultra-robust parser for SCORE BY GROUP block
+  const groups = (() => {
+    const out = {
+      'Hospitality skills': '',
+      'BED competencies': '',
+      'Taking ownership': '',
+      'Collaboration': ''
+    };
+
+    // scan full-page text (handles all line breaks, hidden chars)
+    let text = document.body.innerText || '';
+    text = text.replace(/\s+/g, ' '); // normalize whitespace
+
+    // match "BED competencies" with any hidden chars between words
+    const regex = /(Hospitality skills|BED[\s\S]{0,10}?competencies|Taking ownership|Collaboration)\s*:?[\s\-]*?(\d+)\s*%/gi;
+
+    let match;
+    while ((match = regex.exec(text))) {
+      let name = match[1]
+        .replace(/BED[\s\S]{0,10}?competencies/i, 'BED competencies')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const pct = Number(match[2]);
+      if (name in out) out[name] = pct;
+    }
+    return out;
+  })();
 
   // recommendation
   const recommendation = T(root.querySelector('#pdfBandText, .rec-text, #recText'));
