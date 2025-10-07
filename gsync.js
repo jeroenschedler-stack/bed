@@ -1,4 +1,4 @@
-/* === gsync.js — BED → Google Sheets (FINAL: dual-source group extraction) === */
+/* === gsync.js — BED → Google Sheets (FINAL: dual-source + 1-decimal groups) === */
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyY_cImcU9Vq8fVEOP2qCrCzH6l4www99IcZo3oUyWyTPl53fhQ-ygQjJqIjoXnRxm7/exec';
 
 /* ---------- helpers ---------- */
@@ -106,11 +106,11 @@ function extractGroupsFromStatements() {
     }
   });
 
-  // Convert averages (1–5) to percentages
+  // Convert averages (1–5) to percentages (keep 1 decimal to match PDF rounding)
   const out = { 'Hospitality skills':'', 'BED competencies':'', 'Taking ownership':'', 'Collaboration':'' };
   Object.keys(acc).forEach(k => {
     if (acc[k].count > 0) {
-      out[k] = Math.round((acc[k].sum / acc[k].count) / 5 * 100);
+      out[k] = Number(((acc[k].sum / acc[k].count) / 5 * 100).toFixed(1));
     }
   });
   return out;
