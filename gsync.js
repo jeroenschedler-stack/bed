@@ -1,4 +1,4 @@
-/* === gsync.js — BED → Google Sheets (FINAL BULLETPROOF BUILD) === */
+/* === gsync.js — BED → Google Sheets (FINAL: dual-source group extraction) === */
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyY_cImcU9Vq8fVEOP2qCrCzH6l4www99IcZo3oUyWyTPl53fhQ-ygQjJqIjoXnRxm7/exec';
 
 /* ---------- helpers ---------- */
@@ -10,98 +10,123 @@ const MODE = () =>
     ? 'peer'
     : 'team';
 
-/* ---------- ultra-robust group extraction ---------- */
-/* Strategy:
-   1) Start at the “SCORE BY GROUP” heading if present; expand context.
-   2) For each target group, scan nearby DOM for the first NN% (handles spans/divs/split text).
-   3) Fallback: full-page scan for each group alias.
-*/
-function extractGroupScores() {
-  const targets = [
+/* ---------- DOM utilities ---------- */
+function qAll(root, sel) { return Array.from((root || document).querySelectorAll(sel)); }
+function normTxt(s) { return (s || '').replace(/\s+/g, ' ').trim(); }
+
+/* ---------- PASS A: read “SCORE BY GROUP” block near its heading ---------- */
+function extractGroupsFromHeading() {
+  const out = { 'Hospitality skills':'', 'BED competencies':'', 'Taking ownership':'', 'Collaboration':'' };
+
+  // find the SCORE BY GROUP anchor
+  let anchor = null;
+  for (const el of qAll(document, '*')) {
+    const txt = el && el.textContent ? el.textContent : '';
+    if (/SCORE\s*BY\s*GROUP/i.test(txt)) { anchor = el; break; }
+  }
+  if (!anchor) return out;
+
+  // collect text of the next siblings (covers rows, divs, flex lines)
+  let text = '';
+  let n = anchor.nextElementSibling;
+  for (let i = 0; i < 12 && n; i++, n = n.nextElementSibling) {
+    text += ' ' + (n.textContent || '');
+  }
+  text = normTxt(text);
+
+  // robust label patterns
+  const label = {
+    hosp: /hospitality\s*skills/i,
+    bed: /bed[\s\S]{0,10}?competencies/i,
+    own: /taking\s*ownership/i,
+    coll: /collaboration/i
+  };
+
+  const tryMatch = (rx) => {
+    const m = new RegExp(`${rx.source}.{0,80}?(\\d{1,3})\\s*%`, 'i').exec(text);
+    return m ? Number(m[1]) : '';
+  };
+
+  const hosp = tryMatch(label.hosp);
+  const bed  = tryMatch(label.bed);
+  const own  = tryMatch(label.own);
+  const coll = tryMatch(label.coll);
+
+  if (hosp !== '') out['Hospitality skills'] = hosp;
+  if (bed  !== '') out['BED competencies']   = bed;
+  if (own  !== '') out['Taking ownership']   = own;
+  if (coll !== '') out['Collaboration']      = coll;
+
+  return out;
+}
+
+/* ---------- PASS B: compute from statements table if anything missing ---------- */
+function extractGroupsFromStatements() {
+  // return { key: {sum, count} } using rows under #pdfStatements / #pdfStatementRows
+  const acc = {
+    'Hospitality skills': { sum:0, count:0 },
+    'BED competencies':   { sum:0, count:0 },
+    'Taking ownership':   { sum:0, count:0 },
+    'Collaboration':      { sum:0, count:0 }
+  };
+
+  const alias = [
     { key: 'Hospitality skills', rx: /hospitality\s*skills/i },
-    { key: 'BED competencies',  rx: /bed[\s\-]*competencies/i },
+    { key: 'BED competencies',  rx: /bed[\s\S]{0,10}?competencies/i },
     { key: 'Taking ownership',  rx: /taking\s*ownership/i },
     { key: 'Collaboration',     rx: /collaboration/i }
   ];
 
-  // 1) Find SCORE BY GROUP anchor (if any)
-  let anchor = null;
-  const allEls = document.querySelectorAll('*');
-  for (const el of allEls) {
-    if (el.firstChild && el.firstChild.nodeType === 3) {
-      if (/SCORE\s*BY\s*GROUP/i.test(el.firstChild.textContent || '')) { anchor = el; break; }
+  const rows = qAll(document, '#pdfStatements tbody tr, #pdfStatementRows tr');
+  rows.forEach(tr => {
+    const cells = tr.querySelectorAll('td,th');
+    if (!cells || cells.length === 0) return;
+
+    // Try to find a score in a cell with class "score" or use last numeric in the row
+    let score = '';
+    const scoreCell = tr.querySelector('.score');
+    if (scoreCell) {
+      score = N(scoreCell.textContent || '');
+    } else if (cells.length >= 4) {
+      score = N(cells[3].textContent || '');
+    } else {
+      const m = /(\d{1,2})\s*$/.exec(tr.textContent || '');
+      if (m) score = Number(m[1]);
     }
-    if (/SCORE\s*BY\s*GROUP/i.test(el.textContent || '')) { anchor = el; break; }
-  }
+    if (score === '' || isNaN(score)) return;
 
-  // Utility: collect text from element + next siblings (limited)
-  function collectNeighborhoodText(startEl, blocks = 12) {
-    let text = (startEl?.textContent || '');
-    let n = startEl?.nextElementSibling || null;
-    let count = 0;
-    while (n && count < blocks) { text += ' \n ' + (n.textContent || ''); n = n.nextElementSibling; count++; }
-    return text.replace(/\s+/g, ' ');
-  }
-
-  // Utility: TreeWalker to find nearest percentage around a node index window
-  function findPercentNear(el, winNodes = 40) {
-    const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
-    const nodes = [];
-    while (tw.nextNode()) nodes.push(tw.currentNode);
-    // scan forward first number% within a small window
-    const rePct = /(\d{1,3})\s*%/;
-    for (let i = 0; i < Math.min(nodes.length, winNodes); i++) {
-      const m = rePct.exec(nodes[i].textContent || '');
-      if (m) return Number(m[1]);
+    // Decide which group this row belongs to by row text
+    const rowTxt = normTxt(tr.textContent || '');
+    for (const a of alias) {
+      if (a.rx.test(rowTxt)) {
+        acc[a.key].sum += score;
+        acc[a.key].count += 1;
+        break;
+      }
     }
-    // fallback scan entire el
-    const m2 = rePct.exec(el.textContent || '');
-    return m2 ? Number(m2[1]) : '';
-  }
-
-  const out = { 'Hospitality skills':'', 'BED competencies':'', 'Taking ownership':'', 'Collaboration':'' };
-
-  // 2) Preferred: scan the neighborhood around the SCORE BY GROUP anchor
-  if (anchor) {
-    // Try to match line pairs “<group> … NN%”
-    const neighText = collectNeighborhoodText(anchor, 12);
-    targets.forEach(t => {
-      const rx = new RegExp(`(${t.rx.source}).{0,80}?(\\d{1,3})\\s*%`, 'i'); // up to 80 chars between name and %
-      const m = rx.exec(neighText);
-      if (m) out[t.key] = Number(m[2]);
-    });
-
-    // For any still empty, do DOM-near scan: find element whose text matches the label, then look nearby nodes for NN%
-    targets.forEach(t => {
-      if (out[t.key] !== '') return;
-      // find best candidate element near anchor whose text matches the label
-      let labelEl = null;
-      const searchScope = anchor.parentElement || document.body;
-      const scopeEls = searchScope.querySelectorAll('*');
-      for (const el of scopeEls) {
-        const txt = (el.textContent || '').replace(/\s+/g, ' ');
-        if (t.rx.test(txt)) { labelEl = el; break; }
-      }
-      if (labelEl) {
-        // look inside label container first
-        let pct = findPercentNear(labelEl, 25);
-        if (pct === '' && labelEl.parentElement) pct = findPercentNear(labelEl.parentElement, 40);
-        if (pct === '' && labelEl.nextElementSibling) pct = findPercentNear(labelEl.nextElementSibling, 25);
-        if (pct !== '') out[t.key] = pct;
-      }
-    });
-  }
-
-  // 3) Final fallback: full-page tolerant scan for each group separately
-  const page = (document.body.innerText || '').replace(/\s+/g, ' ');
-  targets.forEach(t => {
-    if (out[t.key] !== '') return;
-    const rx = new RegExp(`${t.rx.source}\\s*:?\\s*[–\\-•:]?\\s*(\\d{1,3})\\s*%`, 'i');
-    const m = rx.exec(page);
-    if (m) out[t.key] = Number(m[1]);
   });
 
+  // Convert averages (1–5) to percentages
+  const out = { 'Hospitality skills':'', 'BED competencies':'', 'Taking ownership':'', 'Collaboration':'' };
+  Object.keys(acc).forEach(k => {
+    if (acc[k].count > 0) {
+      out[k] = Math.round((acc[k].sum / acc[k].count) / 5 * 100);
+    }
+  });
   return out;
+}
+
+/* ---------- Combined extractor: Pass A then fill gaps with Pass B ---------- */
+function extractGroupScores() {
+  const a = extractGroupsFromHeading();
+  const missing = Object.keys(a).filter(k => a[k] === '');
+  if (missing.length === 0) return a;
+
+  const b = extractGroupsFromStatements();
+  missing.forEach(k => {
+    if (b[k] !== '') a[k] = b[k];
+  });
+  return a;
 }
 
 /* ---------- read the rendered PDF content ---------- */
@@ -119,7 +144,7 @@ function readPDF() {
   // overall %
   const overallPct = N(T(root.querySelector('#pdfTotalPct, #pdfScorePct, #pdfOverallPct, #scorePercent')));
 
-  // groups
+  // groups (dual-source)
   const groups = extractGroupScores();
 
   // recommendation
@@ -128,7 +153,7 @@ function readPDF() {
   // Q1..Q35 (4th column in statements table)
   const answers = (() => {
     const arr = [];
-    const rows = root.querySelectorAll('#pdfStatements tbody tr, #pdfStatementRows tr');
+    const rows = qAll(document, '#pdfStatements tbody tr, #pdfStatementRows tr');
     rows.forEach(tr => {
       const c = tr.querySelectorAll('td,th');
       if (c.length >= 4) arr.push(N(T(c[3])));
