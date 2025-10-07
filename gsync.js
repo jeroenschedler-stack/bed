@@ -1,4 +1,4 @@
-/* === gsync.js — BED → Google Sheets (TEMP: no-CORS + de-dupe + robust groups) === */
+/* === gsync.js — BED → Google Sheets (Final, text-based group extraction) === */
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyY_cImcU9Vq8fVEOP2qCrCzH6l4www99IcZo3oUyWyTPl53fhQ-ygQjJqIjoXnRxm7/exec';
 
 /* ---------- helpers ---------- */
@@ -22,30 +22,16 @@ function readPDF() {
   // overall %
   const overallPct = N(T(root.querySelector('#pdfTotalPct, #pdfScorePct, #pdfOverallPct, #scorePercent')));
 
-  // groups — robust: scan known tables first, then any row where col1 matches a group name
+  // groups — text-based fallback for SCORE BY GROUP block
   const groups = (() => {
-    const out = { 'Hospitality skills':'', 'BED competencies':'', 'Taking ownership':'', 'Collaboration':'' };
-    const tableScopes = [
-      '#pdfGroupRows tr', '.group-scores tr', '#scoreByGroup tr', '#pdfGroups tr',
-      '#pdfReport table tr'
-    ];
-    for (const sel of tableScopes) {
-      const rows = root.querySelectorAll(sel);
-      rows.forEach(tr => {
-        const td = tr.querySelectorAll('td,th');
-        if (td.length < 2) return;
-        const labelRaw = T(td[0]); // e.g., "Score BED competencies"
-        const label = labelRaw.replace(/^Score\s+/i,'').trim();
-        const name = normalizeGroup(label);
-        if (!name) return;
-        // % might be in 2nd or 3rd cell, sometimes with a trailing '%'
-        // use the *last* cell for % (handles both 2- and 3-column tables)
-const lastCell = td[td.length - 1];
-const pct = N(T(lastCell));
-if (name && pct !== '') out[name] = pct;
-      });
-      // if all four are filled, stop scanning
-      if (Object.values(out).every(v => v !== '')) break;
+    const out = { 'Hospitality skills': '', 'BED competencies': '', 'Taking ownership': '', 'Collaboration': '' };
+    const section = document.querySelector('#pdfReport')?.innerText || document.body.innerText;
+    const regex = /(Hospitality skills|BED competencies|Taking ownership|Collaboration)\s+(\d+)%/gi;
+    let match;
+    while ((match = regex.exec(section))) {
+      const name = match[1].trim();
+      const pct = Number(match[2]);
+      if (name in out) out[name] = pct;
     }
     return out;
   })();
@@ -70,15 +56,6 @@ if (name && pct !== '') out[name] = pct;
     peerName, peerEmail, peerLocation: peerLoc,
     overallPct, groups, recommendation, answers
   };
-}
-
-function normalizeGroup(label) {
-  const n = (label || '').toLowerCase();
-  if (n.includes('hospitality skills')) return 'Hospitality skills';
-  if (n.includes('bed competencies') || n.includes('hospitality competencies')) return 'BED competencies';
-  if (n.includes('taking ownership')) return 'Taking ownership';
-  if (n.includes('collaboration')) return 'Collaboration';
-  return null;
 }
 
 /* ---------- payload + post ---------- */
@@ -111,14 +88,14 @@ async function postToSheet(payload) {
   console.log('[BED] POST result', res.status, json);
 }
 
-// prefer repo-native builders, else our PDF reader
+/* prefer repo-native builders, else our PDF reader */
 function getPayload() {
   if (typeof window.buildPayloadPDF === 'function') return window.buildPayloadPDF();
   if (typeof window.buildPayloadFromPdf === 'function') return window.buildPayloadFromPdf();
   return buildPayload();
 }
 
-// ---------- single-run sync orchestration (de-dupe) ----------
+/* ---------- single-run sync orchestration (de-dupe) ---------- */
 window.__bedSaved = false;
 window.__bedSaving = false;
 
@@ -140,7 +117,7 @@ window.syncToSheet = async function () {
   }
 };
 
-// ---------- triggers: event + DOM watch + timeout ----------
+/* ---------- triggers: event + DOM watch + timeout ---------- */
 function waitForPDFReady(timeoutMs = 8000) {
   return new Promise(resolve => {
     const start = Date.now();
