@@ -1,4 +1,4 @@
-/* === gsync.js — BED → Google Sheets (FINAL VERIFIED DOM-TARGET BUILD) === */
+/* === gsync.js — BED → Google Sheets (FINAL BULLETPROOF BUILD) === */
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyY_cImcU9Vq8fVEOP2qCrCzH6l4www99IcZo3oUyWyTPl53fhQ-ygQjJqIjoXnRxm7/exec';
 
 /* ---------- helpers ---------- */
@@ -9,6 +9,100 @@ const MODE = () =>
   /PEER REVIEW FORM/i.test(document.body.innerText)
     ? 'peer'
     : 'team';
+
+/* ---------- ultra-robust group extraction ---------- */
+/* Strategy:
+   1) Start at the “SCORE BY GROUP” heading if present; expand context.
+   2) For each target group, scan nearby DOM for the first NN% (handles spans/divs/split text).
+   3) Fallback: full-page scan for each group alias.
+*/
+function extractGroupScores() {
+  const targets = [
+    { key: 'Hospitality skills', rx: /hospitality\s*skills/i },
+    { key: 'BED competencies',  rx: /bed[\s\-]*competencies/i },
+    { key: 'Taking ownership',  rx: /taking\s*ownership/i },
+    { key: 'Collaboration',     rx: /collaboration/i }
+  ];
+
+  // 1) Find SCORE BY GROUP anchor (if any)
+  let anchor = null;
+  const allEls = document.querySelectorAll('*');
+  for (const el of allEls) {
+    if (el.firstChild && el.firstChild.nodeType === 3) {
+      if (/SCORE\s*BY\s*GROUP/i.test(el.firstChild.textContent || '')) { anchor = el; break; }
+    }
+    if (/SCORE\s*BY\s*GROUP/i.test(el.textContent || '')) { anchor = el; break; }
+  }
+
+  // Utility: collect text from element + next siblings (limited)
+  function collectNeighborhoodText(startEl, blocks = 12) {
+    let text = (startEl?.textContent || '');
+    let n = startEl?.nextElementSibling || null;
+    let count = 0;
+    while (n && count < blocks) { text += ' \n ' + (n.textContent || ''); n = n.nextElementSibling; count++; }
+    return text.replace(/\s+/g, ' ');
+  }
+
+  // Utility: TreeWalker to find nearest percentage around a node index window
+  function findPercentNear(el, winNodes = 40) {
+    const tw = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+    const nodes = [];
+    while (tw.nextNode()) nodes.push(tw.currentNode);
+    // scan forward first number% within a small window
+    const rePct = /(\d{1,3})\s*%/;
+    for (let i = 0; i < Math.min(nodes.length, winNodes); i++) {
+      const m = rePct.exec(nodes[i].textContent || '');
+      if (m) return Number(m[1]);
+    }
+    // fallback scan entire el
+    const m2 = rePct.exec(el.textContent || '');
+    return m2 ? Number(m2[1]) : '';
+  }
+
+  const out = { 'Hospitality skills':'', 'BED competencies':'', 'Taking ownership':'', 'Collaboration':'' };
+
+  // 2) Preferred: scan the neighborhood around the SCORE BY GROUP anchor
+  if (anchor) {
+    // Try to match line pairs “<group> … NN%”
+    const neighText = collectNeighborhoodText(anchor, 12);
+    targets.forEach(t => {
+      const rx = new RegExp(`(${t.rx.source}).{0,80}?(\\d{1,3})\\s*%`, 'i'); // up to 80 chars between name and %
+      const m = rx.exec(neighText);
+      if (m) out[t.key] = Number(m[2]);
+    });
+
+    // For any still empty, do DOM-near scan: find element whose text matches the label, then look nearby nodes for NN%
+    targets.forEach(t => {
+      if (out[t.key] !== '') return;
+      // find best candidate element near anchor whose text matches the label
+      let labelEl = null;
+      const searchScope = anchor.parentElement || document.body;
+      const scopeEls = searchScope.querySelectorAll('*');
+      for (const el of scopeEls) {
+        const txt = (el.textContent || '').replace(/\s+/g, ' ');
+        if (t.rx.test(txt)) { labelEl = el; break; }
+      }
+      if (labelEl) {
+        // look inside label container first
+        let pct = findPercentNear(labelEl, 25);
+        if (pct === '' && labelEl.parentElement) pct = findPercentNear(labelEl.parentElement, 40);
+        if (pct === '' && labelEl.nextElementSibling) pct = findPercentNear(labelEl.nextElementSibling, 25);
+        if (pct !== '') out[t.key] = pct;
+      }
+    });
+  }
+
+  // 3) Final fallback: full-page tolerant scan for each group separately
+  const page = (document.body.innerText || '').replace(/\s+/g, ' ');
+  targets.forEach(t => {
+    if (out[t.key] !== '') return;
+    const rx = new RegExp(`${t.rx.source}\\s*:?\\s*[–\\-•:]?\\s*(\\d{1,3})\\s*%`, 'i');
+    const m = rx.exec(page);
+    if (m) out[t.key] = Number(m[1]);
+  });
+
+  return out;
+}
 
 /* ---------- read the rendered PDF content ---------- */
 function readPDF() {
@@ -25,40 +119,8 @@ function readPDF() {
   // overall %
   const overallPct = N(T(root.querySelector('#pdfTotalPct, #pdfScorePct, #pdfOverallPct, #scorePercent')));
 
-  // --- groups: read the SCORE BY GROUP section robustly ---
-  const groups = (() => {
-    const out = {
-      'Hospitality skills': '',
-      'BED competencies': '',
-      'Taking ownership': '',
-      'Collaboration': ''
-    };
-
-    // Find the SCORE BY GROUP section text block
-    const section = Array.from(document.querySelectorAll('*'))
-      .find(el => /SCORE BY GROUP/i.test(el.textContent || ''));
-
-    if (section) {
-      // Collect nearby text nodes within the same parent or next few siblings
-      let text = '';
-      let next = section.nextElementSibling;
-      for (let i = 0; i < 8 && next; i++, next = next.nextElementSibling) {
-        text += ' ' + (next.textContent || '');
-      }
-      text = text.replace(/\s+/g, ' ');
-
-      // Extract groups and percentages
-      const regex = /(Hospitality skills|BED[\s\-]*competencies|Taking ownership|Collaboration)\s*:?[\s\-]*?(\d+)\s*%/gi;
-      let match;
-      while ((match = regex.exec(text))) {
-        const name = match[1].trim().replace(/BED[\s\-]*competencies/i, 'BED competencies');
-        const pct = Number(match[2]);
-        if (name in out) out[name] = pct;
-      }
-    }
-
-    return out;
-  })();
+  // groups
+  const groups = extractGroupScores();
 
   // recommendation
   const recommendation = T(root.querySelector('#pdfBandText, .rec-text, #recText'));
