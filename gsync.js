@@ -96,10 +96,21 @@ function extractGroupsFromStatements() {
 
 /* ---------- Combined extractor: prefer Pass B, fill gaps from Pass A ---------- */
 function extractGroupScores() {
-  const b = extractGroupsFromStatements();
-  if (Object.values(b).every(v => v !== '')) return b;
+  // 1) Exact values from the PDF table (matches what user sees/prints)
+  const t = extractGroupsFromTable();
+  if (Object.values(t).every(v => v !== '')) return t;
+
+  // 2) Fallback: parse text after the "SCORE BY GROUP" heading
   const a = extractGroupsFromHeading();
-  const out = { ...b };
+  if (Object.values(a).some(v => v !== '')) {
+    const out = { ...t };
+    for (const k in a) if (out[k] === '' && a[k] !== '') out[k] = a[k];
+    if (Object.values(out).every(v => v !== '')) return out;
+  }
+
+  // 3) Last resort: recompute from statements grid (may diverge if mapping changes)
+  return extractGroupsFromStatements();
+};
   for (const k in a) if (out[k] === '' && a[k] !== '') out[k] = a[k];
   return out;
 }
