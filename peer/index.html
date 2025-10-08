@@ -1861,65 +1861,77 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </div>
 
-<!-- === Final Confirmation Guard & Sync (v7) === -->
+<!-- === Final Confirmation Guard & Sync (v9) === -->
 
 <script>
 (function () {
-  const modal = document.getElementById("confirmModal");
+  const modal  = document.getElementById("confirmModal");
   const cancel = document.getElementById("cancelConfirm");
-  const ok = document.getElementById("okConfirm");
+  const ok     = document.getElementById("okConfirm");
 
   if (!modal || !cancel || !ok) return;
 
-  // Hidden by default (CSS fallback)
+  // Hide modal by default
   modal.style.display = "none";
 
-  // --- 1) Intercept *any* attempt to open the scoring page ---
+  // Save original showSection if it exists
   const originalShowSection = window.showSection;
   let allowFinish = false;
 
+  // 1️⃣ Guard against auto-navigation to scoring
   window.showSection = function (name) {
-    // If someone tries to jump to "finish" without confirming, show modal first.
     if (name === "finish" && !allowFinish) {
-      modal.style.display = "flex";
-      return; // block navigation
+      modal.style.display = "flex"; // show popup first
+      return; // block transition
     }
-    // Otherwise, proceed normally
-    return originalShowSection ? originalShowSection(name) : void 0;
+    return typeof originalShowSection === "function"
+      ? originalShowSection(name)
+      : void 0;
   };
 
-  // --- 2) Also intercept clicks on the "Submit" button on page 2 (id=submitAll) ---
-  // Use *event delegation* so it still works if the button is re-rendered.
-  document.addEventListener("click", function (e) {
-    const el = e.target;
-    if (!el) return;
+  // 2️⃣ Intercept "Submit" button click (id="submitAll")
+  document.addEventListener(
+    "click",
+    function (e) {
+      const el = e.target;
+      if (el && el.id === "submitAll") {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation?.();
+        modal.style.display = "flex"; // show confirmation first
+      }
+    },
+    true
+  );
 
-    // Click on the final Submit button?
-    if (el.id === "submitAll") {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation?.();
-      modal.style.display = "flex";
-    }
-  }, true); // capture to beat other handlers
-
-  // --- 3) Modal buttons ---
+  // 3️⃣ Popup actions
   cancel.addEventListener("click", function () {
+    // No → close and stay on question page
     modal.style.display = "none";
   });
 
   ok.addEventListener("click", function () {
+    // Yes → proceed to scoring page
     modal.style.display = "none";
-    allowFinish = true;              // allow finish exactly once
+    allowFinish = true;
+
     if (typeof originalShowSection === "function") {
-      originalShowSection("finish"); // now go to scoring
+      originalShowSection("finish");
+    } else {
+      // Fallback: manually show #finish if no showSection
+      try {
+        document.querySelectorAll("main > section").forEach(s => (s.style.display = "none"));
+        const finish = document.getElementById("finish");
+        if (finish) finish.style.display = "";
+      } catch (_) {}
     }
-    allowFinish = false;             // reset guard
+
+    allowFinish = false; // reset for safety
   });
 })();
 </script>
 
-<!-- Optional: clean up any old "recorded" placeholders if they were ever injected -->
+<!-- 🧹 Clean leftover "recorded" message if any -->
 <script>
 document.addEventListener("bed:pdf-ready", () => {
   const finish = document.getElementById("finish");
@@ -1930,7 +1942,8 @@ document.addEventListener("bed:pdf-ready", () => {
 </script>
 
 <!-- === Google Sheets Sync === -->
-<script src="../gsync.js?v=25"></script>
+<script src="../gsync.js?v=27"></script>
 
 </body>
 </html>
+
