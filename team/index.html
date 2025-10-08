@@ -589,6 +589,16 @@
     #pdfReport .statements-table col:nth-child(4){ width:15% !important; }
   }
   </style>
+<style>
+  #confirmModal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:9999}
+  #confirmModal .modal-box{background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.25);padding:22px 24px;width:86%;max-width:380px;font-family:system-ui,Arial,sans-serif;text-align:left}
+  #confirmModal .title{font-size:17px;font-weight:700;color:#111;margin:0 0 8px}
+  #confirmModal .text{font-size:15px;font-weight:400;color:#333;line-height:1.5;margin:0 0 18px}
+  #confirmModal .actions{display:flex;justify-content:flex-end;gap:10px}
+  #confirmModal button{font-size:15px;font-weight:600;border:none;border-radius:10px;padding:8px 22px;cursor:pointer}
+  #confirmModal .btn-cancel{background:#ddd;color:#333}
+  #confirmModal .btn-ok{background:#1E90FF;color:#fff}
+</style>
 </head>
     <body>
         <main class="container">
@@ -607,8 +617,7 @@
     type="email" 
     required 
     autocomplete="email" 
-    inputmode="email" 
-  />
+    />
 </div>
                 <div class="row">
                     <label for="hotel">your location</label>
@@ -988,7 +997,7 @@
                     if (!holder) return;
                     const gp = computeGroupPercents();
                     const desc = groupDescMap();
-                    const order = ["Hospitality skills", "Hospitality competencies", "Taking ownership", "Collaboration"];
+                    const order = ["Hospitality skills", "BED competencies", "Taking ownership", "Collaboration"];
                     let rows = "";
                     order.forEach((name) => {
                         const p = gp[name] ?? 0;
@@ -1156,13 +1165,13 @@ if (typeof window.syncToSheet === 'function') {
                     // Group rows
                     const gp = computeGroupPercents();
                     const descMap = groupDescMap();
-                    const order = ["Hospitality skills", "Hospitality competencies", "Taking ownership", "Collaboration"];
+                    const order = ["Hospitality skills", "BED competencies", "Taking ownership", "Collaboration"];
                     const body = document.getElementById("pdfGroupRows");
                     body.innerHTML = "";
                     order.forEach((name) => {
                         const tr = document.createElement("tr");
                         const tdName = document.createElement("td");
-                        tdName.textContent = "Score " + name;
+                        tdName.textContent = name;
                         const tdPct = document.createElement("td");
                         tdPct.textContent = (gp[name] != null ? gp[name] : "—") + "%";
                         const tdDesc = document.createElement("td");
@@ -1484,257 +1493,19 @@ if (typeof window.syncToSheet === 'function') {
                 }
             })();
         </script>
-        <!-- === Non-invasive group rename + display sync (drop-in) === -->
-        <script>
-            (function () {
-                const MAP = {
-                    "Hospitality skills": "Hospitality skills",
-                    "Hospitality Competencies": "BED competencies",
-                    "Taking Ownership": "Taking ownership",
-                    Collaboration: "Collaboration",
-                };
-                const TARGET_ORDER = ["Hospitality skills", "BED competencies", "Taking ownership", "Collaboration"];
-                function normalizeData() {
-                    const S = window.__S || window.S;
-                    if (!S || !Array.isArray(S.groups) || !Array.isArray(S.questions)) return false;
-                    S.groups.forEach((g) => {
-                        if (MAP[g.name]) g.name = MAP[g.name];
-                    });
-                    S.groups.sort((a, b) => TARGET_ORDER.indexOf(a.name) - TARGET_ORDER.indexOf(b.name));
-                    S.questions.forEach((q) => {
-                        if (MAP[q.group]) q.group = MAP[q.group];
-                    });
-                    return true;
-                }
-                function replaceOldLabelsIn(container) {
-                    if (!container) return;
-                    const TEXT_MAP = {
-                        "Hospitality skills": "Hospitality skills",
-                        "Hospitality competencies": "BED competencies",
-                        "Taking ownership": "Taking ownership",
-                        Collaboration: "Collaboration",
-                        "Score Hospitality skills": "Score hospitality skills",
-                        "Score Hospitality competencies": "Score BED competencies",
-                        "Score Taking ownership": "Score taking ownership",
-                        "Score Collaboration": "Score Collaboration",
-                    };
-                    const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, null);
-                    let n;
-                    while ((n = walker.nextNode())) {
-                        const t = n.nodeValue;
-                        if (!t) continue;
-                        let out = t;
-                        for (const [from, to] of Object.entries(TEXT_MAP)) {
-                            if (out.indexOf(from) !== -1) out = out.replaceAll(from, to);
-                        }
-                        if (out !== t) n.nodeValue = out;
-                    }
-                }
-                function ensureBeforeRender() {
-                    try {
-                        normalizeData();
-                        replaceOldLabelsIn(document.getElementById("finish"));
-                        replaceOldLabelsIn(document.getElementById("pdfReport"));
-                    } catch (e) {}
-                }
-                let tries = 0;
-                const t = setInterval(() => {
-                    if (normalizeData() || ++tries > 40) clearInterval(t);
-                }, 150);
-                ["toQ2", "submitAll", "congratsPdf"].forEach((id) => {
-                    const el = document.getElementById(id);
-                    if (!el) return;
-                    el.addEventListener("click", ensureBeforeRender, { capture: true });
-                });
-                document.addEventListener("DOMContentLoaded", () => {
-                    ensureBeforeRender();
-                    setTimeout(ensureBeforeRender, 200);
-                });
-            })();
-        </script>
-        <!-- === End drop-in === -->
+        
 
         <script>
-            (function () {
-                // Map old->new
-                const MAP = {
-                    "Hospitality skills": "Hospitality skills",
-                    "Hospitality competencies": "BED competencies",
-                    "Taking ownership": "Taking ownership",
-                    Collaboration: "Collaboration",
-                };
-                const TARGET_ORDER = ["Hospitality skills", "BED competencies", "Taking ownership", "Collaboration"];
-
-                function normalizedOrder(S) {
-                    const byName = new Map();
-                    (S.groups || []).forEach((g) => byName.set(g.name, g));
-                    // Build using target order but include fallback to any extras
-                    const out = [];
-                    TARGET_ORDER.forEach((n) => {
-                        if (byName.has(n)) out.push(n);
-                    });
-                    (S.groups || []).forEach((g) => {
-                        if (!out.includes(g.name)) out.push(g.name);
-                    });
-                    return out;
-                }
-
-                // Override renderGroupResults
-                const _render = window.renderGroupResults;
-                window.renderGroupResults = function () {
-                    const S = window.__S || window.S || {};
-                    // Normalize question tags
-                    (S.questions || []).forEach((q) => {
-                        if (MAP[q.group]) q.group = MAP[q.group];
-                    });
-                    // Normalize groups
-                    (S.groups || []).forEach((g) => {
-                        if (MAP[g.name]) g.name = MAP[g.name];
-                    });
-                    const order = normalizedOrder(S);
-                    const byPct = window.computeGroupPercents ? window.computeGroupPercents() : {};
-                    const holder = document.getElementById("groupResults");
-                    if (!holder) {
-                        if (typeof _render === "function") return _render();
-                        else return;
-                    }
-                    holder.innerHTML = "";
-                    order.forEach((name) => {
-                        const p = byPct[name] ?? 0;
-                        const row = document.createElement("div");
-                        row.className = "group-row";
-                        row.innerHTML = '<div class="group-label">' + name + "</div>" + '<div class="group-bar"><div class="fill" style="width:' + p + '%"></div></div>' + '<div class="group-pct">' + p + "%</div>";
-                        holder.appendChild(row);
-                    });
-                };
-
-                // Override buildPdfReport
-                const _buildPdf = window.buildPdfReport;
-                window.buildPdfReport = function () {
-                    const S = window.__S || window.S || {};
-                    (S.questions || []).forEach((q) => {
-                        if (MAP[q.group]) q.group = MAP[q.group];
-                    });
-                    (S.groups || []).forEach((g) => {
-                        if (MAP[g.name]) g.name = MAP[g.name];
-                    });
-                    const order = normalizedOrder(S);
-                    // Call original to lay out the PDF shell first (date, name, totals, etc.)
-                    if (typeof _buildPdf === "function") _buildPdf();
-                    // Then replace the SCORE BY GROUP table using our normalized order
-                    const table = document.getElementById("pdfGroupTable");
-                    if (table) {
-                        table.innerHTML = "";
-                        const byPct = window.computeGroupPercents ? window.computeGroupPercents() : {};
-                        order.forEach((name) => {
-                            const tr = document.createElement("tr");
-                            const td1 = document.createElement("td");
-                            td1.textContent = name;
-                            const td2 = document.createElement("td");
-                            td2.textContent = (byPct[name] ?? 0) + "%";
-                            tr.appendChild(td1);
-                            tr.appendChild(td2);
-                            table.appendChild(tr);
-                        });
-                    }
-                };
-            })();
-        </script>
+            
 
         <script>
-            // === Final normalization & rendering vFinal ===
-            (function () {
-                const MAP = {
-                    "Hospitality skills": "Hospitality skills",
-                    "Hospitality competencies": "BED competencies",
-                    "Taking ownership": "Taking ownership",
-                    Collaboration: "Collaboration",
-                };
-                const ORDER = ["Hospitality skills", "BED competencies", "Taking ownership", "Collaboration"];
-
-                function normalizeAll() {
-                    const S = window.__S || window.S || {};
-                    if (Array.isArray(S.groups))
-                        S.groups.forEach((g) => {
-                            if (MAP[g.name]) g.name = MAP[g.name];
-                        });
-                    if (Array.isArray(S.questions))
-                        S.questions.forEach((q) => {
-                            if (MAP[q.group]) q.group = MAP[q.group];
-                        });
-                }
-                function byOrder(names) {
-                    const seen = new Set();
-                    const out = [];
-                    ORDER.forEach((n) => {
-                        if (names.includes(n) && !seen.has(n)) {
-                            out.push(n);
-                            seen.add(n);
-                        }
-                    });
-                    names.forEach((n) => {
-                        if (!seen.has(n)) out.push(n);
-                    });
-                    return out;
-                }
-
-                // Replace scoring-page renderer
-                window.renderGroupResults = function () {
-                    normalizeAll();
-                    const S = window.__S || window.S || {};
-                    const holder = document.getElementById("groupResults");
-                    if (!holder) return;
-                    const pctMap = window.computeGroupPercents ? window.computeGroupPercents() : {};
-                    const descMap = {};
-                    (S.groups || []).forEach((g) => (descMap[g.name] = g.description || ""));
-                    const names = byOrder(Object.keys(descMap));
-                    holder.innerHTML = "";
-                    names.forEach((name) => {
-                        const p = pctMap[name] ?? 0;
-                        const wrap = document.createElement("div");
-                        wrap.className = "group-row";
-                        wrap.innerHTML = '<div class="group-line"><span class="group-name">' + name + '</span><span class="group-pct">' + p + "%</span></div>" + '<div class="group-desc">' + (descMap[name] || "") + "</div>";
-                        holder.appendChild(wrap);
-                    });
-                };
-
-                // Replace PDF builder (keeps original totals/date/etc. from existing function)
-                const _origBuild = window.buildPdfReport;
-                window.buildPdfReport = function () {
-                    normalizeAll();
-                    if (typeof _origBuild === "function") _origBuild(); // lays out date, totals, info, statements
-
-                    const S = window.__S || window.S || {};
-                    const body = document.getElementById("pdfGroupRows");
-                    if (!body) return;
-                    // Rebuild the SCORE BY GROUP rows with normalized order and clean labels
-                    body.innerHTML = "";
-                    const pctMap = window.computeGroupPercents ? window.computeGroupPercents() : {};
-                    const descMap = {};
-                    (S.groups || []).forEach((g) => (descMap[g.name] = g.description || ""));
-                    const names = byOrder(Object.keys(descMap));
-                    names.forEach((name) => {
-                        const tr = document.createElement("tr");
-                        const tdName = document.createElement("td");
-                        tdName.textContent = name;
-                        const tdPct = document.createElement("td");
-                        tdPct.textContent = (pctMap[name] ?? 0) + "%";
-                        const tdDesc = document.createElement("td");
-                        tdDesc.textContent = descMap[name] || "";
-                        tr.appendChild(tdName);
-                        tr.appendChild(tdPct);
-                        tr.appendChild(tdDesc);
-                        body.appendChild(tr);
-                    });
-                };
-            })();
-        </script>
+            
         <script>
             // === Strong patch v2: force-normalize + recompute group % independent of S.groups ===
             (function () {
                 const MAP = {
                     "Hospitality skills": "Hospitality skills",
-                    "Hospitality competencies": "BED competencies",
+                    "BED competencies": "BED competencies",
                     "Taking ownership": "Taking ownership",
                     Collaboration: "Collaboration",
                 };
@@ -1874,7 +1645,7 @@ if (typeof window.syncToSheet === 'function') {
             (function () {
                 const MAP = {
                     "Hospitality skills": "Hospitality skills",
-                    "Hospitality competencies": "BED competencies",
+                    "BED competencies": "BED competencies",
                     "Taking ownership": "Taking ownership",
                     Collaboration: "Collaboration",
                 };
@@ -2019,7 +1790,7 @@ if (typeof window.syncToSheet === 'function') {
   // === Final hot-fix mapping & order (override globally) ===
   window.MAP = {
     "Hospitality skills":        "Hospitality skills",
-    "Hospitality competencies":  "BED competencies",
+    "BED competencies":  "BED competencies",
     "Taking ownership":          "Taking ownership",
     "Collaboration":             "Collaboration",
   };
@@ -2050,16 +1821,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <!-- Custom "Are you sure?" confirmation modal (white, left text, right buttons) v3 -->
-<style>
-  #confirmModal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:9999}
-  #confirmModal .modal-box{background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.25);padding:22px 24px;width:86%;max-width:380px;font-family:system-ui,Arial,sans-serif;text-align:left}
-  #confirmModal .title{font-size:17px;font-weight:700;color:#111;margin:0 0 8px}
-  #confirmModal .text{font-size:15px;font-weight:400;color:#333;line-height:1.5;margin:0 0 18px}
-  #confirmModal .actions{display:flex;justify-content:flex-end;gap:10px}
-  #confirmModal button{font-size:15px;font-weight:600;border:none;border-radius:10px;padding:8px 22px;cursor:pointer}
-  #confirmModal .btn-cancel{background:#ddd;color:#333}
-  #confirmModal .btn-ok{background:#1E90FF;color:#fff}
-</style>
+
 
 <div id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
   <div class="modal-box">
