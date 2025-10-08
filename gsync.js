@@ -182,36 +182,43 @@
       });
     };
 
-    // === PATCH v2: Capture group percentages from PDF UI ===
+// === PATCH v3: Robust capture of overall %, 4 group %, and recommendation ===
     window.collectResultsFromPdfUi = function () {
-      const groups = ["Hospitality skills", "BED competencies", "Taking ownership", "Collaboration"];
-      const groupScores = {};
+      const out = { overallPercent: "", groupScores: {}, recommendations: "" };
+      try {
+        const overallEl = document.querySelector("#scorePercent, .score-big, [id*='score']") || {};
+        const matchOverall = (overallEl.textContent || "").match(/(\d{1,3})\s*%?/);
+        out.overallPercent = matchOverall ? matchOverall[1] : "";
 
-      groups.forEach(g => {
-        const el = Array.from(document.querySelectorAll("*"))
-          .find(e => e.textContent && e.textContent.trim().toLowerCase().includes(g.toLowerCase()));
-        if (el) {
-          const match = el.textContent.match(/(\d{1,3})\s*%/);
-          groupScores[g] = match ? match[1] : "";
-        } else {
-          groupScores[g] = "";
-        }
-      });
+        const groupLabels = [
+          "Hospitality skills",
+          "BED competencies",
+          "Taking ownership",
+          "Collaboration"
+        ];
+        groupLabels.forEach(g => (out.groupScores[g] = ""));
+        document.querySelectorAll("*").forEach(el => {
+          const t = (el.textContent || "").trim();
+          for (const g of groupLabels) {
+            if (t.toLowerCase().includes(g.toLowerCase())) {
+              const m = t.match(/(\d{1,3})\s*%/);
+              if (m) out.groupScores[g] = m[1];
+            }
+          }
+        });
 
-      const overallEl = document.getElementById("scorePercent");
-      const overallPercent = overallEl
-        ? (overallEl.textContent.match(/(\d{1,3})/)?.[1] || "")
-        : "";
-
-      const recText = document.getElementById("recText")?.textContent.trim() || "";
-
-      return {
-        overallPercent,
-        groupScores,
-        recommendations: recText,
-      };
+        const recEl =
+          document.getElementById("recText") ||
+          [...document.querySelectorAll("*")].find(e =>
+            /focus|excellent|great|support|coach/i.test(e.textContent)
+          );
+        out.recommendations = (recEl && recEl.textContent.trim()) || "";
+      } catch (err) {
+        console.warn("collectResultsFromPdfUi failed:", err);
+      }
+      console.log("📊 collectResultsFromPdfUi()", out);
+      return out;
     };
 
-  }
-})();
-
+  }  // ← closes the main if wrapper
+})();  // ← closes the entire IIFE
