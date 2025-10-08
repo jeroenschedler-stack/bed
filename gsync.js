@@ -78,35 +78,48 @@
 
   const wanted = ['Hospitality skills','BED competencies','Taking ownership','Collaboration'];
   const groupScores = Object.create(null);
-
   wanted.forEach(w => (groupScores[w] = ''));
 
-  // Search specifically inside any PDF result table or <div class="group-results">
-  const possibleRoots = [
-    document.getElementById('pdfGroupTable'),
-    document.querySelector('.group-results'),
-    document.getElementById('finish'),
-    document.body
-  ].filter(Boolean);
+  // Target your structure: <div id="groupResults"> ... <div class="group-row"><div>LABEL XX%</div>...</div>
+  const root =
+    document.getElementById('groupResults') ||
+    document.querySelector('.groupResults') ||
+    document.getElementById('finish') ||
+    document.body;
 
-  possibleRoots.forEach(root => {
+  // Read the first child div inside each group-row (holds "Label 63%")
+  root.querySelectorAll('.group-row').forEach(row => {
+    const nameDiv =
+      row.querySelector('.group-name') ||
+      row.querySelector('div:first-child') ||
+      row;
+
+    const txt = (nameDiv?.textContent || '').trim();
     wanted.forEach(w => {
-      const node = [...root.querySelectorAll('*')].find(el =>
-        el.textContent && el.textContent.trim().toLowerCase().includes(w.toLowerCase())
-      );
-      if (node) {
-        const m = node.textContent.match(/(\d{1,3})\s*%/);
+      if (txt.toLowerCase().includes(w.toLowerCase())) {
+        const m = txt.match(/(\d{1,3})\s*%/);
         if (m) groupScores[w] = m[1];
       }
     });
   });
 
-  const recommendations = document.getElementById('recText')?.textContent?.trim() || '';
-  console.log('📊 Group extraction test →', groupScores);
+  // Fallback: scan any element containing the label text
+  if (Object.values(groupScores).some(v => !v)) {
+    document.querySelectorAll('*').forEach(el => {
+      const t = (el.textContent || '').trim();
+      wanted.forEach(w => {
+        if (!groupScores[w] && t.toLowerCase().includes(w.toLowerCase())) {
+          const m = t.match(/(\d{1,3})\s*%/);
+          if (m) groupScores[w] = m[1];
+        }
+      });
+    });
+  }
 
+  const recommendations = document.getElementById('recText')?.textContent?.trim() || '';
+  console.log('📊 FINAL groups →', groupScores);
   return { overallPercent, groupScores, recommendations };
 }
-
 
   /* ---------- Send to Google Sheet ---------- */
   async function sendToSheet(payload) {
