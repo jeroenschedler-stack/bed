@@ -1861,6 +1861,8 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </div>
 
+<!-- === Final Confirmation & Sync Section (v4) === -->
+
 <script>
 (function () {
   const modal = document.getElementById("confirmModal");
@@ -1868,39 +1870,40 @@ document.addEventListener('DOMContentLoaded', () => {
   const ok = document.getElementById("okConfirm");
   const submitBtn = document.getElementById("submitAll");
 
-  if (!submitBtn || !modal) return;
-
-  // Hide modal by default
+  if (!modal || !submitBtn) return;
   modal.style.display = "none";
 
-  // Intercept the normal submit click
+  // Trigger confirmation BEFORE showing the scoring page
   submitBtn.addEventListener("click", function (e) {
-    e.preventDefault();
-    modal.style.display = "flex"; // show modal first
+    e.preventDefault();              // stop direct navigation
+    modal.style.display = "flex";    // show modal first
   });
 
-  // Cancel just closes the modal
   cancel.addEventListener("click", function () {
     modal.style.display = "none";
   });
 
-  // OK proceeds to scoring page and hides modal
   ok.addEventListener("click", function () {
     modal.style.display = "none";
-    // now show the scoring page
-    const finishSection = document.getElementById("finish");
-    if (finishSection) showSection("finish");
+    // only now show the scoring page
+    if (typeof showSection === "function") {
+      showSection("finish");
+    }
   });
 })();
 </script>
 
+<!-- Optional: PDF-related message injection (kept for backward compatibility, no duplicate text) -->
 <script>
 document.addEventListener("bed:pdf-ready", () => {
-  // find the finish section
   const finish = document.getElementById("finish");
   if (!finish) return;
 
-  // check if message already exists to prevent duplicates
+  // remove any existing "Your assessment is recorded" message
+  const oldMsg = finish.querySelector("#recordedMsg, #recordMsg");
+  if (oldMsg) oldMsg.remove();
+
+  // placeholder for any future dynamic messages
   if (!finish.querySelector("#recordMsg")) {
     const p = document.createElement("p");
     p.id = "recordMsg";
@@ -1909,7 +1912,6 @@ document.addEventListener("bed:pdf-ready", () => {
     p.style.color = "#434343";
     p.style.textAlign = "left";
 
-    // find PDF instruction text
     const pdfHint = Array.from(finish.querySelectorAll("p, div"))
       .find(el => el.textContent && el.textContent.includes("Click PDF"));
 
@@ -1921,31 +1923,10 @@ document.addEventListener("bed:pdf-ready", () => {
   }
 });
 </script>
-        <script>
-document.addEventListener("DOMContentLoaded", () => {
-  // Wait until the completion (congrats) page is shown
-  const targetNode = document.getElementById("congrats");
-  if (!targetNode) return;
 
-  const observer = new MutationObserver(() => {
-    const pdfText = targetNode.querySelector("p");
-    if (pdfText && pdfText.textContent.toLowerCase().includes("click pdf")) {
-      // Only add once
-      if (!document.getElementById("recordedMsg")) {
-        const msg = document.createElement("p");
-        msg.id = "recordedMsg";
-        msg.textContent = "Your assessment is recorded.";
-        msg.style.fontSize = "16px";
-        msg.style.color = "#434343";
-        msg.style.marginBottom = "4px";
-        pdfText.parentNode.insertBefore(msg, pdfText);
-      }
-    }
-  });
-
-  observer.observe(targetNode, { childList: true, subtree: true });
-});
-</script>
+<!-- === Google Sheets Sync === -->
 <script src="../gsync.js?v=21"></script>
+
 </body>
 </html>
+
