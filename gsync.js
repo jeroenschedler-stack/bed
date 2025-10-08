@@ -6,7 +6,8 @@
 
 (function () {
   // ⚙️ Deployed Apps Script Web App URL (must end with /exec)
-  const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzwNbIbUEG06lq0cUaXeJdywW5gIw7JCPvzBMH5SauCPVFyeDOAWd2fbLB5hT8d89uJ/exec';
+  const WEBAPP_URL = 'const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwp3ung9sZVbajXDxeBHD0Z7oUXtvrT_hfo-ox1zyqanogLUY9N-A7kELDAo4vKBCBU/exec';
+';
 
   /* ---------- Utility helpers ---------- */
   function extractPercent(txt) {
