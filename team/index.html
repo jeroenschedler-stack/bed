@@ -429,52 +429,37 @@
               #pdfReport .info-grid .card .kv-label strong {
                 font-weight: 400 !important;
               }
-            <!-- 🔧 BUTTON WIDTH FIX v2 — applies to all buttons including modals -->
+            <!-- 🔧 BUTTON WIDTH FIX v3 — applies to all button types everywhere -->
 <style>
 button,
+a.btn,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
 .popup button,
+.popup a.btn,
 .modal button,
-.confirm button {
+.modal a.btn,
+.confirm button,
+.confirm a.btn {
+  box-sizing: border-box !important;   /* include padding/border in width */
   width: 100px !important;
   min-width: 100px !important;
   text-align: center;
+  padding: 10px 12px;
 }
-        </style>
-        <script id="embeddedQuestions" type="application/json">
-            []
-        </script>
-        <style>
-            /* === FINAL fixes v68: Statements duplicate header removal + header alignment (print only) === */
-            @media print {
 
-                /* Align blue header bar labels with table columns */
-                #pdfReport .statements-bar {
-                    display: grid !important;
-                    column-gap: 0 !important;
-                    padding: 0 !important;
-                    margin: 0 !important;
-                }
-                #pdfReport .statements-bar .lbl-stmt {
-                    grid-column: 2 !important;
-                    text-align: left !important;
-                }
-                #pdfReport .statements-bar .lbl-group {
-                    grid-column: 3 !important;
-                    text-align: left !important;
-                }
-                #pdfReport .statements-bar .lbl-score {
-                    grid-column: 4 !important;
-                    text-align: center !important;
-                }
-
-                /* Hide the table's header row to avoid duplication under the blue bar */
-                #pdfReport #pdfStatements thead,
-                #pdfReport #pdfStatements thead tr,
-                #pdfReport #pdfStatements thead th {
-                    display: none !important;
-                }
-            }
-        </style>
+/* Optional: center buttons in rows such as popups or bottom navs */
+.actions,
+.popup .actions,
+.modal .actions,
+.confirm .actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+</style>
         <style>
             /* === FINAL fixes v69: Information section row alignment + unbold labels (screen + print) === */
             #pdfReport .info-grid .fields {
