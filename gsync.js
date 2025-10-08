@@ -73,36 +73,40 @@
 
   /* ---------- Collect results from PDF UI ---------- */
   function collectResultsFromPdfUi() {
-    const overallTxt = document.getElementById('scorePercent')?.textContent || '';
-    const overallPercent = extractPercent(overallTxt);
+  const overallTxt = document.getElementById('scorePercent')?.textContent || '';
+  const overallPercent = extractPercent(overallTxt);
 
-    const wanted = ['Hospitality skills', 'BED competencies', 'Taking ownership', 'Collaboration'];
-    const groupScores = Object.create(null);
+  const wanted = ['Hospitality skills','BED competencies','Taking ownership','Collaboration'];
+  const groupScores = Object.create(null);
 
-    function tryTable(table) {
-      const rows = table.querySelectorAll('tr');
-      rows.forEach(tr => {
-        const tds = tr.querySelectorAll('td,th');
-        if (tds.length >= 2) {
-          const name = (tds[0].textContent || '').trim();
-          const val  = (tds[1].textContent || '').trim();
-          const hit = wanted.find(w => textEq(name, w));
-          if (hit) groupScores[hit] = extractPercent(val) || groupScores[hit] || '';
-        }
-      });
-    }
+  wanted.forEach(w => (groupScores[w] = ''));
 
-    const explicit = document.getElementById('pdfGroupTable');
-    if (explicit) tryTable(explicit);
-    (document.getElementById('finish') || document).querySelectorAll('table').forEach(tryTable);
+  // Search specifically inside any PDF result table or <div class="group-results">
+  const possibleRoots = [
+    document.getElementById('pdfGroupTable'),
+    document.querySelector('.group-results'),
+    document.getElementById('finish'),
+    document.body
+  ].filter(Boolean);
 
+  possibleRoots.forEach(root => {
     wanted.forEach(w => {
-      if (!groupScores[w]) groupScores[w] = (window.groupResults && window.groupResults[w]) || '';
+      const node = [...root.querySelectorAll('*')].find(el =>
+        el.textContent && el.textContent.trim().toLowerCase().includes(w.toLowerCase())
+      );
+      if (node) {
+        const m = node.textContent.match(/(\d{1,3})\s*%/);
+        if (m) groupScores[w] = m[1];
+      }
     });
+  });
 
-    const recommendations = document.getElementById('recText')?.textContent?.trim() || '';
-    return { overallPercent, groupScores, recommendations };
-  }
+  const recommendations = document.getElementById('recText')?.textContent?.trim() || '';
+  console.log('📊 Group extraction test →', groupScores);
+
+  return { overallPercent, groupScores, recommendations };
+}
+
 
   /* ---------- Send to Google Sheet ---------- */
   async function sendToSheet(payload) {
