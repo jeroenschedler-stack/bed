@@ -1820,7 +1820,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <div id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
   <div class="modal-box">
-    <div id="confirmTitle" class="title">please confirm</div>
+    <div id="confirmTitle" class="title">please confirm v1</div>
     <div id="confirmText" class="text">after you submit your self-assessment the scores will be automatically saved</div>
     <div class="actions">
       <button id="cancelConfirm" class="btn-cancel" type="button">No</button>
@@ -1829,7 +1829,7 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </div>
 
-<!-- === Final Confirmation Guard & Sync (v9) === -->
+<!-- === Final Confirmation + Score Render (v11) === -->
 
 <script>
 (function () {
@@ -1842,51 +1842,46 @@ document.addEventListener('DOMContentLoaded', () => {
   // Hide modal by default
   modal.style.display = "none";
 
-  // Save original showSection if it exists
+  // Keep original showSection
   const originalShowSection = window.showSection;
   let allowFinish = false;
 
-  // 1️⃣ Guard against auto-navigation to scoring
+  // 1) Guard: block unconfirmed jumps to "finish"
   window.showSection = function (name) {
     if (name === "finish" && !allowFinish) {
-      modal.style.display = "flex"; // show popup first
-      return; // block transition
+      modal.style.display = "flex";
+      return;
     }
     return typeof originalShowSection === "function"
       ? originalShowSection(name)
       : void 0;
   };
 
-  // 2️⃣ Intercept "Submit" button click (id="submitAll")
-  document.addEventListener(
-    "click",
-    function (e) {
-      const el = e.target;
-      if (el && el.id === "submitAll") {
-        e.preventDefault();
-        e.stopPropagation();
-        e.stopImmediatePropagation?.();
-        modal.style.display = "flex"; // show confirmation first
-      }
-    },
-    true
-  );
+  // 2) Intercept the last-page Submit (id="submitAll")
+  document.addEventListener("click", function (e) {
+    const el = e.target;
+    if (el && el.id === "submitAll") {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation?.();
+      modal.style.display = "flex";   // show confirm first
+    }
+  }, true); // capture phase
 
-  // 3️⃣ Popup actions
+  // 3) Modal actions
   cancel.addEventListener("click", function () {
     // No → close and stay on question page
     modal.style.display = "none";
   });
 
   ok.addEventListener("click", function () {
-    // Yes → proceed to scoring page
+    // Yes → close and go to scoring
     modal.style.display = "none";
     allowFinish = true;
 
     if (typeof originalShowSection === "function") {
       originalShowSection("finish");
     } else {
-      // Fallback: manually show #finish if no showSection
       try {
         document.querySelectorAll("main > section").forEach(s => (s.style.display = "none"));
         const finish = document.getElementById("finish");
@@ -1894,24 +1889,53 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (_) {}
     }
 
-    allowFinish = false; // reset for safety
+    // Ensure score render after navigation (next tick)
+    setTimeout(() => {
+      const scoreEl = document.getElementById("scorePercent");
+      const recEl   = document.getElementById("recText");
+      if (document.getElementById("finish")?.style.display !== "none" &&
+          scoreEl && (!scoreEl.textContent || !scoreEl.textContent.trim())) {
+        if (typeof renderFinalScore === "function") {
+          renderFinalScore();
+        } else if (typeof buildPdfReport === "function") {
+          buildPdfReport();
+        }
+      }
+    }, 0);
+
+    allowFinish = false; // reset guard
   });
 })();
 </script>
 
-<!-- 🧹 Clean leftover "recorded" message if any -->
+<!-- 4) Backup: re-render score whenever #finish becomes visible -->
 <script>
-document.addEventListener("bed:pdf-ready", () => {
+document.addEventListener("DOMContentLoaded", () => {
   const finish = document.getElementById("finish");
   if (!finish) return;
-  const oldMsg = finish.querySelector("#recordedMsg, #recordMsg");
-  if (oldMsg) oldMsg.remove();
+
+  const ensureScore = () => {
+    const scoreEl = document.getElementById("scorePercent");
+    const recEl   = document.getElementById("recText");
+    if (finish.style.display !== "none" &&
+        scoreEl && (!scoreEl.textContent || !scoreEl.textContent.trim())) {
+      if (typeof renderFinalScore === "function") {
+        renderFinalScore();
+      } else if (typeof buildPdfReport === "function") {
+        buildPdfReport();
+      }
+    }
+  };
+
+  const obs = new MutationObserver(muts => ensureScore());
+  obs.observe(finish, { attributes: true, attributeFilter: ["style"] });
 });
 </script>
 
 <!-- === Google Sheets Sync === -->
-<script src="../gsync.js?v=27"></script>
+<script src="../gsync.js?v=28"></script>
 
 </body>
 </html>
+
 
