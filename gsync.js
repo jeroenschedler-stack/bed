@@ -47,27 +47,29 @@
      E) window.currentAnswers / window.answers (fallback)
   ----------------------------------------- */
   function getAnswerFromDom(n) {
-    // A) canonical: data-qid + pill.selected -> data-val
-    let el = document.querySelector(`div[data-qid="${n}"] .pill.selected`);
-    if (el) return el.getAttribute('data-val') || el.getAttribute('value') || el.textContent.trim() || '';
+  // A) Your structure: .q-item[data-qid="N"] .pill.selected -> data-val
+  let el = document.querySelector(`.q-item[data-qid="${n}"] .pill.selected`);
+  if (el) return el.getAttribute('data-val') || el.getAttribute('value') || el.textContent.trim() || '';
 
-    // B) fallback: by list-qN id
-    el = document.querySelector(`#list-q${n} .pill.selected`);
-    if (el) return el.getAttribute('data-val') || el.getAttribute('value') || el.textContent.trim() || '';
+  // B) Also accept any element with data-qid="N"
+  el = document.querySelector(`[data-qid="${n}"] .pill.selected`);
+  if (el) return el.getAttribute('data-val') || el.getAttribute('value') || el.textContent.trim() || '';
 
-    // C) radios
-    el = document.querySelector(`input[type="radio"][name="q${n}"]:checked`);
-    if (el) return el.value ?? '';
+  // C) Fallbacks we keep (just in case)
+  el = document.querySelector(`#list-q${n} .pill.selected`);
+  if (el) return el.getAttribute('data-val') || el.getAttribute('value') || el.textContent.trim() || '';
 
-    // D) other custom widgets
-    el = document.querySelector(`[data-q="${n}"][aria-checked="true"], #list-q${n} [aria-checked="true"]`);
-    if (el) return el.getAttribute('data-value') || el.getAttribute('value') || '';
+  el = document.querySelector(`input[type="radio"][name="q${n}"]:checked`);
+  if (el) return el.value ?? '';
 
-    el = document.querySelector(`[data-q="${n}"].selected, #list-q${n} .selected`);
-    if (el) return el.getAttribute('data-value') || el.getAttribute('value') || '';
+  el = document.querySelector(`[data-q="${n}"][aria-checked="true"], #list-q${n} [aria-checked="true"]`);
+  if (el) return el.getAttribute('data-value') || el.getAttribute('value') || '';
 
-    return '';
-  }
+  el = document.querySelector(`[data-q="${n}"].selected, #list-q${n} .selected`);
+  if (el) return el.getAttribute('data-value') || el.getAttribute('value') || '';
+
+  return '';
+}
 
   function collectAnswers() {
     const out = {};
