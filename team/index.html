@@ -597,6 +597,12 @@
   #confirmModal .btn-cancel{background:#ddd;color:#333}
   #confirmModal .btn-ok{background:#1E90FF;color:#fff}
 </style>
+<style>
+/* Safety: ensure TEAM welcome fields are visible */
+#welcome .row { display: flex; align-items: center; gap: 12px; margin: 10px 0; }
+#welcome label { min-width: 140px; font-weight: 600; }
+#welcome input, #welcome select { display: block; visibility: visible; opacity: 1; width: 100%; max-width: 520px; }
+</style>
 </head>
 <body>
 <main class="container">
@@ -1119,150 +1125,14 @@
 
 <!-- === End drop-in === -->
 
-<script>
-            (function(){
-              // Date format: DDMMMYYYY (e.g., 24Sep2025)
-              function formatDateDDMMMYYYY(d=new Date()){
-                const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-                const dd  = String(d.getDate()).padStart(2,'0');
-                return `${dd}${mon[d.getMonth()]}${d.getFullYear()}`;
-              }
 
-              // Try multiple sources to get overall % (robust)
-              function getOverallPct(){
-                try { if (typeof window.computeOverallPercent === 'function') {
-                  const v = window.computeOverallPercent(); if (!isNaN(v)) return Math.round(v);
-                }} catch(e){}
-                try { if (window.totals && typeof window.totals.pct === 'number') return Math.round(window.totals.pct); } catch(e){}
-                const sp = document.getElementById('scorePercent');
-                if (sp) {
-                  const m = sp.textContent.match(/(\d+)\s*%/);
-                  if (m) return parseInt(m[1],10);
-                }
-                return 0;
-              }
-            })();
-        </script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const el = document.getElementById('peerEmail');
-  if (!el) return;
-  el.type = 'email';
-  el.required = true;
-  el.autocomplete = 'email';
-  el.setAttribute('inputmode','email');
-  let msg = document.createElement('small');
-  msg.id = 'emailMsg';
-  msg.style.display = 'block';
-  msg.style.marginTop = '4px';
-  el.after(msg);
-  const show = () => { msg.textContent = el.checkValidity() ? '' : 'Please enter a valid email address'; };
-  el.addEventListener('input', show);
-  el.addEventListener('blur', show);
-});
-</script>
-<!-- Custom "Are you sure?" confirmation modal (white, left text, right buttons) v3 -->
-
-<div aria-describedby="confirmText" aria-labelledby="confirmTitle" aria-modal="true" id="confirmModal" role="dialog">
-<div class="modal-box">
-<div class="title" id="confirmTitle">Are you sure?</div>
-<div class="text" id="confirmText">Your assessment scores will be automatically saved.</div>
-<div class="actions">
-<button class="btn-cancel" id="cancelConfirm" type="button">No</button>
-<button class="btn-ok" id="okConfirm" type="button">Yes</button>
-</div>
-</div>
-</div>
-<script>
-(function () {
-  const modal = document.getElementById("confirmModal");
-  const cancel = document.getElementById("cancelConfirm");
-  const ok = document.getElementById("okConfirm");
-  const submitBtn = document.getElementById("submitAll");
-  if (!submitBtn || !modal) return;
-
-  // intercept click to show modal
-  function intercept(e){
-    e.preventDefault();
-    modal.style.display = "flex";
-    setTimeout(()=>cancel.focus(),100);
-  }
-  submitBtn.addEventListener("click", intercept);
-
-  // close on "No"
-  cancel.addEventListener("click", () => { modal.style.display = "none"; });
-
-  // proceed on "Yes"
-  ok.addEventListener("click", () => {
-    modal.style.display = "none";
-    submitBtn.removeEventListener("click", intercept);
-    submitBtn.disabled = true;
-    submitBtn.click(); // runs existing submit logic
-  });
-})();
-</script>
-<script>
-document.addEventListener("bed:pdf-ready", () => {
-  // find the finish section
-  const finish = document.getElementById("finish");
-  if (!finish) return;
-
-  // check if message already exists to prevent duplicates
-  if (!finish.querySelector("#recordMsg")) {
-    const p = document.createElement("p");
-    p.id = "recordMsg";
-    p.textContent = "Your assessment is recorded.";
-    p.style.marginTop = "12px";
-    p.style.fontSize = "16px";
-    p.style.color = "#434343";
-    p.style.textAlign = "left";
-
-    // find PDF instruction text
-    const pdfHint = Array.from(finish.querySelectorAll("p, div"))
-      .find(el => el.textContent && el.textContent.includes("Click PDF"));
-
-    if (pdfHint) {
-      pdfHint.parentNode.insertBefore(p, pdfHint);
-    } else {
-      finish.appendChild(p);
-    }
-  }
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  // Wait until the completion (congrats) page is shown
-  const targetNode = document.getElementById("congrats");
-  if (!targetNode) return;
-
-  const observer = new MutationObserver(() => {
-    const pdfText = targetNode.querySelector("p");
-    if (pdfText && pdfText.textContent.toLowerCase().includes("click pdf")) {
-      // Only add once
-      if (!document.getElementById("recordedMsg")) {
-        const msg = document.createElement("p");
-        msg.id = "recordedMsg";
-        msg.textContent = "Your assessment is recorded.";
-        msg.style.fontSize = "16px";
-        msg.style.color = "#434343";
-        msg.style.marginBottom = "4px";
-        pdfText.parentNode.insertBefore(msg, pdfText);
-      }
-    }
-  });
-
-  observer.observe(targetNode, { childList: true, subtree: true });
-});
-</script>
-<script src="../gsync.js?v=21"></script>
 <script>
 (function(){
-  // Consolidated TEAM controller
-  const q = s => document.querySelector(s);
   const byId = id => document.getElementById(id);
-
   const startBtn = byId('toInstructions');
+  const backWelcome = byId('backToWelcome');
+  const toQ1 = byId('toQ1');
+
   const nameEl = byId('nick');
   const emailEl = byId('email');
   const hotelEl = byId('hotel');
@@ -1271,7 +1141,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const secInstructions = byId('instructions');
 
   const dots = document.querySelectorAll('#progressHeader .dot');
-
   function setProgress(i){
     if (!dots || !dots.length) return;
     dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
@@ -1279,31 +1148,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function validEmail(v){
     if (!v) return false;
-    // Use browser validity if available
-    if (emailEl && typeof emailEl.checkValidity === 'function') {
-      return emailEl.checkValidity();
-    }
-    // Fallback simple regex
+    if (emailEl && typeof emailEl.checkValidity === 'function') return emailEl.checkValidity();
     return /.+@.+\..+/.test(v);
   }
-
   function canEnable(){
     const nameOk = !!(nameEl && nameEl.value && nameEl.value.trim().length);
     const emailOk = !!(emailEl && validEmail(emailEl.value));
     const hotelOk = !!(hotelEl && hotelEl.value && hotelEl.value.trim().length);
     return nameOk && emailOk && hotelOk;
   }
-
   function syncStart(){
     if (startBtn) startBtn.disabled = !canEnable();
   }
-
-  // Wire input listeners (guard against nulls)
   if (nameEl) nameEl.addEventListener('input', syncStart);
   if (emailEl) emailEl.addEventListener('input', syncStart);
   if (hotelEl) hotelEl.addEventListener('change', syncStart);
 
-  // Initial UI state
+  // Initial
   setProgress(0);
   syncStart();
 
@@ -1314,26 +1175,24 @@ document.addEventListener("DOMContentLoaded", () => {
       if (secWelcome) secWelcome.style.display = 'none';
       if (secInstructions) secInstructions.style.display = 'block';
       setProgress(1);
-      // Scroll to top to avoid being stuck
       window.scrollTo({ top: 0, behavior: 'instant' });
     });
   }
 
-  // Optional back button support if present
-  const backToInstructions = byId('backToInstructions');
-  if (backToInstructions) {
-    backToInstructions.addEventListener('click', function(){
-      if (secInstructions) secInstructions.style.display = 'block';
-      setProgress(1);
+  // Back on Instructions -> Welcome
+  if (backWelcome) {
+    backWelcome.addEventListener('click', function(){
+      if (secInstructions) secInstructions.style.display = 'none';
+      if (secWelcome) secWelcome.style.display = '';
+      setProgress(0);
     });
   }
 
-  // Guard: if no dots exist, create them quickly to ensure visibility
-  if (!dots || !dots.length) {
-    const ph = byId('progressHeader') || document.querySelector('.progress');
-    if (ph) {
-      ph.innerHTML = '<span class="dot active"></span><span class="dot"></span><span class="dot"></span>';
-    }
+  // Instructions -> Q1
+  if (toQ1) {
+    toQ1.addEventListener('click', function(){
+      setProgress(2);
+    });
   }
 
   //__TEAM_CONTROLLER_END__
