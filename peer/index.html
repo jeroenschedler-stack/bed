@@ -107,7 +107,7 @@
             button:disabled{background:#ccc; color:#666; cursor:not-allowed;}
 
 
-              .btn-secondary{width:120px; height:42px; font-size:12pt;}
+              .btn-secondary{width:100px; height:42px; font-size:12pt;}
 
               /* QUESTIONS */
               .q-item{padding:12px 0;  display:grid; grid-template-columns: 26px 1fr; column-gap:6px; align-items:baseline}
@@ -429,8 +429,18 @@
               #pdfReport .info-grid .card .kv-label strong {
                 font-weight: 400 !important;
               }
-            }
-        </style>
+            <!-- 🔧 BUTTON WIDTH FIX v2 — applies to all buttons including modals -->
+<style>
+button,
+.popup button,
+.modal button,
+.confirm button {
+  width: 100px !important;
+  min-width: 100px !important;
+  text-align: center;
+}
+</style>
+
         <script id="embeddedQuestions" type="application/json">
             []
         </script>
