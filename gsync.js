@@ -161,64 +161,34 @@
       return r;
     };
 
-    // Manual trigger (run in console if you want to force a send without PDF build)
-        window.__gsyncFlushToSheet = function () {
-      const isPeer = (document.querySelector('.subheader')?.textContent || '').toLowerCase().includes('peer');
-      const people   = collectPeople(isPeer);
-      const answers  = collectAnswers();
-      const results  = collectResultsFromPdfUi();
-      sendToSheet({
-        formType: people.formType,
-        teamName: people.teamName,
-        teamEmail: people.teamEmail,
-        teamLocation: people.teamLocation,
-        peerName: people.peerName,
-        peerEmail: people.peerEmail,
-        peerLocation: people.peerLocation,
-        ...answers,
-        overallPercent: results.overallPercent,
-        groupScores: results.groupScores,
-        recommendations: results.recommendations
-      });
-    };
+   // === FINAL PATCH: flatten groupScores before sending ===
+window.__gsyncFlushToSheet = function () {
+  const isPeer = (document.querySelector('.subheader')?.textContent || '').toLowerCase().includes('peer');
+  const people   = collectPeople(isPeer);
+  const answers  = collectAnswers();
+  const results  = collectResultsFromPdfUi();
 
-// === PATCH v3: Robust capture of overall %, 4 group %, and recommendation ===
-    window.collectResultsFromPdfUi = function () {
-      const out = { overallPercent: "", groupScores: {}, recommendations: "" };
-      try {
-        const overallEl = document.querySelector("#scorePercent, .score-big, [id*='score']") || {};
-        const matchOverall = (overallEl.textContent || "").match(/(\d{1,3})\s*%?/);
-        out.overallPercent = matchOverall ? matchOverall[1] : "";
+  // Flatten group scores
+  const gs = results.groupScores || {};
+  const payload = {
+    formType: people.formType,
+    teamName: people.teamName,
+    teamEmail: people.teamEmail,
+    teamLocation: people.teamLocation,
+    peerName: people.peerName,
+    peerEmail: people.peerEmail,
+    peerLocation: people.peerLocation,
+    ...answers,
+    overallPercent: results.overallPercent,
+    groupHospitalitySkills: gs['Hospitality skills'] || '',
+    groupBedCompetencies: gs['BED competencies'] || '',
+    groupTakingOwnership: gs['Taking ownership'] || '',
+    groupCollaboration: gs['Collaboration'] || '',
+    recommendations: results.recommendations
+  };
 
-        const groupLabels = [
-          "Hospitality skills",
-          "BED competencies",
-          "Taking ownership",
-          "Collaboration"
-        ];
-        groupLabels.forEach(g => (out.groupScores[g] = ""));
-        document.querySelectorAll("*").forEach(el => {
-          const t = (el.textContent || "").trim();
-          for (const g of groupLabels) {
-            if (t.toLowerCase().includes(g.toLowerCase())) {
-              const m = t.match(/(\d{1,3})\s*%/);
-              if (m) out.groupScores[g] = m[1];
-            }
-          }
-        });
+  console.log("📤 Sending payload:", payload);
+  sendToSheet(payload);
+};
 
-        const recEl =
-          document.getElementById("recText") ||
-          [...document.querySelectorAll("*")].find(e =>
-            /focus|excellent|great|support|coach/i.test(e.textContent)
-          );
-        out.recommendations = (recEl && recEl.textContent.trim()) || "";
-      } catch (err) {
-        console.warn("collectResultsFromPdfUi failed:", err);
-      }
-      console.log("📊 collectResultsFromPdfUi()", out);
-      return out;
-    };
-
-  }  // ← closes the main if wrapper
-})();  // ← closes the entire IIFE
+// === keep your existing collectResultsFromPdfUi as-is ===
