@@ -606,8 +606,25 @@
 <!-- PAGE 1 -->
 <section id="welcome">
 <h2 class="section-title">team member information</h2>
+<div class="row"><label for="nick">your name</label><input id="nick" /></div>
+<div class="row">
+  <label for="email">your email</label>
+  <input autocomplete="email" id="email" name="email" required type="email" />
+</div>
+<div class="row">
+  <label for="hotel">your location</label>
+  <select id="hotel" required>
+    <option disabled selected value="">select hotel</option>
+    <option>BED Changkian</option>
+    <option>BED Phrasingh</option>
+    <option>BED Nimman</option>
+    <option>BED Chiangmai Gate</option>
+    <option>BED Flying</option>
+    <option>BED Support</option>
+  </select>
+</div>
 <div class="actions">
-<button disabled="" id="toInstructions">Start</button>
+  <button id="toInstructions" disabled>Start</button>
 </div>
 </section>
 <!-- Instructions -->
