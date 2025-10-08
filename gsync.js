@@ -80,7 +80,7 @@
   const groupScores = Object.create(null);
   wanted.forEach(w => (groupScores[w] = ''));
 
-  // Target your structure: <div id="groupResults"> ... <div class="group-row"><div>LABEL XX%</div>...</div>
+    // Target your structure: <div id="groupResults"> ... <div class="group-row"><div>LABEL XX%</div>...</div>
   const root =
     document.getElementById('groupResults') ||
     document.querySelector('.groupResults') ||
@@ -90,10 +90,7 @@
   // Read the first child div inside each group-row (holds "Label 63%")
   root.querySelectorAll('.group-row').forEach(row => {
     const nameDiv =
-      row.querySelector('.group-name') ||
-      row.querySelector('div:first-child') ||
-      row;
-
+      row.querySelector('div:first-child') || row;
     const txt = (nameDiv?.textContent || '').trim();
     wanted.forEach(w => {
       if (txt.toLowerCase().includes(w.toLowerCase())) {
