@@ -1820,7 +1820,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <div id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
   <div class="modal-box">
-    <div id="confirmTitle" class="title">please confirm</div>
+    <div id="confirmTitle" class="title">please confirm v1</div>
     <div id="confirmText" class="text">after you submit your self-assessment the scores will be automatically saved</div>
     <div class="actions">
       <button id="cancelConfirm" class="btn-cancel" type="button">No</button>
@@ -1829,8 +1829,7 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </div>
 
-<!-- === Final Confirmation + Score Render (v11) === -->
-
+<!-- === Final Confirmation + Auto-Render (v12) === -->
 <script>
 (function () {
   const modal  = document.getElementById("confirmModal");
@@ -1839,14 +1838,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (!modal || !cancel || !ok) return;
 
-  // Hide modal by default
   modal.style.display = "none";
 
-  // Keep original showSection
   const originalShowSection = window.showSection;
   let allowFinish = false;
 
-  // 1) Guard: block unconfirmed jumps to "finish"
+  // Block any unconfirmed jump to scoring
   window.showSection = function (name) {
     if (name === "finish" && !allowFinish) {
       modal.style.display = "flex";
@@ -1857,84 +1854,56 @@ document.addEventListener('DOMContentLoaded', () => {
       : void 0;
   };
 
-  // 2) Intercept the last-page Submit (id="submitAll")
-  document.addEventListener("click", function (e) {
+  // Intercept Submit click
+  document.addEventListener("click", e => {
     const el = e.target;
     if (el && el.id === "submitAll") {
       e.preventDefault();
       e.stopPropagation();
-      e.stopImmediatePropagation?.();
-      modal.style.display = "flex";   // show confirm first
+      modal.style.display = "flex";
     }
-  }, true); // capture phase
+  }, true);
 
-  // 3) Modal actions
-  cancel.addEventListener("click", function () {
-    // No → close and stay on question page
-    modal.style.display = "none";
+  cancel.addEventListener("click", () => {
+    modal.style.display = "none";   // stay on question page
   });
 
-  ok.addEventListener("click", function () {
-    // Yes → close and go to scoring
+  ok.addEventListener("click", () => {
     modal.style.display = "none";
     allowFinish = true;
 
+    // Go to scoring
     if (typeof originalShowSection === "function") {
       originalShowSection("finish");
     } else {
-      try {
-        document.querySelectorAll("main > section").forEach(s => (s.style.display = "none"));
-        const finish = document.getElementById("finish");
-        if (finish) finish.style.display = "";
-      } catch (_) {}
+      // Fallback manual show
+      document.querySelectorAll("main > section").forEach(s => s.style.display = "none");
+      const finish = document.getElementById("finish");
+      if (finish) finish.style.display = "";
     }
 
-    // Ensure score render after navigation (next tick)
+    // 🔁  Auto-render the score & recommendation
     setTimeout(() => {
-      const scoreEl = document.getElementById("scorePercent");
-      const recEl   = document.getElementById("recText");
-      if (document.getElementById("finish")?.style.display !== "none" &&
-          scoreEl && (!scoreEl.textContent || !scoreEl.textContent.trim())) {
+      const score = document.getElementById("scorePercent");
+      const rec   = document.getElementById("recText");
+
+      // run whichever render function exists
+      if ((score && !score.textContent.trim()) || (rec && !rec.textContent.trim())) {
         if (typeof renderFinalScore === "function") {
           renderFinalScore();
         } else if (typeof buildPdfReport === "function") {
           buildPdfReport();
         }
       }
-    }, 0);
+    }, 200); // small delay to let DOM settle
 
-    allowFinish = false; // reset guard
+    allowFinish = false;
   });
 })();
 </script>
 
-<!-- 4) Backup: re-render score whenever #finish becomes visible -->
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const finish = document.getElementById("finish");
-  if (!finish) return;
-
-  const ensureScore = () => {
-    const scoreEl = document.getElementById("scorePercent");
-    const recEl   = document.getElementById("recText");
-    if (finish.style.display !== "none" &&
-        scoreEl && (!scoreEl.textContent || !scoreEl.textContent.trim())) {
-      if (typeof renderFinalScore === "function") {
-        renderFinalScore();
-      } else if (typeof buildPdfReport === "function") {
-        buildPdfReport();
-      }
-    }
-  };
-
-  const obs = new MutationObserver(muts => ensureScore());
-  obs.observe(finish, { attributes: true, attributeFilter: ["style"] });
-});
-</script>
-
 <!-- === Google Sheets Sync === -->
-<script src="../gsync.js?v=28"></script>
+<script src="../gsync.js?v=29"></script>
 
 </body>
 </html>
-
