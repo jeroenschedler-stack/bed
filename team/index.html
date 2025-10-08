@@ -599,6 +599,42 @@
   #confirmModal .btn-cancel{background:#ddd;color:#333}
   #confirmModal .btn-ok{background:#1E90FF;color:#fff}
 </style>
+<!-- 🔧 BUTTON WIDTH FIX v3 — applies to all button types everywhere -->
+<style>
+button,
+a.btn,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+.popup button,
+.popup a.btn,
+.modal button,
+.modal a.btn,
+.confirm button,
+.confirm a.btn {
+  box-sizing: border-box !important;
+  width: 100px !important;
+  min-width: 100px !important;
+  max-width: 100px !important;
+  text-align: center;
+  padding: 10px 12px;
+  white-space: nowrap;
+  display: inline-block;
+  cursor: pointer;
+}
+
+/* Optional: center grouped buttons */
+.actions,
+.popup .actions,
+.modal .actions,
+.confirm .actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+</style>
+
 </head>
     <body>
         <main class="container">
@@ -1395,7 +1431,7 @@ if (typeof window.syncToSheet === 'function') {
                 document.addEventListener("DOMContentLoaded", setState);
                 setTimeout(setState, 0);
             })();
-            // === End patch v3 ===
+            // === End patch  ===
         </script>
         <script>
             // === Validation patch v4: DOM-based completion (resilient) ===
