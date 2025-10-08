@@ -1,18 +1,14 @@
-/* === gsync.js (final) — No recompute; captures exactly what's on screen ===
-   - Works for TEAM and PEER forms (mirrored structure)
-   - Captures: person fields, Q1–Q35, overall %, 4 group %s, recommendations
-   - Selector model matches your DOM:
-       • Questions live inside: #list-qN > div[data-qid="N"]
-       • Selected rating is:    .pill.selected  (value from @data-val)
-       • PDF group table rows:  first cell is canonical group name
-   - Requires your Apps Script Web App URL (ends with /exec)
---------------------------------------------------------------------------- */
+/* === gsync.js (final production)
+   - Works for TEAM and PEER forms (mirrored)
+   - Captures: person fields, Q1–Q35, overall %, 4 group %, recommendation
+   - Sends flattened group fields for clean write into Google Sheet
+   ------------------------------------------------------------------- */
 
 (function () {
-  // ⚠️ PASTE YOUR DEPLOYED APPS SCRIPT WEB APP URL (must end with /exec)
+  // ⚙️ Deployed Apps Script Web App URL (must end with /exec)
   const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxjfi90ddtP7iee7Jyc5iAPYzpuxnr0x7a_FPV28OUGxm2kXCYVn4ZMP5JPIImfrwEL/exec';
 
-  /* ---------------- utils ---------------- */
+  /* ---------- Utility helpers ---------- */
   function extractPercent(txt) {
     if (!txt) return '';
     const m = String(txt).match(/(\d+(?:\.\d+)?)\s*%/);
@@ -22,7 +18,7 @@
     return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
   }
 
-  /* --------------- people ---------------- */
+  /* ---------- Person info ---------- */
   function collectPeople(isPeerForm) {
     const teamName   = document.getElementById('nick')?.value?.trim() || '';
     const teamEmail  = document.getElementById('email')?.value?.trim() || '';
@@ -34,42 +30,35 @@
     const peerLocSel = document.getElementById('peerHotel');
     const peerLocation = peerLocSel ? (peerLocSel.value || peerLocSel.options[peerLocSel.selectedIndex]?.text || '') : '';
 
-    return { teamName, teamEmail, teamLocation, peerName, peerEmail, peerLocation,
-             formType: isPeerForm ? 'peer' : 'team' };
+    return {
+      teamName, teamEmail, teamLocation,
+      peerName, peerEmail, peerLocation,
+      formType: isPeerForm ? 'peer' : 'team'
+    };
   }
 
-  /* ------------- answers Q1–Q35 ----------
-     Detection priority tailored to your DOM:
-     A) div[data-qid="N"] .pill.selected   -> pull @data-val
-     B) #list-qN .pill.selected            -> pull @data-val
-     C) input[type=radio][name="qN"]:checked
-     D) other custom widgets (aria-checked/selected)
-     E) window.currentAnswers / window.answers (fallback)
-  ----------------------------------------- */
+  /* ---------- Collect answers Q1–Q35 ---------- */
   function getAnswerFromDom(n) {
-  // A) Your structure: .q-item[data-qid="N"] .pill.selected -> data-val
-  let el = document.querySelector(`.q-item[data-qid="${n}"] .pill.selected`);
-  if (el) return el.getAttribute('data-val') || el.getAttribute('value') || el.textContent.trim() || '';
+    let el = document.querySelector(`.q-item[data-qid="${n}"] .pill.selected`);
+    if (el) return el.getAttribute('data-val') || el.getAttribute('value') || el.textContent.trim() || '';
 
-  // B) Also accept any element with data-qid="N"
-  el = document.querySelector(`[data-qid="${n}"] .pill.selected`);
-  if (el) return el.getAttribute('data-val') || el.getAttribute('value') || el.textContent.trim() || '';
+    el = document.querySelector(`[data-qid="${n}"] .pill.selected`);
+    if (el) return el.getAttribute('data-val') || el.getAttribute('value') || el.textContent.trim() || '';
 
-  // C) Fallbacks we keep (just in case)
-  el = document.querySelector(`#list-q${n} .pill.selected`);
-  if (el) return el.getAttribute('data-val') || el.getAttribute('value') || el.textContent.trim() || '';
+    el = document.querySelector(`#list-q${n} .pill.selected`);
+    if (el) return el.getAttribute('data-val') || el.getAttribute('value') || el.textContent.trim() || '';
 
-  el = document.querySelector(`input[type="radio"][name="q${n}"]:checked`);
-  if (el) return el.value ?? '';
+    el = document.querySelector(`input[type="radio"][name="q${n}"]:checked`);
+    if (el) return el.value ?? '';
 
-  el = document.querySelector(`[data-q="${n}"][aria-checked="true"], #list-q${n} [aria-checked="true"]`);
-  if (el) return el.getAttribute('data-value') || el.getAttribute('value') || '';
+    el = document.querySelector(`[data-q="${n}"][aria-checked="true"], #list-q${n} [aria-checked="true"]`);
+    if (el) return el.getAttribute('data-value') || el.getAttribute('value') || '';
 
-  el = document.querySelector(`[data-q="${n}"].selected, #list-q${n} .selected`);
-  if (el) return el.getAttribute('data-value') || el.getAttribute('value') || '';
+    el = document.querySelector(`[data-q="${n}"].selected, #list-q${n} .selected`);
+    if (el) return el.getAttribute('data-value') || el.getAttribute('value') || '';
 
-  return '';
-}
+    return '';
+  }
 
   function collectAnswers() {
     const out = {};
@@ -82,12 +71,12 @@
     return out;
   }
 
-  /* --------- PDF UI (groups & recs) ----- */
+  /* ---------- Collect results from PDF UI ---------- */
   function collectResultsFromPdfUi() {
     const overallTxt = document.getElementById('scorePercent')?.textContent || '';
     const overallPercent = extractPercent(overallTxt);
 
-    const wanted = ['Hospitality skills','BED competencies','Taking ownership','Collaboration'];
+    const wanted = ['Hospitality skills', 'BED competencies', 'Taking ownership', 'Collaboration'];
     const groupScores = Object.create(null);
 
     function tryTable(table) {
@@ -115,21 +104,21 @@
     return { overallPercent, groupScores, recommendations };
   }
 
-  /* --------------- send ----------------- */
+  /* ---------- Send to Google Sheet ---------- */
   async function sendToSheet(payload) {
     try {
       await fetch(WEBAPP_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-        mode: 'no-cors' // opaque is fine for our use; we don't read the response
+        mode: 'no-cors'
       });
     } catch (e) {
       console.warn('Sheet post failed', e);
     }
   }
 
-  /* --------------- hook ----------------- */
+  /* ---------- Hook into PDF builder ---------- */
   if (!window.__gsyncWrapped) {
     window.__gsyncWrapped = true;
     const isPeerForm = (document.querySelector('.subheader')?.textContent || '').toLowerCase().includes('peer');
@@ -142,6 +131,7 @@
       const answers  = collectAnswers();
       const results  = collectResultsFromPdfUi();
 
+      const gs = results.groupScores || {};
       const payload = {
         formType: people.formType,
         teamName: people.teamName,
@@ -152,43 +142,45 @@
         peerLocation: people.peerLocation,
         ...answers,
         overallPercent: results.overallPercent,
-        groupScores: results.groupScores,
+        groupHospitalitySkills: gs['Hospitality skills'] || '',
+        groupBedCompetencies: gs['BED competencies'] || '',
+        groupTakingOwnership: gs['Taking ownership'] || '',
+        groupCollaboration: gs['Collaboration'] || '',
         recommendations: results.recommendations
       };
 
-      // console.table(payload); // <- uncomment to debug locally
+      console.log('📤 Sending payload:', payload);
       sendToSheet(payload);
       return r;
     };
 
-   // === FINAL PATCH: flatten groupScores before sending ===
-window.__gsyncFlushToSheet = function () {
-  const isPeer = (document.querySelector('.subheader')?.textContent || '').toLowerCase().includes('peer');
-  const people   = collectPeople(isPeer);
-  const answers  = collectAnswers();
-  const results  = collectResultsFromPdfUi();
+    /* ---------- Manual flush (DEV) ---------- */
+    window.__gsyncFlushToSheet = function () {
+      const isPeer = (document.querySelector('.subheader')?.textContent || '').toLowerCase().includes('peer');
+      const people   = collectPeople(isPeer);
+      const answers  = collectAnswers();
+      const results  = collectResultsFromPdfUi();
 
-  // Flatten group scores
-  const gs = results.groupScores || {};
-  const payload = {
-    formType: people.formType,
-    teamName: people.teamName,
-    teamEmail: people.teamEmail,
-    teamLocation: people.teamLocation,
-    peerName: people.peerName,
-    peerEmail: people.peerEmail,
-    peerLocation: people.peerLocation,
-    ...answers,
-    overallPercent: results.overallPercent,
-    groupHospitalitySkills: gs['Hospitality skills'] || '',
-    groupBedCompetencies: gs['BED competencies'] || '',
-    groupTakingOwnership: gs['Taking ownership'] || '',
-    groupCollaboration: gs['Collaboration'] || '',
-    recommendations: results.recommendations
-  };
+      const gs = results.groupScores || {};
+      const payload = {
+        formType: people.formType,
+        teamName: people.teamName,
+        teamEmail: people.teamEmail,
+        teamLocation: people.teamLocation,
+        peerName: people.peerName,
+        peerEmail: people.peerEmail,
+        peerLocation: people.peerLocation,
+        ...answers,
+        overallPercent: results.overallPercent,
+        groupHospitalitySkills: gs['Hospitality skills'] || '',
+        groupBedCompetencies: gs['BED competencies'] || '',
+        groupTakingOwnership: gs['Taking ownership'] || '',
+        groupCollaboration: gs['Collaboration'] || '',
+        recommendations: results.recommendations
+      };
 
-  console.log("📤 Sending payload:", payload);
-  sendToSheet(payload);
-};
-
-// === keep your existing collectResultsFromPdfUi as-is ===
+      console.log('📤 Manual flush payload:', payload);
+      sendToSheet(payload);
+    };
+  } // end wrapper
+})(); // end IIFE
