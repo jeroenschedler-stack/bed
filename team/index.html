@@ -586,6 +586,17 @@
     #pdfReport .statements-table col:nth-child(4){ width:15% !important; }
   }
   </style>
+
+<style>
+  #confirmModal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:9999}
+  #confirmModal .modal-box{background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.25);padding:22px 24px;width:86%;max-width:380px;font-family:system-ui,Arial,sans-serif;text-align:left}
+  #confirmModal .title{font-size:17px;font-weight:700;color:#111;margin:0 0 8px}
+  #confirmModal .text{font-size:15px;font-weight:400;color:#333;line-height:1.5;margin:0 0 18px}
+  #confirmModal .actions{display:flex;justify-content:flex-end;gap:10px}
+  #confirmModal button{font-size:15px;font-weight:600;border:none;border-radius:10px;padding:8px 22px;cursor:pointer}
+  #confirmModal .btn-cancel{background:#ddd;color:#333}
+  #confirmModal .btn-ok{background:#1E90FF;color:#fff}
+</style>
 </head>
 <body>
 <main class="container">
@@ -1135,16 +1146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 <!-- Custom "Are you sure?" confirmation modal (white, left text, right buttons) v3 -->
-<style>
-  #confirmModal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:9999}
-  #confirmModal .modal-box{background:#fff;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.25);padding:22px 24px;width:86%;max-width:380px;font-family:system-ui,Arial,sans-serif;text-align:left}
-  #confirmModal .title{font-size:17px;font-weight:700;color:#111;margin:0 0 8px}
-  #confirmModal .text{font-size:15px;font-weight:400;color:#333;line-height:1.5;margin:0 0 18px}
-  #confirmModal .actions{display:flex;justify-content:flex-end;gap:10px}
-  #confirmModal button{font-size:15px;font-weight:600;border:none;border-radius:10px;padding:8px 22px;cursor:pointer}
-  #confirmModal .btn-cancel{background:#ddd;color:#333}
-  #confirmModal .btn-ok{background:#1E90FF;color:#fff}
-</style>
+
 <div aria-describedby="confirmText" aria-labelledby="confirmTitle" aria-modal="true" id="confirmModal" role="dialog">
 <div class="modal-box">
 <div class="title" id="confirmTitle">Are you sure?</div>
@@ -1237,5 +1239,88 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 <script src="../gsync.js?v=21"></script>
+<script>
+(function(){
+  // Consolidated TEAM controller
+  const q = s => document.querySelector(s);
+  const byId = id => document.getElementById(id);
+
+  const startBtn = byId('toInstructions');
+  const nameEl = byId('nick');
+  const emailEl = byId('email');
+  const hotelEl = byId('hotel');
+
+  const secWelcome = byId('welcome');
+  const secInstructions = byId('instructions');
+
+  const dots = document.querySelectorAll('#progressHeader .dot');
+
+  function setProgress(i){
+    if (!dots || !dots.length) return;
+    dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+  }
+
+  function validEmail(v){
+    if (!v) return false;
+    // Use browser validity if available
+    if (emailEl && typeof emailEl.checkValidity === 'function') {
+      return emailEl.checkValidity();
+    }
+    // Fallback simple regex
+    return /.+@.+\..+/.test(v);
+  }
+
+  function canEnable(){
+    const nameOk = !!(nameEl && nameEl.value && nameEl.value.trim().length);
+    const emailOk = !!(emailEl && validEmail(emailEl.value));
+    const hotelOk = !!(hotelEl && hotelEl.value && hotelEl.value.trim().length);
+    return nameOk && emailOk && hotelOk;
+  }
+
+  function syncStart(){
+    if (startBtn) startBtn.disabled = !canEnable();
+  }
+
+  // Wire input listeners (guard against nulls)
+  if (nameEl) nameEl.addEventListener('input', syncStart);
+  if (emailEl) emailEl.addEventListener('input', syncStart);
+  if (hotelEl) hotelEl.addEventListener('change', syncStart);
+
+  // Initial UI state
+  setProgress(0);
+  syncStart();
+
+  // Start -> Instructions
+  if (startBtn) {
+    startBtn.addEventListener('click', function(){
+      if (!canEnable()) return;
+      if (secWelcome) secWelcome.style.display = 'none';
+      if (secInstructions) secInstructions.style.display = 'block';
+      setProgress(1);
+      // Scroll to top to avoid being stuck
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    });
+  }
+
+  // Optional back button support if present
+  const backToInstructions = byId('backToInstructions');
+  if (backToInstructions) {
+    backToInstructions.addEventListener('click', function(){
+      if (secInstructions) secInstructions.style.display = 'block';
+      setProgress(1);
+    });
+  }
+
+  // Guard: if no dots exist, create them quickly to ensure visibility
+  if (!dots || !dots.length) {
+    const ph = byId('progressHeader') || document.querySelector('.progress');
+    if (ph) {
+      ph.innerHTML = '<span class="dot active"></span><span class="dot"></span><span class="dot"></span>';
+    }
+  }
+
+  //__TEAM_CONTROLLER_END__
+})();
+</script>
 </body>
 </html>
