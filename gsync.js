@@ -162,7 +162,7 @@
     };
 
     // Manual trigger (run in console if you want to force a send without PDF build)
-    window.__gsyncFlushToSheet = function () {
+        window.__gsyncFlushToSheet = function () {
       const isPeer = (document.querySelector('.subheader')?.textContent || '').toLowerCase().includes('peer');
       const people   = collectPeople(isPeer);
       const answers  = collectAnswers();
@@ -181,5 +181,37 @@
         recommendations: results.recommendations
       });
     };
+
+    // === PATCH v2: Capture group percentages from PDF UI ===
+    window.collectResultsFromPdfUi = function () {
+      const groups = ["Hospitality skills", "BED competencies", "Taking ownership", "Collaboration"];
+      const groupScores = {};
+
+      groups.forEach(g => {
+        const el = Array.from(document.querySelectorAll("*"))
+          .find(e => e.textContent && e.textContent.trim().toLowerCase().includes(g.toLowerCase()));
+        if (el) {
+          const match = el.textContent.match(/(\d{1,3})\s*%/);
+          groupScores[g] = match ? match[1] : "";
+        } else {
+          groupScores[g] = "";
+        }
+      });
+
+      const overallEl = document.getElementById("scorePercent");
+      const overallPercent = overallEl
+        ? (overallEl.textContent.match(/(\d{1,3})/)?.[1] || "")
+        : "";
+
+      const recText = document.getElementById("recText")?.textContent.trim() || "";
+
+      return {
+        overallPercent,
+        groupScores,
+        recommendations: recText,
+      };
+    };
+
   }
 })();
+
