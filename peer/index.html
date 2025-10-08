@@ -1852,8 +1852,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <div id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
   <div class="modal-box">
-    <div id="confirmTitle" class="title">Are you sure?</div>
-    <div id="confirmText" class="text">Your assessment scores will be automatically saved.</div>
+    <div id="confirmTitle" class="title">please confirm</div>
+    <div id="confirmText" class="text">after you submit your peer review the scores will be automatically saved</div>
     <div class="actions">
       <button id="cancelConfirm" class="btn-cancel" type="button">No</button>
       <button id="okConfirm" class="btn-ok" type="button">Yes</button>
@@ -1861,72 +1861,76 @@ document.addEventListener('DOMContentLoaded', () => {
   </div>
 </div>
 
-<!-- === Final Confirmation & Sync Section (v4) === -->
+<!-- === Final Confirmation Guard & Sync (v7) === -->
 
 <script>
 (function () {
   const modal = document.getElementById("confirmModal");
   const cancel = document.getElementById("cancelConfirm");
   const ok = document.getElementById("okConfirm");
-  const submitBtn = document.getElementById("submitAll");
 
-  if (!modal || !submitBtn) return;
+  if (!modal || !cancel || !ok) return;
+
+  // Hidden by default (CSS fallback)
   modal.style.display = "none";
 
-  // Trigger confirmation BEFORE showing the scoring page
-  submitBtn.addEventListener("click", function (e) {
-    e.preventDefault();              // stop direct navigation
-    modal.style.display = "flex";    // show modal first
-  });
+  // --- 1) Intercept *any* attempt to open the scoring page ---
+  const originalShowSection = window.showSection;
+  let allowFinish = false;
 
+  window.showSection = function (name) {
+    // If someone tries to jump to "finish" without confirming, show modal first.
+    if (name === "finish" && !allowFinish) {
+      modal.style.display = "flex";
+      return; // block navigation
+    }
+    // Otherwise, proceed normally
+    return originalShowSection ? originalShowSection(name) : void 0;
+  };
+
+  // --- 2) Also intercept clicks on the "Submit" button on page 2 (id=submitAll) ---
+  // Use *event delegation* so it still works if the button is re-rendered.
+  document.addEventListener("click", function (e) {
+    const el = e.target;
+    if (!el) return;
+
+    // Click on the final Submit button?
+    if (el.id === "submitAll") {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation?.();
+      modal.style.display = "flex";
+    }
+  }, true); // capture to beat other handlers
+
+  // --- 3) Modal buttons ---
   cancel.addEventListener("click", function () {
     modal.style.display = "none";
   });
 
   ok.addEventListener("click", function () {
     modal.style.display = "none";
-    // only now show the scoring page
-    if (typeof showSection === "function") {
-      showSection("finish");
+    allowFinish = true;              // allow finish exactly once
+    if (typeof originalShowSection === "function") {
+      originalShowSection("finish"); // now go to scoring
     }
+    allowFinish = false;             // reset guard
   });
 })();
 </script>
 
-<!-- Optional: PDF-related message injection (kept for backward compatibility, no duplicate text) -->
+<!-- Optional: clean up any old "recorded" placeholders if they were ever injected -->
 <script>
 document.addEventListener("bed:pdf-ready", () => {
   const finish = document.getElementById("finish");
   if (!finish) return;
-
-  // remove any existing "Your assessment is recorded" message
   const oldMsg = finish.querySelector("#recordedMsg, #recordMsg");
   if (oldMsg) oldMsg.remove();
-
-  // placeholder for any future dynamic messages
-  if (!finish.querySelector("#recordMsg")) {
-    const p = document.createElement("p");
-    p.id = "recordMsg";
-    p.style.marginTop = "12px";
-    p.style.fontSize = "16px";
-    p.style.color = "#434343";
-    p.style.textAlign = "left";
-
-    const pdfHint = Array.from(finish.querySelectorAll("p, div"))
-      .find(el => el.textContent && el.textContent.includes("Click PDF"));
-
-    if (pdfHint) {
-      pdfHint.parentNode.insertBefore(p, pdfHint);
-    } else {
-      finish.appendChild(p);
-    }
-  }
 });
 </script>
 
 <!-- === Google Sheets Sync === -->
-<script src="../gsync.js?v=21"></script>
+<script src="../gsync.js?v=25"></script>
 
 </body>
 </html>
-
