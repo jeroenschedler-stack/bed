@@ -1867,25 +1867,29 @@ document.addEventListener('DOMContentLoaded', () => {
   const cancel = document.getElementById("cancelConfirm");
   const ok = document.getElementById("okConfirm");
   const submitBtn = document.getElementById("submitAll");
+
   if (!submitBtn || !modal) return;
 
-  // intercept click to show modal
-  function intercept(e){
+  // Hide modal by default
+  modal.style.display = "none";
+
+  // Intercept the normal submit click
+  submitBtn.addEventListener("click", function (e) {
     e.preventDefault();
-    modal.style.display = "flex";
-    setTimeout(()=>cancel.focus(),100);
-  }
-  submitBtn.addEventListener("click", intercept);
+    modal.style.display = "flex"; // show modal first
+  });
 
-  // close on "No"
-  cancel.addEventListener("click", () => { modal.style.display = "none"; });
-
-  // proceed on "Yes"
-  ok.addEventListener("click", () => {
+  // Cancel just closes the modal
+  cancel.addEventListener("click", function () {
     modal.style.display = "none";
-    submitBtn.removeEventListener("click", intercept);
-    submitBtn.disabled = true;
-    submitBtn.click(); // runs existing submit logic
+  });
+
+  // OK proceeds to scoring page and hides modal
+  ok.addEventListener("click", function () {
+    modal.style.display = "none";
+    // now show the scoring page
+    const finishSection = document.getElementById("finish");
+    if (finishSection) showSection("finish");
   });
 })();
 </script>
@@ -1900,7 +1904,6 @@ document.addEventListener("bed:pdf-ready", () => {
   if (!finish.querySelector("#recordMsg")) {
     const p = document.createElement("p");
     p.id = "recordMsg";
-    p.textContent = "Your assessment is recorded.";
     p.style.marginTop = "12px";
     p.style.fontSize = "16px";
     p.style.color = "#434343";
