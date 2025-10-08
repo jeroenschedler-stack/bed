@@ -838,7 +838,7 @@ button:disabled,
         <!-- Modal -->
         <div class="modal-backdrop" id="eligBackdrop" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); display: none; align-items: center; justify-content: center; z-index: 50;">
             <div class="modal" style="width: min(92vw, 520px); background: #fff; border-radius: 18px; padding: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);">
-                <h3 style="margin: 0 0 10px 0; font-size: 18px;">please confirm V1</h3>
+                <h3 style="margin: 0 0 10px 0; font-size: 18px;">please confirm V2</h3>
                 <p style="margin: 0 0 18px 0; font-size: 16px; line-height: 1.5; color: #222;">my peer knows me well and has worked in BED for at least 12 months</p>
                 <div class="row-btns" style="display: flex; justify-content: flex-end; gap: 10px;">
                     <button class="btn-secondary" id="eligCancel">Cancel</button>
@@ -1888,9 +1888,7 @@ document.addEventListener('DOMContentLoaded', () => {
   el.addEventListener('blur', show);
 });
 </script>
-<!-- Custom "Are you sure?" confirmation modal (white, left text, right buttons) v3 -->
-
-
+<!-- Custom "Are you sure?" confirmation modal (white, left text, right buttons) v4 -->
 <div id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
   <div class="modal-box">
     <div id="confirmTitle" class="title">Are you sure?</div>
@@ -1903,41 +1901,56 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
 
 <script>
+/* Intercept Submit on Q2, confirm, then proceed only on "Yes" */
 (function () {
-  const modal = document.getElementById("confirmModal");
+  const modal  = document.getElementById("confirmModal");
   const cancel = document.getElementById("cancelConfirm");
-  const ok = document.getElementById("okConfirm");
-  const submitBtn = document.getElementById("submitAll");
-  if (!submitBtn || !modal) return;
+  const ok     = document.getElementById("okConfirm");
+  const submit = document.getElementById("submitAll");
+  if (!modal || !submit || !cancel || !ok) return;
 
-  // intercept click to show modal
+  // keep original submit logic (which navigates to scoring)
+  const originalSubmit = submit.onclick;
+  let allowPass = false;
+
   function intercept(e){
+    if (allowPass) return;                 // allow only after "Yes"
     e.preventDefault();
-    modal.style.display = "flex";
-    setTimeout(()=>cancel.focus(),100);
+    e.stopImmediatePropagation();          // block any other handlers
+    modal.style.display = "flex";          // show confirm while still on Q2
+    setTimeout(() => cancel.focus(), 60);
   }
-  submitBtn.addEventListener("click", intercept);
 
-  // close on "No"
-  cancel.addEventListener("click", () => { modal.style.display = "none"; });
+  // Run first (capture) so we can stop default flow
+  submit.addEventListener("click", intercept, { capture: true });
 
-  // proceed on "Yes"
+  // "No" → stay on Q2
+  cancel.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+
+  // "Yes" → perform the original submit flow (go to scoring)
   ok.addEventListener("click", () => {
     modal.style.display = "none";
-    submitBtn.removeEventListener("click", intercept);
-    submitBtn.disabled = true;
-    submitBtn.click(); // runs existing submit logic
+    allowPass = true;
+    try {
+      if (typeof originalSubmit === "function") {
+        originalSubmit();                  // invoke original handler
+      } else {
+        submit.click();                    // fallback (now passes)
+      }
+    } finally {
+      allowPass = false;                   // reset guard
+    }
   });
 })();
 </script>
 
 <script>
 document.addEventListener("bed:pdf-ready", () => {
-  // find the finish section
   const finish = document.getElementById("finish");
   if (!finish) return;
 
-  // check if message already exists to prevent duplicates
   if (!finish.querySelector("#recordMsg")) {
     const p = document.createElement("p");
     p.id = "recordMsg";
@@ -1947,7 +1960,6 @@ document.addEventListener("bed:pdf-ready", () => {
     p.style.color = "#434343";
     p.style.textAlign = "left";
 
-    // find PDF instruction text
     const pdfHint = Array.from(finish.querySelectorAll("p, div"))
       .find(el => el.textContent && el.textContent.includes("Click PDF"));
 
@@ -1959,16 +1971,15 @@ document.addEventListener("bed:pdf-ready", () => {
   }
 });
 </script>
-        <script>
+
+<script>
 document.addEventListener("DOMContentLoaded", () => {
-  // Wait until the completion (congrats) page is shown
   const targetNode = document.getElementById("congrats");
   if (!targetNode) return;
 
   const observer = new MutationObserver(() => {
     const pdfText = targetNode.querySelector("p");
     if (pdfText && pdfText.textContent.toLowerCase().includes("click pdf")) {
-      // Only add once
       if (!document.getElementById("recordedMsg")) {
         const msg = document.createElement("p");
         msg.id = "recordedMsg";
@@ -1984,6 +1995,8 @@ document.addEventListener("DOMContentLoaded", () => {
   observer.observe(targetNode, { childList: true, subtree: true });
 });
 </script>
+
 <script src="../gsync.js?v=21"></script>
 </body>
 </html>
+
