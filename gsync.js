@@ -1,16 +1,20 @@
-/* === gsync.js (final, no recompute; posts exactly what PDF shows) === */
+/* === gsync.js (robust capture: Q1–Q35 + group scores, no recompute) === */
 (function () {
-  // Paste your deployed "Web app" URL from Apps Script here:
-  const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxjfi90ddtP7iee7Jyc5iAPYzpuxnr0x7a_FPV28OUGxm2kXCYVn4ZMP5JPIImfrwEL/exec';
+  // Paste your deployed Apps Script "Web app" URL here:
+  const WEBAPP_URL = 'PASTE_WEBAPP_URL_HERE';
 
-  // Convert visible text like "OVERALL SCORE 78%" -> "78"
+  /* ---------- utils ---------- */
   function extractPercent(txt) {
     if (!txt) return '';
     const m = String(txt).match(/(\d+(?:\.\d+)?)\s*%/);
     return m ? m[1] : '';
   }
 
-  // Grab info page fields (same IDs across Team & Peer)
+  function textEq(a, b) {
+    return String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+  }
+
+  /* ---------- people fields ---------- */
   function collectPeople(isPeerForm) {
     const teamName   = document.getElementById('nick')?.value?.trim() || '';
     const teamEmail  = document.getElementById('email')?.value?.trim() || '';
@@ -26,38 +30,80 @@
              formType: isPeerForm ? 'peer' : 'team' };
   }
 
-  // Read Q1–Q35 exactly as chosen
+  /* ---------- answers Q1–Q35 ----------
+     We try multiple strategies in order:
+     1) Checked radio inputs: input[type=radio][name="qN"]
+     2) Pressed buttons/spans using data attributes: [data-q="N"][aria-checked="true"]
+     3) Generic "selected" flag: [data-q="N"].selected or .is-selected
+     4) Global state objects some builds use, e.g., window.currentAnswers or window.answers
+  ------------------------------------- */
+  function getAnswerFromDom(n) {
+    // radios
+    const r = document.querySelector(`input[type="radio"][name="q${n}"]:checked`);
+    if (r) return r.value ?? '';
+
+    // aria-checked custom widgets
+    const aria = document.querySelector(`[data-q="${n}"][aria-checked="true"]`);
+    if (aria) return aria.getAttribute('data-value') || aria.getAttribute('value') || '';
+
+    // "selected" class or attribute
+    const sel = document.querySelector(`[data-q="${n}"].selected, [data-q="${n}"].is-selected, [data-q="${n}"][data-selected="true"]`);
+    if (sel) return sel.getAttribute('data-value') || sel.getAttribute('value') || '';
+
+    return '';
+  }
+
   function collectAnswers() {
     const out = {};
     for (let i = 1; i <= 35; i++) {
-      const els = document.querySelectorAll(`[name="q${i}"]:checked, [data-q="${i}"][aria-checked="true"]`);
-      if (els && els[0]) {
-        const v = els[0].value ?? els[0].getAttribute('data-value') ?? '';
-        out[`Q${i}`] = v;
-      } else {
-        out[`Q${i}`] = window.currentAnswers?.[i] ?? '';
-      }
+      let v = getAnswerFromDom(i);
+      if (!v && window.currentAnswers && (i in window.currentAnswers)) v = window.currentAnswers[i];
+      if (!v && window.answers && (i in window.answers)) v = window.answers[i];
+      out[`Q${i}`] = v ?? '';
     }
     return out;
   }
 
-  // Pull already-rendered PDF UI results (canonical groups)
+  /* ---------- results from PDF UI ----------
+     Strategy:
+     - Read overall from #scorePercent text
+     - For groups, look across ANY tables rendered in the results section.
+       We find rows where the first cell equals one of the canonical names.
+  ------------------------------------------ */
   function collectResultsFromPdfUi() {
     const overallTxt = document.getElementById('scorePercent')?.textContent || '';
     const overallPercent = extractPercent(overallTxt);
 
-    const groups = ['Hospitality skills','BED competencies','Taking ownership','Collaboration'];
-    const groupScores = {};
-    groups.forEach(g => {
-      const row = [...document.querySelectorAll('#pdfGroupTable tr')].find(tr => {
-        const td = tr.querySelector('td');
-        return td && td.textContent.trim() === g;
+    const wanted = ['Hospitality skills','BED competencies','Taking ownership','Collaboration'];
+    const groupScores = Object.create(null);
+
+    function tryTable(table) {
+      const rows = table.querySelectorAll('tr');
+      rows.forEach(tr => {
+        const tds = tr.querySelectorAll('td,th');
+        if (tds.length >= 2) {
+          const name = tds[0].textContent || '';
+          const val  = tds[1].textContent || '';
+          const hit = wanted.find(w => textEq(name, w));
+          if (hit) {
+            groupScores[hit] = extractPercent(val) || groupScores[hit] || '';
+          }
+        }
       });
-      if (row) {
-        const valTd = row.querySelectorAll('td')[1];
-        groupScores[g] = extractPercent(valTd?.textContent || '');
-      } else {
-        groupScores[g] = window.groupResults?.[g] ?? '';
+    }
+
+    // Prefer explicit id if present
+    const explicit = document.getElementById('pdfGroupTable');
+    if (explicit) tryTable(explicit);
+
+    // Fallback: scan tables inside any "finish"/results/PDF section
+    const finish = document.getElementById('finish') || document.getElementById('pdf') || document;
+    finish.querySelectorAll('table').forEach(tryTable);
+
+    // Final fallback to globals
+    wanted.forEach(w => {
+      if (!groupScores[w]) {
+        groupScores[w] = (window.groupResults && window.groupResults[w]) || '';
       }
     });
 
@@ -68,18 +114,18 @@
 
   async function sendToSheet(payload) {
     try {
-      // Use no-cors to avoid preflight/CORS blocks; we don't need to read the response
       await fetch(WEBAPP_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-        mode: 'no-cors'
+        mode: 'no-cors' // we don't need to read the response
       });
     } catch (e) {
       console.warn('Sheet post failed', e);
     }
   }
 
+  /* ---------- hook ---------- */
   if (!window.__gsyncWrapped) {
     window.__gsyncWrapped = true;
     const isPeerForm = (document.querySelector('.subheader')?.textContent || '').toLowerCase().includes('peer');
@@ -106,16 +152,19 @@
         recommendations: results.recommendations
       };
 
+      // Uncomment to debug in console:
+      // console.table(payload);
+
       sendToSheet(payload);
       return r;
     };
 
-    // Manual hook if you want to trigger without PDF:
+    // Manual escape hatch
     window.__gsyncFlushToSheet = function () {
       const people   = collectPeople(isPeerForm);
       const answers  = collectAnswers();
       const results  = collectResultsFromPdfUi();
-      const payload = {
+      sendToSheet({
         formType: people.formType,
         teamName: people.teamName,
         teamEmail: people.teamEmail,
@@ -127,8 +176,7 @@
         overallPercent: results.overallPercent,
         groupScores: results.groupScores,
         recommendations: results.recommendations
-      };
-      sendToSheet(payload);
+      });
     };
   }
 })();
