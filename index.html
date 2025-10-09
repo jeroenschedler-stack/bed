@@ -52,15 +52,35 @@
     }
 
     /* Buttons */
-    .btn{
-      appearance:none; border:1.5px solid #E5E7EB; background:#fff; color:#666666;
-      width:100%; border-radius:14px; cursor:pointer; display:block;
-      transition:transform .05s ease, border-color .15s ease, box-shadow .15s ease;
-      margin:14px 0; padding:16px 18px;
-    }
-    border:1.5px solid var(--brand-blue);
-    .btn:focus-visible{outline:none; box-shadow:0 0 0 4px rgba(30,144,255,.2); border-color:var(--brand-blue)}
-    .btn:active{transform:scale(.997)}
+.btn {
+  appearance: none;
+  border: 1.5px solid var(--brand-blue);   /* always blue border */
+  background: #fff;
+  color: var(--text-dark);
+  width: 100%;
+  border-radius: 16px;
+  cursor: pointer;
+  display: block;
+  transition: 
+    transform .05s ease,
+    box-shadow .15s ease;
+  margin: 14px 0;
+  padding: 16px 18px;
+}
+
+.btn:hover {
+  border-color: var(--brand-blue);         /* keeps blue on hover */
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(30,144,255,.2);
+  border-color: var(--brand-blue);
+}
+
+.btn:active {
+  transform: scale(.997);
+}
 
     .btn-grid{
       display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center;
