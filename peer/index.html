@@ -1246,19 +1246,6 @@ recTarget.innerHTML =
   " points.</div>" +
   "<div style='margin-top:6px; font-size:16px; color:#434343; font-weight:600;'>" + rec + "</div>";
 
-
-                        recTarget.innerHTML =
-                            "<div style='line-height:1.4; font-size:16px; color:#434343; font-weight:600;'>Your overall score is " +
-                            totals.pct +
-                            "% based on " +
-                            totals.raw +
-                            " out of " +
-                            ((S.questions || []).length * 5 || 175) +
-                            " points. Here's what that means:</div>" +
-                            "<div style='font-size:16px; color:#434343; font-weight:600;'>" +
-                            rec +
-                            "</div>";
-
                         // Info
                         document.getElementById("pdfEmpName").textContent = document.getElementById("nick").value || "";
                         document.getElementById("pdfEmpEmail").textContent = document.getElementById("email").value || "";
@@ -2034,40 +2021,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 <script>
-/* === Canonical Submit → Confirm → Run Original Submit === */
-(function () {
-  var submitBtn = document.getElementById('submitAll');
-  var modal     = document.getElementById('confirmModal');
-  var ok        = document.getElementById('okConfirm');
-  var cancel    = document.getElementById('cancelConfirm');
-
-  if (!submitBtn || !modal || !ok || !cancel) return;
-
-  // Capture the original submit handler (this builds the PDF, shows scoring, triggers sync)
-  var originalSubmit = submitBtn.onclick;
-  if (typeof originalSubmit !== 'function') return;
-
-  // Replace submit click: open confirm modal only
-  submitBtn.onclick = function (ev) {
-    ev.preventDefault();
-    ev.stopPropagation();
-    modal.style.display = 'flex';
-  };
-
-  // OK → close modal and execute the original submit logic
-  ok.onclick = function () {
-    modal.style.display = 'none';
-    // next-tick to avoid any event re-entrancy issues
-    setTimeout(function () { originalSubmit(); }, 0);
-  };
-
-  // Cancel → just close modal
-  cancel.onclick = function () {
-    modal.style.display = 'none';
-  };
-})();
-</script>
-
 
 <script src="../gsync.js?v=21"></script>
 </body>
