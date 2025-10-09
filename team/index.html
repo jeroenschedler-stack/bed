@@ -2033,45 +2033,41 @@ document.addEventListener("DOMContentLoaded", () => {
   observer.observe(targetNode, { childList: true, subtree: true });
 });
 </script>
-<!-- === Final Confirmation Guard & Sync (restored patch) === -->
 <script>
+/* === Canonical Submit → Confirm → Run Original Submit === */
 (function () {
-  const modal  = document.getElementById("confirmModal");
-  const cancel = document.getElementById("cancelConfirm");
-  const ok     = document.getElementById("okConfirm");
+  var submitBtn = document.getElementById('submitAll');
+  var modal     = document.getElementById('confirmModal');
+  var ok        = document.getElementById('okConfirm');
+  var cancel    = document.getElementById('cancelConfirm');
 
-  if (!modal || !cancel || !ok) return;
+  if (!submitBtn || !modal || !ok || !cancel) return;
 
-  // Hide modal by default
-  modal.style.display = "none";
+  // Capture the original submit handler (this builds the PDF, shows scoring, triggers sync)
+  var originalSubmit = submitBtn.onclick;
+  if (typeof originalSubmit !== 'function') return;
 
-  // Save original showSection if it exists
-  const originalShowSection = window.showSection;
-  let allowFinish = false;
-
-  // 1️⃣ Guard against auto-navigation to scoring
-  window.showSection = function (name) {
-    if (name === "finish" && !allowFinish) {
-      modal.style.display = "flex";
-      return;
-    }
-    if (typeof originalShowSection === "function") originalShowSection(name);
+  // Replace submit click: open confirm modal only
+  submitBtn.onclick = function (ev) {
+    ev.preventDefault();
+    ev.stopPropagation();
+    modal.style.display = 'flex';
   };
 
-  // 2️⃣ Cancel: simply close modal
-  cancel.addEventListener("click", () => {
-    modal.style.display = "none";
-  });
+  // OK → close modal and execute the original submit logic
+  ok.onclick = function () {
+    modal.style.display = 'none';
+    // next-tick to avoid any event re-entrancy issues
+    setTimeout(function () { originalSubmit(); }, 0);
+  };
 
-  // 3️⃣ OK: allow scoring page and navigate there
-  ok.addEventListener("click", () => {
-    modal.style.display = "none";
-    allowFinish = true;
-    show("finish");
-    allowFinish = false;
-  });
+  // Cancel → just close modal
+  cancel.onclick = function () {
+    modal.style.display = 'none';
+  };
 })();
 </script>
+
 
 <script src="../gsync.js?v=21"></script>
 </body>
