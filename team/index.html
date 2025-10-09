@@ -2033,6 +2033,45 @@ document.addEventListener("DOMContentLoaded", () => {
   observer.observe(targetNode, { childList: true, subtree: true });
 });
 </script>
+<!-- === Final Confirmation Guard & Sync (restored patch) === -->
+<script>
+(function () {
+  const modal  = document.getElementById("confirmModal");
+  const cancel = document.getElementById("cancelConfirm");
+  const ok     = document.getElementById("okConfirm");
+
+  if (!modal || !cancel || !ok) return;
+
+  // Hide modal by default
+  modal.style.display = "none";
+
+  // Save original showSection if it exists
+  const originalShowSection = window.showSection;
+  let allowFinish = false;
+
+  // 1️⃣ Guard against auto-navigation to scoring
+  window.showSection = function (name) {
+    if (name === "finish" && !allowFinish) {
+      modal.style.display = "flex";
+      return;
+    }
+    if (typeof originalShowSection === "function") originalShowSection(name);
+  };
+
+  // 2️⃣ Cancel: simply close modal
+  cancel.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+
+  // 3️⃣ OK: allow scoring page and navigate there
+  ok.addEventListener("click", () => {
+    modal.style.display = "none";
+    allowFinish = true;
+    show("finish");
+    allowFinish = false;
+  });
+})();
+</script>
 
 <script src="../gsync.js?v=21"></script>
 </body>
