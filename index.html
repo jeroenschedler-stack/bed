@@ -42,6 +42,13 @@
       font-size:20px;
       color:#666666;
     }
+    .intro {
+  font-size:15px; /* adjust as needed */
+  line-height:1.5;
+  color:#555555;
+  margin-bottom:24px;
+}
+
 
     /* Buttons */
     .btn{
@@ -58,7 +65,7 @@
       display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center;
     }
     .title{font-weight:700; font-size:18px; line-height:1.2; text-align:left}
-    .subtitle{font-size:16px; color: #444444; margin-top:3px; line-height:1.2; text-align:left}
+    .subtitle{font-size:15px; color: #444444; margin-top:3px; line-height:1.2; text-align:left}
 
     /* Prominent icons */
     .icon{
@@ -96,19 +103,27 @@ This app reminds us of some small and big things and helps us to grow together a
         </div>
       </button>
 
-      <!-- Button 2: Peer (two persons simplified) -->
-      <button class="btn" onclick="location.href='./peer/';"
-        aria-label="I am a peer reviewer. I want to review my friend.">
-        <div class="btn-grid">
-          <span class="icon" aria-hidden="true">
-            <svg viewBox="0 0 48 48" fill="none">
-              <!-- left person -->
-              <circle cx="18" cy="18" r="7" fill="#ffffff"/>
-              <!-- right person -->
-              <circle cx="30" cy="18" r="7" fill="#ffffff" opacity="0.95"/>
-              <!-- base (shared shoulders) -->
-              <path d="M10 38c0-7 6-12 12-12s12 5 12 12" fill="#ffffff" opacity="0.9"/>
-            </svg>
+     <!-- Button 2: Peer (two persons simplified) -->
+<button class="btn" onclick="location.href='./peer/';"
+  aria-label="I am a peer reviewer. I want to review my friend.">
+  <div class="btn-grid">
+    <span class="icon" aria-hidden="true">
+      <svg viewBox="0 0 48 48" fill="none">
+        <!-- front person -->
+        <circle cx="22" cy="22" r="9" fill="#ffffff"/>
+        <!-- back person -->
+        <circle cx="32" cy="18" r="7" fill="#ffffff"/>
+        <!-- shared shoulders -->
+        <path d="M10 38c0-8 7-13 14-13s14 5 14 13" fill="#ffffff"/>
+      </svg>
+    </span>
+    <div>
+      <div class="title">I am a peer reviewer</div>
+      <div class="subtitle">I want to review my friend</div>
+    </div>
+  </div>
+</button>
+
           </span>
           <div>
             <div class="title">I am a peer reviewer</div>
