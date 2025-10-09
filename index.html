@@ -21,7 +21,7 @@
     .wrap{max-width:720px; margin:40px auto; padding:0 16px}
     .card{
       background:var(--card-bg);
-      border-radius:24px; /* round all corners */
+      border-radius:12px; /* round all corners */
       box-shadow:0 8px 24px rgba(0,0,0,.08);
       padding:28px 24px;
     }
@@ -58,7 +58,7 @@
       display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center;
     }
     .title{font-weight:700; font-size:18px; line-height:1.2; text-align:left}
-    .subtitle{font-size:14px; color:var(--muted); margin-top:3px; line-height:1.2; text-align:left}
+    .subtitle{font-size:16px; color: #444444; margin-top:3px; line-height:1.2; text-align:left}
 
     /* Prominent icons */
     .icon{
@@ -73,6 +73,11 @@
     <section class="card" role="region" aria-labelledby="title">
       <h1 id="title">BED HOSPITALITY 2.0</h1>
       <div class="subhead">Self Assessment Form</div>
+
+      <p class="intro">
+  Many things may change in BED 2.0 but our care, shared responsibility, passion and common sense will always our foundation.
+This app reminds us of some small and big things and helps us to grow together as one team..
+</p>
 
       <!-- Button 1: Team (single person) -->
       <button class="btn" onclick="location.href='./team/';"
