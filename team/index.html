@@ -846,96 +846,104 @@ button:disabled,
             </div>
         </div>
         <!-- PRINT REPORT (Blue-branded) -->
-        <section aria-hidden="true" id="pdfReport">
-            <h2 class="visually-hidden">PDF Report</h2>
-            <div class="pdf-top">
-                <div>
-                    <div class="pdf-title">BED HOSPITALITY 2.0</div>
-                    <div class="pdf-sub">team member report</div>
-                    <div class="pdf-date" id="pdfDate">assessment date —</div>
-                </div>
-                <div class="score-box">
-                    <div class="pct" id="pdfTotalPct">—%</div>
-                    <div class="raw" id="pdfTotalRaw">— OUT OF 175 POINTS</div>
-                </div>
-            </div>
+     <script>
+function buildPdfReport() {
+  const totals = computeTotals();
 
-            <div class="pdf-divider"></div>
+  // Date + score box
+  document.getElementById("pdfDate").textContent = "assessment date " + (function(){
+    try {
+      const dt = new Date();
+      const d = String(dt.getDate()).padStart(2,"0");
+      const m = String(dt.getMonth()+1).padStart(2,"0");
+      const y = dt.getFullYear();
+      return `${d}-${m}-${y}`;
+    } catch(_) { return ""; }
+  })();
+  document.getElementById("pdfTotalPct").textContent = (isFinite(totals.pct) ? totals.pct : "—") + "%";
+  document.getElementById("pdfTotalRaw").textContent = (totals.raw || 0) + " of " + ((window.__S?.questions?.length || 35) * 5);
 
-            <!-- Information section -->
-            <div class="sec-h assess-bar"><span class="lbl-group">INFORMATION</span></div>
-            <div class="card" style="padding: 0;">
-                <table id="pdfInfoTable">
-                    <colgroup>
-                        <col style="width: 20%;" />
-                        <col style="width: 30%;" />
-                        <col style="width: 20%;" />
-                        <col style="width: 30%;" />
-                    </colgroup>
-                    <tbody>
-                        <tr>
-                            <td>team member</td>
-                            <td id="pdfEmpName"></td>
-                            <td>peer reviewer</td>
-                            <td id="pdfPeerName"></td>
-                        </tr>
-                        <tr>
-                            <td>email address</td>
-                            <td id="pdfEmpEmail"></td>
-                            <td>email address</td>
-                            <td id="pdfPeerEmail"></td>
-                        </tr>
-                        <tr>
-                            <td>BED location</td>
-                            <td id="pdfEmpHotel"></td>
-                            <td>BED location</td>
-                            <td id="pdfPeerHotel"></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+  // === Unified recommendation bands (55/75/90) + unified typography (16px, #434343, 600) ===
+  const recTarget = document.getElementById("pdfBandText");
+  let rec = "";
+  if (totals.pct < 55) rec = `This score suggests limited understanding of BED. It is your responsibility to change that. 
+    You need passion and common sense to become a full member of the team.
+    Focus on self-development. It starts with awareness and practise. Observe others but don’t copy them. Find your own identity. 
+    Set goals each week and ask the team to evaluate your progress. Ask your coach for guidance.`;
+  else if (totals.pct < 75) rec = `This score means that you know hospitality but perhaps you take it too easy. 
+    Focus more and understand that BED plays in the Champions League.
+    You need to be more proactive and focused. Push yourself to act like an equal member of the team. 
+    Ask your team members for advice and then ask yourself: did I do things different today?`;
+  else if (totals.pct < 90) rec = `This score shows that you really understand hospitality and use the core values of BED in daily work. 
+    This means you are ready to grow into the next level.
+    Think about your personal growth. Use your time in BED to learn new things about people, leadership and management. 
+    Without challenge work becomes routine. Think about new ideas for BED 2.0 and help other members with positive feedback.`;
+  else rec = `This score suggests that you truly understand BED. You care for people and take ownership of the hotels. 
+    Continue to inspire the teams in BED and lead them by example.
+    Get involved in shared leadership and developing the next generation of hotels. Use your strengths to grow in the organization and 
+    take an active role in BED 2.0. You are ready for the next step.`;
 
-            <!--  section -->
-            <div class="sec-h assess-bar"><span class="lbl-group">SCORE SUMMARY</span></div>
-            <div id="pdfBandText" style="margin-top: 10px; font-size: 16px; font-weight: 600; color: #434343; width: 100%; display: block; text-align: left; line-height: 1.5;"></div>
+  // Same style on both lines (overall + recommendation)
+  recTarget.innerHTML =
+    "Your overall score is " + totals.pct + "%. " +
+    "You scored " + totals.raw + " out of " + ((window.__S?.questions?.length || 35) * 5) + " points." +
+    "<br><br>" +
+    rec;
 
-            <!-- Score by Group section -->
-            <div class="sec-h assess-bar"><span class="lbl-group">SCORE BY GROUP</span></div>
-            <div class="card" style="padding: 0;">
-                <table>
-                    <tbody id="pdfGroupRows">
-                        <!-- rows injected -->
-                    </tbody>
-                </table>
-            </div>
+  // Info fields
+  document.getElementById("pdfEmpName").textContent  = document.getElementById("nick").value || "";
+  document.getElementById("pdfEmpEmail").textContent = document.getElementById("email").value || "";
+  document.getElementById("pdfEmpHotel").textContent = document.getElementById("hotel").value || "";
+  document.getElementById("pdfPeerName").textContent = document.getElementById("peerName").value || "";
+  document.getElementById("pdfPeerEmail").textContent= document.getElementById("peerEmail").value || "";
+  document.getElementById("pdfPeerHotel").textContent= document.getElementById("peerHotel").value || "";
 
-            <!-- Statements -->
-            <div class="sec-h statements-bar">
-                <span class="lbl-stmt" style="display: block;">STATEMENTS</span>
-                <span class="lbl-group" style="display: block;">GROUP</span>
-                <span class="lbl-score" style="display: block;">SCORE</span>
-            </div>
-            <div class="card" style="padding: 0;">
-                <table id="pdfStatements">
-  <colgroup>
-    <col />  <!-- NO -->
-    <col />  <!-- STATEMENT -->
-    <col />  <!-- GROUP -->
-    <col />  <!-- SCORE -->
-  </colgroup>
-  <thead>
-    <tr>
-      <th>NO</th>
-      <th>STATEMENT</th>
-      <th>GROUP</th>
-      <th>SCORE</th>
-    </tr>
-  </thead>
-  <tbody id="pdfStatementRows"><!-- rows injected --></tbody>
-</table>
+  // Score by Group
+  const gp = computeGroupPercents();
+  const descMap = (function(){
+    const m = {};
+    (window.__S?.groups || []).forEach(g => m[g.name] = g.description || "");
+    return m;
+  })();
+  const order = ["Hospitality skills", "BED competencies", "Taking ownership", "Collaboration"];
+  const body = document.getElementById("pdfGroupRows");
+  body.innerHTML = "";
+  order.forEach((name) => {
+    const tr = document.createElement("tr");
+    const tdName = document.createElement("td"); tdName.textContent = name;
+    const tdPct  = document.createElement("td"); tdPct.textContent  = (gp[name] != null ? gp[name] : "—") + "%";
+    const tdDesc = document.createElement("td"); tdDesc.textContent = descMap[name] || "(add description)";
+    tr.appendChild(tdName); tr.appendChild(tdPct); tr.appendChild(tdDesc);
+    body.appendChild(tr);
+  });
 
-            </div>
-        </section>
+  // Statements table
+  const tb = document.querySelector("#pdfStatements tbody");
+  tb.innerHTML = "";
+  (window.__S?.questions || []).forEach((q, i) => {
+    const tr = document.createElement("tr");
+
+    const tdNo = document.createElement("td");
+    tdNo.textContent = i + 1;
+    tdNo.className = "st-no";
+
+    const tdSt = document.createElement("td");
+    const title = String(q.statement || "").replace(/^\s*\d+\.\s*/, "");
+    tdSt.innerHTML = '<div class="st-title">' + title + '</div>' + (q.subtext ? '<div class="muted">' + q.subtext + '</div>' : '');
+
+    const tdGp = document.createElement("td");
+    tdGp.textContent = q.group || "";
+
+    const tdRt = document.createElement("td");
+    tdRt.textContent = window.__S?.answers?.[q.id] != null ? window.__S.answers[q.id] : "";
+    tdRt.className = "st-rating";
+
+    tr.appendChild(tdNo); tr.appendChild(tdSt); tr.appendChild(tdGp); tr.appendChild(tdRt);
+    tb.appendChild(tr);
+  });
+}
+</script>
+
         <script>
             (function () {
                 const S = { answers: {}, questions: [], groups: [] };
