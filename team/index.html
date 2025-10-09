@@ -789,7 +789,6 @@
     })();
   </script>
 
-  <!-- Inject “Your assessment is recorded.” on finish/congrats for clarity -->
   <script>
     document.addEventListener("bed:pdf-ready", () => {
       const finish = document.getElementById("finish");
@@ -797,7 +796,6 @@
       if (!finish.querySelector("#recordMsg")) {
         const p = document.createElement("p");
         p.id = "recordMsg";
-        p.textContent = "Your assessment is recorded.";
         p.style.marginTop = "12px"; p.style.fontSize = "16px"; p.style.color = "#434343"; p.style.textAlign = "left";
         const pdfHint = Array.from(finish.querySelectorAll("p, div")).find(el => el.textContent && el.textContent.includes("Click PDF"));
         pdfHint ? pdfHint.parentNode.insertBefore(p, pdfHint) : finish.appendChild(p);
@@ -813,7 +811,6 @@
           if (!document.getElementById("recordedMsg")) {
             const msg = document.createElement("p");
             msg.id = "recordedMsg";
-            msg.textContent = "Your assessment is recorded.";
             msg.style.fontSize = "16px"; msg.style.color = "#434343"; msg.style.marginBottom = "4px";
             pdfText.parentNode.insertBefore(msg, pdfText);
           }
