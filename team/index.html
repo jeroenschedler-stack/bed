@@ -837,7 +837,7 @@ button:disabled,
         <!-- Modal -->
         <div class="modal-backdrop" id="eligBackdrop" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); display: none; align-items: center; justify-content: center; z-index: 50;">
             <div class="modal" style="width: min(92vw, 520px); background: #fff; border-radius: 18px; padding: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);">
-                <h3 style="margin: 0 0 10px 0; font-size: 18px;">please confirm V2</h3>
+                <h3 style="margin: 0 0 10px 0; font-size: 18px;">please confirm V3</h3>
                 <p style="margin: 0 0 18px 0; font-size: 16px; line-height: 1.5; color: #222;">my peer knows me well and has worked in BED for at least 12 months</p>
                 <div class="row-btns" style="display: flex; justify-content: flex-end; gap: 10px;">
                     <button class="btn-secondary" id="eligCancel">Cancel</button>
@@ -2040,6 +2040,31 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 <script>
+<!-- === Guaranteed PDF button activation (multi-instance safe) === -->
+<script>
+function activatePdfButtons() {
+  const buttons = document.querySelectorAll("#congratsPdf");
+  if (!buttons.length) {
+    setTimeout(activatePdfButtons, 300);
+    return;
+  }
+
+  buttons.forEach((btn) => {
+    btn.onclick = () => {
+      try {
+        buildPdfReport();
+        window.print();
+      } catch (err) {
+        console.warn("[BED] PDF button error:", err);
+      }
+    };
+  });
+}
+
+// Run now and every time PDF is rebuilt
+document.addEventListener("DOMContentLoaded", activatePdfButtons);
+document.addEventListener("bed:pdf-ready", activatePdfButtons);
+</script>
 
 <script src="../gsync.js?v=21"></script>
 </body>
