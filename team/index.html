@@ -2151,89 +2151,94 @@ document.addEventListener("bed:pdf-ready", activatePdfButtons);
 </script>
 
 <script>
-/* === BED sync wrapper (single-run hybrid: prefer gsync, fallback form; no duplicates) === */
+/* === BED sync wrapper: classic FORM submit with exact Sheet headers; one-shot === */
 (function () {
-  // One-shot guard per submission
+  // One-shot per submission
   window.__SYNC_SENT__ = false;
 
-  // Build payload with BOTH naming styles (no-spaces + human labels)
-  function collectPayload() {
-    const S   = window.__S || {};
-    const qs  = Array.isArray(S.questions) ? S.questions : [];
-    const ans = S.answers || {};
+  function val(id) {
+    var el = document.getElementById(id);
+    return el && el.value ? String(el.value).trim() : "";
+  }
+  function textNum(id) {
+    var t = document.getElementById(id) ? document.getElementById(id).textContent || "" : "";
+    return t.replace(/[^\d]/g, "");
+  }
 
-    const payload = {
-      // generic keys (no spaces, lower_snake)
-      timestamp: new Date().toISOString(),
-      team_name:    document.getElementById("nick")?.value || "",
-      team_email:   document.getElementById("email")?.value || "",
-      team_hotel:   document.getElementById("hotel")?.value || "",
-      peer_name:    document.getElementById("peerName")?.value || "",
-      peer_email:   document.getElementById("peerEmail")?.value || "",
-      peer_hotel:   document.getElementById("peerHotel")?.value || "",
-      overall_pct:  (document.getElementById("scorePercent")?.textContent || "").replace(/[^\d]/g, ""),
-      recommendation_html: document.getElementById("recText")?.innerHTML || ""
+  // Build ALL fields with the exact header names your Sheet expects
+  function buildFields() {
+    var S = window.__S || window.S || {};
+    var qs = Array.isArray(S.questions) ? S.questions : [];
+    var ans = S.answers || {};
+
+    var fields = {
+      "TIMESTAMP": new Date().toISOString(),
+      "NAME TEAM MEMBER": val("nick"),
+      "EMAIL TEAM MEMBER": val("email"),
+      "LOCATION TEAM MEMBER": val("hotel"),
+      "NAME PEER REVIEWER": val("peerName"),
+      "EMAIL PEER REVIEWER": val("peerEmail"),
+      "LOCATION PEER REVIEWER": val("peerHotel"),
+      "OVERALL SCORE": textNum("scorePercent"),
+      "RECOMMENDATIONS": (document.getElementById("recText")?.innerHTML || "")
     };
 
-    // add human-label mirrors (spaces & caps) in case GAS expects those
-    payload["TIMESTAMP"] = payload.timestamp;
-    payload["NAME TEAM MEMBER"]        = payload.team_name;
-    payload["EMAIL TEAM MEMBER"]       = payload.team_email;
-    payload["LOCATION TEAM MEMBER"]    = payload.team_hotel;
-    payload["NAME PEER REVIEWER"]      = payload.peer_name;
-    payload["EMAIL PEER REVIEWER"]     = payload.peer_email;
-    payload["LOCATION PEER REVIEWER"]  = payload.peer_hotel;
-    payload["OVERALL SCORE"]           = payload.overall_pct;
-    payload["RECOMMENDATIONS"]         = payload.recommendation_html;
-
-    // Q1..Q35 as both styles
-    qs.forEach((q, i) => {
-      const key = "Q" + (i + 1);
-      const id  = q?.id;
-      const val = (id != null && ans[id] != null) ? String(ans[id]) : "";
-      payload[key] = val;          // e.parameter["Q1"]
-      payload["q" + (i + 1)] = val; // e.parameter.q1
+    // Also include Q1..Q35 as headers
+    qs.forEach(function (q, i) {
+      var k = "Q" + (i + 1);
+      var v = (q && q.id != null && ans[q.id] != null) ? String(ans[q.id]) : "";
+      fields[k] = v;
     });
 
-    return payload;
+    return fields;
   }
 
-  function postForm(url, data) {
-    const params = new URLSearchParams();
-    Object.keys(data).forEach(k => params.append(k, data[k]));
-    return fetch(url, {
-      method: "POST",
-      headers: {"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"},
-      body: params,
-      mode: "no-cors"
+  // Submit via hidden form (works reliably with Apps Script e.parameter)
+  function postViaForm(url, fields) {
+    var form = document.createElement("form");
+    form.method = "POST";
+    form.action = url;
+    form.style.display = "none";
+    // OPTIONAL: open in a background tab/window to avoid nav-blockers
+    form.target = "gsheet_sink";
+    var w = window.open("", "gsheet_sink"); if (w) { try { w.blur(); } catch(_){} }
+
+    Object.keys(fields).forEach(function (name) {
+      var input = document.createElement("input");
+      input.type = "hidden";
+      input.name = name;
+      input.value = fields[name];
+      form.appendChild(input);
     });
+
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(function () { form.remove(); }, 2000);
   }
 
-  window.syncToSheetSafe = async function () {
-    if (window.__SYNC_SENT__) return;     // prevent duplicates
+  // Public single entry point we call after bed:pdf-ready
+  window.syncToSheetSafe = function () {
+    if (window.__SYNC_SENT__) return;
     window.__SYNC_SENT__ = true;
 
-    // Prefer your original gsync.js if present
     try {
+      // Prefer your original gsync.js if it exists and works for you
       if (typeof window.syncToSheet === "function") {
-        await window.syncToSheet();
+        // If your gsync.js already does a form-style post, let it run and return
+        window.syncToSheet();
         return;
       }
-    } catch (e) {
-      // fall through to form post
-      // console.warn("[BED] syncToSheet() error, using fallback:", e);
+    } catch (_) {
+      // fall through to our form submit
     }
 
-    // Fallback direct post to Apps Script
-    const url = String(window.WEBAPP_URL || "").trim();
+    var url = String(window.WEBAPP_URL || "").trim();
     if (!url) return;
-    const data = collectPayload();
-    try { await postForm(url, data); } catch (_) {}
+    var fields = buildFields();
+    postViaForm(url, fields);
   };
 })();
 </script>
-
-
 
 <script src="../gsync.js?v=21"></script>
 </body>
