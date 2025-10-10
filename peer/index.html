@@ -2040,6 +2040,31 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script>
 <script>
+<!-- === Guaranteed PDF button activation (multi-instance safe) === -->
+<script>
+function activatePdfButtons() {
+  const buttons = document.querySelectorAll("#congratsPdf");
+  if (!buttons.length) {
+    setTimeout(activatePdfButtons, 300);
+    return;
+  }
+
+  buttons.forEach((btn) => {
+    btn.onclick = () => {
+      try {
+        buildPdfReport();
+        window.print();
+      } catch (err) {
+        console.warn("[BED] PDF button error:", err);
+      }
+    };
+  });
+}
+
+// Run now and every time PDF is rebuilt
+document.addEventListener("DOMContentLoaded", activatePdfButtons);
+document.addEventListener("bed:pdf-ready", activatePdfButtons);
+</script>
 
 <script src="../gsync.js?v=21"></script>
 </body>
