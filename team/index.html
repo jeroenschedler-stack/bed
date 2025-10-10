@@ -1167,6 +1167,7 @@ take an active role in BED 2.0. You are ready for the next step.`;
     renderGroupResults();
     buildPdfReport();
     document.dispatchEvent(new Event("bed:pdf-ready"));
+setTimeout(() => window.syncToSheetSafe && window.syncToSheetSafe(), 500);
 
     // ✅ Restore PDF button behaviour
     const pdfBtn = document.getElementById("congratsPdf");
@@ -2145,52 +2146,70 @@ document.addEventListener("bed:pdf-ready", activatePdfButtons);
   </div>
 </section>
 <script>
-/* === BED sync wrapper (non-breaking) === */
+  window.WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwr_xjFQQX-SJj1eBShD_r0fE3mPxkfDWOVOyNoVvDekBYFXADYTr_KRgfR69_DdaHgag/exec';
+</script>
+
+<script>
+/* === BED sync wrapper (forced form post, CORS-safe) === */
 (function () {
-  if (window.__SYNC_SHIM_LOADED__) return;
-  window.__SYNC_SHIM_LOADED__ = true;
+  if (window.__SYNC_SHIM_FORCE__) return;
+  window.__SYNC_SHIM_FORCE__ = true;
 
-  // Call your original gsync if present; otherwise do a minimal fallback POST.
-  window.syncToSheetSafe = async function () {
+  function collectPayload() {
+    const S   = window.__S || {};
+    const qs  = Array.isArray(S.questions) ? S.questions : [];
+    const ans = S.answers || {};
+    const data = {
+      TIMESTAMP: new Date().toISOString(),
+
+      // person fields (match your sheet header names if you already set them)
+      "NAME TEAM MEMBER":  document.getElementById("nick")?.value || "",
+      "EMAIL TEAM MEMBER": document.getElementById("email")?.value || "",
+      "LOCATION TEAM MEMBER": document.getElementById("hotel")?.value || "",
+
+      "NAME PEER REVIEWER":  document.getElementById("peerName")?.value || "",
+      "EMAIL PEER REVIEWER": document.getElementById("peerEmail")?.value || "",
+      "LOCATION PEER REVIEWER": document.getElementById("peerHotel")?.value || "",
+
+      "OVERALL SCORE": (document.getElementById("scorePercent")?.textContent || "").replace(/[^\d]/g, ""),
+      "RECOMMENDATIONS": document.getElementById("recText")?.innerHTML || ""
+    };
+
+    // Q1..Q35 in order
+    qs.forEach((q, i) => {
+      const key = "Q" + (i + 1);
+      const id  = q?.id;
+      data[key] = (id != null && ans[id] != null) ? String(ans[id]) : "";
+    });
+    return data;
+  }
+
+  function postForm(url, data) {
+    const params = new URLSearchParams();
+    Object.keys(data).forEach(k => params.append(k, data[k]));
+    // Use no-cors so the request always leaves the page even if GAS doesn’t send CORS headers
+    return fetch(url, {
+      method: "POST",
+      headers: {"Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"},
+      body: params,
+      mode: "no-cors"
+    });
+  }
+
+  // Expose a single call used by submit handler
+  window.syncToSheetSafe = function () {
+    const url = String(window.WEBAPP_URL || "").trim();
+    if (!url) { console.warn("[BED] WEBAPP_URL missing"); return; }
     try {
-      if (typeof window.syncToSheet === "function") {
-        return await window.syncToSheet(); // use your existing gsync.js
-      }
-    } catch (err) {
-      console.warn("[BED] syncToSheet threw:", err);
-    }
-
-    // Fallback (only used if no syncToSheet() exists)
-    try {
-      // Keep this URL identical to your working Apps Script Web App (ends with /exec)
-      const WEBAPP_URL = window.WEBAPP_URL || ""; // if you defined it earlier
-      if (!WEBAPP_URL) return;
-
-      const payload = {
-        timestamp: new Date().toISOString(),
-        team_name:    document.getElementById("nick")?.value || "",
-        team_email:   document.getElementById("email")?.value || "",
-        team_hotel:   document.getElementById("hotel")?.value || "",
-        peer_name:    document.getElementById("peerName")?.value || "",
-        peer_email:   document.getElementById("peerEmail")?.value || "",
-        peer_hotel:   document.getElementById("peerHotel")?.value || "",
-        overall_pct:  (document.getElementById("scorePercent")?.textContent || "").replace(/[^\d]/g, ""),
-        recommendation_html: document.getElementById("recText")?.innerHTML || ""
-      };
-
-      await fetch(WEBAPP_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // NOTE: If your Apps Script expects form-data, switch to URLSearchParams instead.
-        body: JSON.stringify(payload),
-        // mode: "no-cors" // uncomment only if CORS blocks you and you don't need a response
-      });
+      const payload = collectPayload();
+      postForm(url, payload);
     } catch (e) {
-      console.warn("[BED] fallback sync error:", e);
+      console.warn("[BED] syncToSheetSafe error:", e);
     }
   };
 })();
 </script>
+
 
 <script src="../gsync.js?v=21"></script>
 </body>
