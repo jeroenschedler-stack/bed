@@ -1177,8 +1177,7 @@ take an active role in BED 2.0. You are ready for the next step.`;
       };
     }
 
-    if (typeof window.syncToSheet === "function")
-      setTimeout(() => window.syncToSheet(), 500);
+   setTimeout(() => window.syncToSheetSafe(), 500);
   } catch (e) {
     console.warn("[BED] submitAll error:", e);
   } finally {
@@ -2145,6 +2144,53 @@ document.addEventListener("bed:pdf-ready", activatePdfButtons);
     </table>
   </div>
 </section>
+<script>
+/* === BED sync wrapper (non-breaking) === */
+(function () {
+  if (window.__SYNC_SHIM_LOADED__) return;
+  window.__SYNC_SHIM_LOADED__ = true;
+
+  // Call your original gsync if present; otherwise do a minimal fallback POST.
+  window.syncToSheetSafe = async function () {
+    try {
+      if (typeof window.syncToSheet === "function") {
+        return await window.syncToSheet(); // use your existing gsync.js
+      }
+    } catch (err) {
+      console.warn("[BED] syncToSheet threw:", err);
+    }
+
+    // Fallback (only used if no syncToSheet() exists)
+    try {
+      // Keep this URL identical to your working Apps Script Web App (ends with /exec)
+      const WEBAPP_URL = window.WEBAPP_URL || ""; // if you defined it earlier
+      if (!WEBAPP_URL) return;
+
+      const payload = {
+        timestamp: new Date().toISOString(),
+        team_name:    document.getElementById("nick")?.value || "",
+        team_email:   document.getElementById("email")?.value || "",
+        team_hotel:   document.getElementById("hotel")?.value || "",
+        peer_name:    document.getElementById("peerName")?.value || "",
+        peer_email:   document.getElementById("peerEmail")?.value || "",
+        peer_hotel:   document.getElementById("peerHotel")?.value || "",
+        overall_pct:  (document.getElementById("scorePercent")?.textContent || "").replace(/[^\d]/g, ""),
+        recommendation_html: document.getElementById("recText")?.innerHTML || ""
+      };
+
+      await fetch(WEBAPP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // NOTE: If your Apps Script expects form-data, switch to URLSearchParams instead.
+        body: JSON.stringify(payload),
+        // mode: "no-cors" // uncomment only if CORS blocks you and you don't need a response
+      });
+    } catch (e) {
+      console.warn("[BED] fallback sync error:", e);
+    }
+  };
+})();
+</script>
 
 <script src="../gsync.js?v=21"></script>
 </body>
