@@ -1166,7 +1166,17 @@ take an active role in BED 2.0. You are ready for the next step.`;
 
     renderGroupResults();
     buildPdfReport();
-   document.getElementById("congratsPdf").onclick = () => { buildPdfReport(); window.print(); };
+    document.dispatchEvent(new Event("bed:pdf-ready"));
+
+    // ✅ Restore PDF button behaviour
+    const pdfBtn = document.getElementById("congratsPdf");
+    if (pdfBtn) {
+      pdfBtn.onclick = () => {
+        buildPdfReport();
+        window.print();
+      };
+    }
+
     if (typeof window.syncToSheet === "function")
       setTimeout(() => window.syncToSheet(), 500);
   } catch (e) {
