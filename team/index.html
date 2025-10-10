@@ -2065,6 +2065,86 @@ function activatePdfButtons() {
 document.addEventListener("DOMContentLoaded", activatePdfButtons);
 document.addEventListener("bed:pdf-ready", activatePdfButtons);
 </script>
+<!-- PRINT REPORT (Blue-branded) -->
+<section aria-hidden="true" id="pdfReport">
+  <h2 class="visually-hidden">PDF Report</h2>
+
+  <div class="pdf-top">
+    <div>
+      <div class="pdf-title">BED HOSPITALITY 2.0</div>
+      <div class="pdf-sub">team member report</div>
+      <div class="pdf-date" id="pdfDate">assessment date —</div>
+    </div>
+    <div class="score-box">
+      <div class="pct" id="pdfTotalPct">—%</div>
+      <div class="raw" id="pdfTotalRaw">— OUT OF 175 POINTS</div>
+    </div>
+  </div>
+
+  <div class="pdf-divider"></div>
+
+  <!-- Information -->
+  <div class="sec-h assess-bar"><span class="lbl-group">INFORMATION</span></div>
+  <div class="card" style="padding:0;">
+    <table id="pdfInfoTable">
+      <colgroup>
+        <col style="width:20%;" />
+        <col style="width:30%;" />
+        <col style="width:20%;" />
+        <col style="width:30%;" />
+      </colgroup>
+      <tbody>
+        <tr>
+          <td>team member</td><td id="pdfEmpName"></td>
+          <td>peer reviewer</td><td id="pdfPeerName"></td>
+        </tr>
+        <tr>
+          <td>email address</td><td id="pdfEmpEmail"></td>
+          <td>email address</td><td id="pdfPeerEmail"></td>
+        </tr>
+        <tr>
+          <td>BED location</td><td id="pdfEmpHotel"></td>
+          <td>BED location</td><td id="pdfPeerHotel"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Score summary (sentence + recommendation injected by JS) -->
+  <div class="sec-h assess-bar"><span class="lbl-group">SCORE SUMMARY</span></div>
+  <div id="pdfBandText" style="margin-top:10px;font-size:16px;font-weight:600;color:#434343;line-height:1.5;"></div>
+
+  <!-- Score by Group -->
+  <div class="sec-h assess-bar"><span class="lbl-group">SCORE BY GROUP</span></div>
+  <div class="card" style="padding:0;">
+    <table>
+      <tbody id="pdfGroupRows"><!-- rows injected --></tbody>
+    </table>
+  </div>
+
+  <!-- Statements -->
+  <div class="sec-h statements-bar">
+    <span class="lbl-stmt">STATEMENTS</span>
+    <span class="lbl-group">GROUP</span>
+    <span class="lbl-score">SCORE</span>
+  </div>
+  <div class="card" style="padding:0;">
+    <table id="pdfStatements" class="statements-table">
+      <colgroup>
+        <col />  <!-- NO -->
+        <col />  <!-- STATEMENT -->
+        <col />  <!-- GROUP -->
+        <col />  <!-- SCORE -->
+      </colgroup>
+      <thead>
+        <tr>
+          <th>NO</th><th>STATEMENT</th><th>GROUP</th><th>SCORE</th>
+        </tr>
+      </thead>
+      <tbody id="pdfStatementRows"><!-- rows injected --></tbody>
+    </table>
+  </div>
+</section>
 
 <script src="../gsync.js?v=21"></script>
 </body>
