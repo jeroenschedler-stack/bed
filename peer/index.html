@@ -1124,49 +1124,58 @@ function buildPdfReport() {
                 el("backToQ1").onclick = () => show("q1");
 
                 el("submitAll").onclick = () => {
-                    const totals = computeTotals();
-                    el("scorePercent").textContent = "OVERALL SCORE " + totals.pct + "%";
-                    const gauge = el("gauge");
-                    gauge.style.setProperty("--marker", totals.pct + "%");
-                    gauge.style.position = "relative";
-                    let markerStyle = document.getElementById("markerStyle");
-                    if (!markerStyle) {
-                        markerStyle = document.createElement("style");
-                        markerStyle.id = "markerStyle";
-                        document.head.appendChild(markerStyle);
-                    }
-                    markerStyle.textContent = ".gauge::after{left: calc(var(--marker) - 5px);}";
-                    let rec = "";
-                     if(totals.pct < 55) rec = `This score suggests limited understanding of BED. It is your responsibility to change that. 
-  You need passion and common sense to become a full member of the team.<br><br>
-  Focus on self-development. It starts with awareness and practise. Observe others but don’t copy them. Find your own identity. 
-  Set goals each week and ask the team to evaluate your progress. Ask your coach for guidance.`;
-else if(totals.pct < 75) rec = `This score means that you know hospitality but perhaps you take it too easy. 
-  Focus more and understand that BED plays in the Champions League.<br><br>
-  You need to be more proactive and focused. Push yourself to act like an equal member of the team. 
-  Ask your team members for advice and then ask yourself: did I do things different today?`;
-else if(totals.pct < 90) rec = `This score shows that you really understand hospitality and use the core values of BED in daily work. 
-  This means you are ready to grow into the next level.<br><br>
-  Think about your personal growth. Use your time in BED to learn new things about people, leadership and management. 
-  Without challenge work becomes routine. Think about new ideas for BED 2.0 and help other members with positive feedback.`;
-else rec = `This score suggests that you truly understand BED. You care for people and take ownership of the hotels. 
-  Continue to inspire the teams in BED and lead them by example.<br><br>
-  Get involved in shared leadership and developing the next generation of hotels. Use your strengths to grow in the organization and 
-  take an active role in BED 2.0. You are ready for the next step.`;
-document.getElementById("recText").innerHTML = rec;
+  try {
+    const totals = computeTotals();
+    el("scorePercent").textContent = "OVERALL SCORE " + totals.pct + "%";
 
-                    renderGroupResults();
-buildPdfReport();                                   // build PDF DOM now
-document.dispatchEvent(new Event('bed:pdf-ready')); // signal: PDF is ready for export
-show("finish");
-        // === Trigger BED → Google Sheet Sync ===
-if (typeof window.syncToSheet === 'function') {
-  console.log('[BED] Manual sync trigger after PDF build');
-  setTimeout(() => {
-    window.syncToSheet();
-  }, 500);
-}
-                };
+    const gauge = el("gauge");
+    gauge.style.setProperty("--marker", totals.pct + "%");
+    gauge.style.position = "relative";
+    let markerStyle = document.getElementById("markerStyle");
+    if (!markerStyle) {
+      markerStyle = document.createElement("style");
+      markerStyle.id = "markerStyle";
+      document.head.appendChild(markerStyle);
+    }
+    markerStyle.textContent = ".gauge::after{left: calc(var(--marker) - 5px);}";
+
+    // === Recommendation (55 / 75 / 90) ===
+    let rec = "";
+    if (totals.pct < 55)
+      rec = `This score suggests limited understanding of BED. It is your responsibility to change that.
+You need passion and common sense to become a full member of the team.<br><br>
+Focus on self-development. It starts with awareness and practise. Observe others but don’t copy them. Find your own identity.
+Set goals each week and ask the team to evaluate your progress. Ask your coach for guidance.`;
+    else if (totals.pct < 75)
+      rec = `This score means that you know hospitality but perhaps you take it too easy.
+Focus more and understand that BED plays in the Champions League.<br><br>
+You need to be more proactive and focused. Push yourself to act like an equal member of the team.
+Ask your team members for advice and then ask yourself: did I do things different today?`;
+    else if (totals.pct < 90)
+      rec = `This score shows that you really understand hospitality and use the core values of BED in daily work.
+This means you are ready to grow into the next level.<br><br>
+Think about your personal growth. Use your time in BED to learn new things about people, leadership and management.
+Without challenge work becomes routine. Think about new ideas for BED 2.0 and help other members with positive feedback.`;
+    else
+      rec = `This score suggests that you truly understand BED. You care for people and take ownership of the hotels.
+Continue to inspire the teams in BED and lead them by example.<br><br>
+Get involved in shared leadership and developing the next generation of hotels. Use your strengths to grow in the organization and
+take an active role in BED 2.0. You are ready for the next step.`;
+
+    el("recText").innerHTML = rec;
+
+    renderGroupResults();
+    buildPdfReport();
+    document.dispatchEvent(new Event("bed:pdf-ready"));
+    if (typeof window.syncToSheet === "function")
+      setTimeout(() => window.syncToSheet(), 500);
+  } catch (e) {
+    console.warn("[BED] submitAll error:", e);
+  } finally {
+    if (typeof show === "function") show("finish");
+    else document.getElementById("finish").style.display = "block";
+  }
+};
 
                 el("backToQ2").onclick = () => show("q2");
                 el("nextToPeer").onclick = () => show("congrats");
