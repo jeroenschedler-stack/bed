@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta content="width=device-width, initial-scale=1" name="viewport" />
-        <title>BED HOSPITALITY — Self-Assessment</title>
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <title>BED HOSPITALITY — Self-Assessment</title>
         <style>
             /* === FINAL consolidated fixes === */
             @media print {
@@ -1169,6 +1169,7 @@ take an active role in BED 2.0. You are ready for the next step.`;
     buildPdfReport();
     document.dispatchEvent(new Event("bed:pdf-ready"));
 setTimeout(() => window.syncToSheetSafe && window.syncToSheetSafe(), 500);
+      console.log('[BED] queued original syncToSheet()');
 
     // ✅ Restore PDF button behaviour
     const pdfBtn = document.getElementById("congratsPdf");
@@ -1605,15 +1606,7 @@ recTarget.innerHTML =
                     labelScore.textContent = "SCORE";
                 }
             })();
-        </script>
-        
-
-        <script>
-            
-
-        <script>
-            
-        <script>
+       
             // === Strong patch v2: force-normalize + recompute group % independent of S.groups ===
             (function () {
                 const MAP = {
@@ -1992,81 +1985,29 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <script>
-document.addEventListener("bed:pdf-ready", () => {
-  const finish = document.getElementById("finish");
-  if (!finish) return;
-
-  if (!finish.querySelector("#recordMsg")) {
-    const p = document.createElement("p");
-    p.id = "recordMsg";
-    p.textContent = "Your assessment is recorded.";
-    p.style.marginTop = "12px";
-    p.style.fontSize = "16px";
-    p.style.color = "#434343";
-    p.style.textAlign = "left";
-
-    const pdfHint = Array.from(finish.querySelectorAll("p, div"))
-      .find(el => el.textContent && el.textContent.includes("Click PDF"));
-
-    if (pdfHint) {
-      pdfHint.parentNode.insertBefore(p, pdfHint);
-    } else {
-      finish.appendChild(p);
-    }
-  }
-});
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const targetNode = document.getElementById("congrats");
-  if (!targetNode) return;
-
-  const observer = new MutationObserver(() => {
-    const pdfText = targetNode.querySelector("p");
-    if (pdfText && pdfText.textContent.toLowerCase().includes("click pdf")) {
-      if (!document.getElementById("recordedMsg")) {
-        const msg = document.createElement("p");
-        msg.id = "recordedMsg";
-        msg.textContent = "Your assessment is recorded.";
-        msg.style.fontSize = "16px";
-        msg.style.color = "#434343";
-        msg.style.marginBottom = "4px";
-        pdfText.parentNode.insertBefore(msg, pdfText);
-      }
-    }
-  });
-
-  observer.observe(targetNode, { childList: true, subtree: true });
-});
-</script>
-<script>
-<!-- === Guaranteed PDF button activation (multi-instance safe) === -->
-<script>
+/* === Guaranteed PDF button activation (multi-instance safe) === */
 function activatePdfButtons() {
-  const buttons = document.querySelectorAll("#congratsPdf");
-  if (!buttons.length) {
+  // Use an ID once, so select by ID; if you intend multiple, use a class.
+  const btn = document.getElementById("congratsPdf");
+  if (!btn) {
     setTimeout(activatePdfButtons, 300);
     return;
   }
-
-  buttons.forEach((btn) => {
-    btn.onclick = () => {
-      try {
-        buildPdfReport();
-        window.print();
-      } catch (err) {
-        console.warn("[BED] PDF button error:", err);
-      }
-    };
-  });
+  btn.onclick = () => {
+    try {
+      if (typeof buildPdfReport === "function") buildPdfReport();
+      window.print();
+    } catch (err) {
+      console.warn("[BED] PDF button error:", err);
+    }
+  };
 }
 
-// Run now and every time PDF is rebuilt
 document.addEventListener("DOMContentLoaded", activatePdfButtons);
 document.addEventListener("bed:pdf-ready", activatePdfButtons);
 </script>
-<!-- PRINT REPORT (Blue-branded) -->
+
+        <!-- PRINT REPORT (Blue-branded) -->
 <section aria-hidden="true" id="pdfReport">
   <h2 class="visually-hidden">PDF Report</h2>
 
@@ -2146,100 +2087,8 @@ document.addEventListener("bed:pdf-ready", activatePdfButtons);
     </table>
   </div>
 </section>
-<script>
-  window.WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbwr_xjFQQX-SJj1eBShD_r0fE3mPxkfDWOVOyNoVvDekBYFXADYTr_KRgfR69_DdaHgag/exec';
-</script>
 
-<script>
-/* === BED sync wrapper: classic FORM submit with exact Sheet headers; one-shot === */
-(function () {
-  // One-shot per submission
-  window.__SYNC_SENT__ = false;
-
-  function val(id) {
-    var el = document.getElementById(id);
-    return el && el.value ? String(el.value).trim() : "";
-  }
-  function textNum(id) {
-    var t = document.getElementById(id) ? document.getElementById(id).textContent || "" : "";
-    return t.replace(/[^\d]/g, "");
-  }
-
-  // Build ALL fields with the exact header names your Sheet expects
-  function buildFields() {
-    var S = window.__S || window.S || {};
-    var qs = Array.isArray(S.questions) ? S.questions : [];
-    var ans = S.answers || {};
-
-    var fields = {
-      "TIMESTAMP": new Date().toISOString(),
-      "NAME TEAM MEMBER": val("nick"),
-      "EMAIL TEAM MEMBER": val("email"),
-      "LOCATION TEAM MEMBER": val("hotel"),
-      "NAME PEER REVIEWER": val("peerName"),
-      "EMAIL PEER REVIEWER": val("peerEmail"),
-      "LOCATION PEER REVIEWER": val("peerHotel"),
-      "OVERALL SCORE": textNum("scorePercent"),
-      "RECOMMENDATIONS": (document.getElementById("recText")?.innerHTML || "")
-    };
-
-    // Also include Q1..Q35 as headers
-    qs.forEach(function (q, i) {
-      var k = "Q" + (i + 1);
-      var v = (q && q.id != null && ans[q.id] != null) ? String(ans[q.id]) : "";
-      fields[k] = v;
-    });
-
-    return fields;
-  }
-
-  // Submit via hidden form (works reliably with Apps Script e.parameter)
-  function postViaForm(url, fields) {
-    var form = document.createElement("form");
-    form.method = "POST";
-    form.action = url;
-    form.style.display = "none";
-    // OPTIONAL: open in a background tab/window to avoid nav-blockers
-    form.target = "gsheet_sink";
-    var w = window.open("", "gsheet_sink"); if (w) { try { w.blur(); } catch(_){} }
-
-    Object.keys(fields).forEach(function (name) {
-      var input = document.createElement("input");
-      input.type = "hidden";
-      input.name = name;
-      input.value = fields[name];
-      form.appendChild(input);
-    });
-
-    document.body.appendChild(form);
-    form.submit();
-    setTimeout(function () { form.remove(); }, 2000);
-  }
-
-  // Public single entry point we call after bed:pdf-ready
-  window.syncToSheetSafe = function () {
-    if (window.__SYNC_SENT__) return;
-    window.__SYNC_SENT__ = true;
-
-    try {
-      // Prefer your original gsync.js if it exists and works for you
-      if (typeof window.syncToSheet === "function") {
-        // If your gsync.js already does a form-style post, let it run and return
-        window.syncToSheet();
-        return;
-      }
-    } catch (_) {
-      // fall through to our form submit
-    }
-
-    var url = String(window.WEBAPP_URL || "").trim();
-    if (!url) return;
-    var fields = buildFields();
-    postViaForm(url, fields);
-  };
-})();
-</script>
-
-<script src="../gsync.js?v=21"></script>
+<script src="../gsync.js?v=22"></script>
 </body>
 </html>
+
