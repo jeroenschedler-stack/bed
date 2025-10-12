@@ -1145,7 +1145,7 @@ button:disabled,
                     hotel and organization. This shows you understand Shared Responsibility. Continue to lead others by example. 
                     Use your leadership strengths to grow within the organization and consider taking an executive role 
                     in shaping BED 2.0. You are ready for the next level`;
-                    document.getElementById("recText").textContent = rec;
+                    document.getElementById("recText").innerHTML = rec;
                     renderGroupResults();
 buildPdfReport();                                   // build PDF DOM now
 document.dispatchEvent(new Event('bed:pdf-ready')); // signal: PDF is ready for export
