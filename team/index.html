@@ -1130,21 +1130,10 @@ button:disabled,
                     }
                     markerStyle.textContent = ".gauge::after{left: calc(var(--marker) - 5px);}";
                     let rec = "";
-                    if (totals.pct < 50) rec = `This score suggests that you are behind. You need to develop
-                    yourself, learn more about BED, and focus more on the job. Observe others but 
-                    don’t copy them. You must find your own identity. Set a few personal goals each week and ask the
-                    team to evaluate your progress. Contact your coach for advice`;
-                    else if (totals.pct < 70) rec = `This score suggests that you are taking your job too lightly. 
-                    You need to develop yourself. Be more aware of your actions and practice. You are playing in the Premier League. 
-                    Be more proactive and push yourself to become an equal member of the team. 
-                    Ask your team for suggestions so you know what you can do better and then ask yourself: did I do things different today?`;
-                    else if (totals.pct < 85) rec = `This score suggests that your hospitality competencies are great. 
-                    You can read people and situations. It is important to keep challenging yourself. Use BED to learn new things. 
-                    Contribute new ideas for BED 2.0 and actively support your team members by giving honest and positive feedback`;
-                    else rec = `The score suggests you truly understand BED. You care for people,
-                    hotel and organization. This shows you understand Shared Responsibility. Continue to lead others by example. 
-                    Use your leadership strengths to grow within the organization and consider taking an executive role 
-                    in shaping BED 2.0. You are ready for the next level`;
+                    if (totals.pct < 50) rec = `This score suggests that you are behind. You need to develop yourself, learn more about BED, and focus more on the job. Observe others but don’t copy them. You must find your own identity. Set a few personal goals each week and ask the team to evaluate your progress. Contact your coach for advice`;
+                    else if (totals.pct < 70) rec = `This score suggests that you are taking the job too easy. You need to develop yourself. You are playing in the Premier League. Be aware of your actions and be more proactive. Push yourself to be an equal member of the team. Ask your friends for suggestions and ask yourself: did I do things different today?`;
+                    else if (totals.pct < 85) rec = `This score suggests that your hospitality competencies are great. You are good at reading people and situations. It is important to keep challenging yourself. Use BED to learn new things. Contribute to BED 2.0 and actively support your team members by giving honest and positive feedback`;
+                    else rec = `The score suggests you truly understand BED. You care for people, hotel and organization and understand what Shared Leadership means. Continue to lead others by example. Use your leadership strengths to grow within the organization and take an executive role in shaping BED 2.0. You are ready for the next level`;
                     document.getElementById("recText").innerHTML = rec;
                     renderGroupResults();
 buildPdfReport();                                   // build PDF DOM now
