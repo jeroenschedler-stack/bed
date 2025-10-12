@@ -216,7 +216,7 @@
                 .st-title{font-weight:800}
               }
 
-              .rec-text{font-size:11pt; font-weight:500; color:#444; margin-top:24px; line-height:1.5;}
+              .rec-text{font-size:10pt; font-weight:450; color:#666666; margin-top:24px; line-height:1.6;}
 
               .group-results-header{font-size:18pt; font-weight:800; color:#444; margin-bottom:8px;}
 
@@ -539,9 +539,9 @@
   display: flex;
   align-items: center;
   margin: 6px 0;
-  font-size: 17px;
-  font-weight: 600; /* increased from 500 */
-  color: #444;
+  font-size: 16px;
+  font-weight: 500; /* increased from 500 */
+  color: #666666;
 }
         </style>
         <style>
@@ -699,7 +699,7 @@ button:disabled,
                     </select>
                 </div>
                 <h2 class="section-title">team member information</h2>
-                <p class="intro">After you assess yourself a friend will review you. You can ask anyone in your team who knows you well and worked in BED for at least 12 months</p>
+                <p class="intro">You are invited to review another team member. To do this you must know the person well and have worked in BED for at least 12 months</p>
                 <div class="row"><label for="peerName">name</label><input id="peerName"  placeholder="team member name"></div>
                 <div class="row"><label for="peerEmail">email</label><input id="peerEmail" type="email"  placeholder="team member email"></div>
                 <div class="row">
@@ -722,7 +722,7 @@ button:disabled,
             <section id="instructions" style="display: none;">
                 <h2 class="section-title">before you start</h2>
                 <p class="intro">
-                You will get 35 short statements. Read each one and think about how the person acts in these situations. Then score the person from 1 to 5. Be honest and sincere. This app is a mirror to show people what they're good at and what they can do better
+                You will get 35 statements. Read each statement and think about how the person acts in these situations. Then score the person from 1 to 5. Be honest and sincere. This app is a mirror to show people what they're good at and what they can do better
                 </p>
                 <h2 class="section-title">about the scoring</h2>
                 <ul class="scale-list" style="list-style: none; padding: 0; margin: 10px 0;">
@@ -1891,7 +1891,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- Custom "Are you sure?" confirmation modal (white, left text, right buttons) v4 (peer) -->
 <div id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
   <div class="modal-box">
-    <div id="confirmTitle" class="title">Are you sure?</div>
+    <div id="confirmTitle" class="title">you want to submit now?</div>
     <div id="confirmText" class="text">Your assessment scores will be automatically saved.</div>
     <div class="actions">
       <button id="cancelConfirm" class="btn-cancel" type="button">No</button>
