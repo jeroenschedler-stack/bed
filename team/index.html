@@ -1116,28 +1116,46 @@ button:disabled,
                 el("backToQ1").onclick = () => show("q1");
 
                 el("submitAll").onclick = () => {
-                    const totals = computeTotals();
-                    el("scorePercent").textContent = "OVERALL SCORE " + totals.pct + "%";
-                    const gauge = el("gauge");
-                    gauge.style.setProperty("--marker", totals.pct + "%");
-                    gauge.style.position = "relative";
-                    let markerStyle = document.getElementById("markerStyle");
-                    if (!markerStyle) {
-                        markerStyle = document.createElement("style");
-                        markerStyle.id = "markerStyle";
-                        document.head.appendChild(markerStyle);
-                    }
-                    markerStyle.textContent = ".gauge::after{left: calc(var(--marker) - 5px);}";
-                    let rec = "";
-                    if(totals.pct < 50) rec = `This score suggests that you are behind. You need to develop yourself, learn more about BED, and focus more on the job. Observe others but don’t copy them. You need to find your own identity. Set a few personal goals each week and ask the team to evaluate your progress. Contact your coach for advice`;
-                    else if(totals.pct < 70) rec = `This score suggests that you are taking your job too easy. You are playing in the Premier League. You need to develop yourself. Be more aware of your actions and practice.  Be more proactive and push yourself to become an equal member of the team. Ask your team for suggestions and feedback and then ask yourself: did I do things different today?`;
-                    else if(totals.pct < 90) rec = `This score shows that you have great hospitality competencies. You can clearly read people and situations. But it’s important to keep challenging yourself. Use BED to learn new things. Contribute to BED 2.0 and actively help your team members by giving honest and positive feedback`;
-                    else rec = `This score shows you truly understand BED. You care for people, hotel and organization and understand the meaning of Shared Leadership. Continue to lead others by example. Use your leadership strengths to grow in the organization and take an executive role in shaping BED 2.0. You are ready for the next level`;
-                    document.getElementById("recText").innerHTML = rec;
-                    renderGroupResults();
-buildPdfReport();                                   // build PDF DOM now
-document.dispatchEvent(new Event('bed:pdf-ready')); // signal: PDF is ready for export
-show("finish");
+  const totals = computeTotals();
+  el("scorePercent").textContent = "OVERALL SCORE " + totals.pct + "%";
+
+  const gauge = el("gauge");
+  gauge.style.setProperty("--marker", totals.pct + "%");
+  gauge.style.position = "relative";
+  let markerStyle = document.getElementById("markerStyle");
+  if (!markerStyle) {
+    markerStyle = document.createElement("style");
+    markerStyle.id = "markerStyle";
+    document.head.appendChild(markerStyle);
+  }
+  markerStyle.textContent = ".gauge::after{left: calc(var(--marker) - 5px);}";
+
+  let rec = "";
+  if (totals.pct < 50) {
+    rec = `This score suggests that you are behind. You need to develop yourself, learn more about BED, and focus more on the job. Observe others but don’t copy them. You need to find your own identity. Set a few personal goals each week and ask the team to evaluate your progress. Contact your coach for advice`;
+  } else if (totals.pct < 70) {
+    rec = `This score suggests that you are taking your job too easy. You are playing in the Premier League. You need to develop yourself. Be more aware of your actions and practice.  Be more proactive and push yourself to become an equal member of the team. Ask your team for suggestions and feedback and then ask yourself: did I do things different today?`;
+  } else if (totals.pct < 90) {
+    rec = `This score shows that you have great hospitality competencies. You can clearly read people and situations. But it’s important to keep challenging yourself. Use BED to learn new things. Contribute to BED 2.0 and actively help your team members by giving honest and positive feedback`;
+  } else {
+    rec = `This score shows you truly understand BED. You care for people, hotel and organization and understand the meaning of Shared Leadership. Continue to lead others by example. Use your leadership strengths to grow in the organization and take an executive role in shaping BED 2.0. You are ready for the next level`;
+  }
+  document.getElementById("recText").innerHTML = rec;
+
+  renderGroupResults();
+  buildPdfReport();                                   // build PDF DOM now
+  document.dispatchEvent(new Event("bed:pdf-ready")); // notify PDF listeners
+
+  // Sheet sync (keep your original or wrapper; pick one)
+  if (typeof window.syncToSheet === "function") {
+    setTimeout(() => window.syncToSheet(), 500);
+  }
+  // if you use the wrapper instead, comment the above and use:
+  // setTimeout(() => window.syncToSheetSafe && window.syncToSheetSafe(), 500);
+
+  show("finish"); // go to scoring page
+};
+
         // === Trigger BED → Google Sheet Sync ===
 if (typeof window.syncToSheet === 'function') {
   console.log('[BED] Manual sync trigger after PDF build');
