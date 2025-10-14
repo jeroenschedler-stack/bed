@@ -173,9 +173,9 @@
 
                 /* Title block */
                 .pdf-top{display:grid; grid-template-columns: 1fr 220px; gap:16px; align-items:start; margin-bottom:10px}
-                .pdf-title{font-size:45px; font-weight:1000; color:var(--blue); margin:0}
-                .pdf-sub { font-size:30px; font-weight:600; color:var(--blue); margin:2px 0; line-height:1.2; text-align:left; }
-                .pdf-date { font-size:15px; font-weight:450; color:var(--blue); margin:2px 0; line-height:1.2; text-align:left; }
+                .pdf-title{font-size:45px; font-weight:1000; color:1E90FF; margin:0}
+                .pdf-sub { font-size:30px; font-weight:600; color:1E90FF; margin:2px 0 10px 0; line-height:1.2; text-align:left; }
+                .pdf-date { font-size:15px; font-weight:450; color:1E90FF; margin:2px 0; line-height:1.2; text-align:left; }
                 .pdf-divider{height:1px; background:#cfd4dc; margin:8px 0 14px 0}
 
                 /* ====== SCORE BOX (SAFE TO EDIT) ====== */
@@ -184,16 +184,16 @@
                   -webkit-print-color-adjust: exact;     /* Safari/Chrome */
                   print-color-adjust: exact;             /* Firefox */
                   color:#fff !important;                 /* Safe: change text color if needed */
-                  border-radius:6px;
+                  border-radius:16px;
                   padding:12px 14px;
                   text-align:center;
                 }
-                .score-box .pct{font-size:40px; font-weight:900; margin:4px 0 2px 0}
-              .score-box .raw { font-size:20px; font-weight:800; color:#fff !important; margin-bottom:6px; }
+                .score-box .pct{font-size:40px; font-weight:800; margin:4px 0 2px 0}
+              .score-box .raw { font-size:20px; font-weight:700; color:#fff !important; margin-bottom:6px; }
              }
 
             /* ====== SECTION HEADERS (SAFE TO EDIT) ====== */
-            .sec-h { background:var(--blue) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; color:#fff !important; font-weight:800; text-transform:uppercase; padding:6px 10px; border-radius:4px; margin:16px 0 8px 0; }
+            .sec-h { background:var(--blue) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; font-size:15px; color:#fff !important; font-weight:600; text-transform:uppercase; padding:6px 10px; border-radius:4px; margin:16px 0 8px 0; }
             .pdf-top { display:grid; grid-template-columns: 1fr 180px; gap:16px; align-items:start; margin-bottom:10px; }
             .pdf-title { font-size:34px; font-weight:900; color:var(--blue); margin:0; }
 
@@ -1210,14 +1210,14 @@ if (typeof window.syncToSheet === 'function') {
                         }
 
                         recTarget.innerHTML =
-                            "<div style='line-height:1.4; font-size:16px; color:#434343; font-weight:600;'>Your overall score is " +
+                            "<div style='line-height:1.5; font-size:14px; color:#434343; font-weight:450;'>Your overall score is " +
                             totals.pct +
                             "% based on " +
                             totals.raw +
                             " out of " +
                             ((S.questions || []).length * 5 || 175) +
                             " points. Here's what that means:</div>" +
-                            "<div style='font-size:16px; color:#434343; font-weight:600;'>" +
+                            "<div style='font-size:14px; color:#434343; font-weight:450;'>" +
                             rec +
                             "</div>";
 
