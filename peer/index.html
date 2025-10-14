@@ -722,29 +722,29 @@ button:disabled,
             <section id="instructions" style="display: none;">
                 <h2 class="section-title">before you start</h2>
                 <p class="intro">
-                You will get 35 statements. Read each statement and think about how the person acts in these situations. Then give a score from 1 to 5. Be honest and sincere. This app is a mirror to show our team members what they're good at and what they can do better
+                You will get 35 statements. Read each statement and think about how the team member acts in these situations. Then give a score from 1 to 5. Be honest and sincere. This app is a mirror to show team members what they're good at and what they can do better
                 </p>
                 <h2 class="section-title">about the scoring</h2>
                 <ul class="scale-list" style="list-style: none; padding: 0; margin: 10px 0;">
                     <li class="scale-item" style="display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12pt;">
                         <span class="badge" style="width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700;">1</span>
-                        <span>I am not good at this</span>
+                        <span>You are not good at this</span>
                     </li>
                     <li class="scale-item" style="display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12pt;">
                         <span class="badge" style="width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700;">2</span>
-                        <span>I can be better at this</span>
+                        <span>You can be better at this</span>
                     </li>
                     <li class="scale-item" style="display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12pt;">
                         <span class="badge" style="width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700;">3</span>
-                        <span>I am average at this</span>
+                        <span>You are average at this</span>
                     </li>
                     <li class="scale-item" style="display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12pt;">
                         <span class="badge" style="width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700;">4</span>
-                        <span>I am good at this</span>
+                        <span>You are good at this</span>
                     </li>
                     <li class="scale-item" style="display: flex; align-items: center; gap: 10px; margin: 8px 0; font-size: 12pt;">
                         <span class="badge" style="width: 28px; height: 28px; border-radius: 50%; background: var(--blue); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-weight: 700;">5</span>
-                        <span>I am very good at this</span>
+                        <span>You are very good at this</span>
                     </li>
                 </ul>
                 <br />
@@ -811,15 +811,15 @@ button:disabled,
   <div style="margin-top:10px;">
     <div class="step">
       <span class="number-circle">1</span>
-      <span>Your scores are recorded</span>
+      <span>your review scores are recorded</span>
     </div>
     <div class="step">
       <span class="number-circle">2</span>
-      <span>Click PDF to download the report</span>
+      <span>click PDF to download the full report</span>
     </div>
     <div class="step">
       <span class="number-circle">3</span>
-      <span>Ask your peer to review you</span>
+      <span>please send a copy to the team member</span>
     </div>
   </div>
 </div>
@@ -838,7 +838,7 @@ button:disabled,
         <div class="modal-backdrop" id="eligBackdrop" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.35); display: none; align-items: center; justify-content: center; z-index: 50;">
             <div class="modal" style="width: min(92vw, 520px); background: #fff; border-radius: 18px; padding: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);">
                 <h3 style="margin: 0 0 10px 0; font-size: 18px;">please confirm</h3>
-                <p style="margin: 0 0 18px 0; font-size: 16px; line-height: 1.5; color: #222;">I know this person well and worked in BED for at least 12 months</p>
+                <p style="margin: 0 0 18px 0; font-size: 16px; line-height: 1.5; color: #222;">I know this team member well and I worked in BED for at least 12 months</p>
                 <div class="row-btns" style="display: flex; justify-content: flex-end; gap: 10px;">
                     <button class="btn-secondary" id="eligCancel">Cancel</button>
                     <button id="eligOk">OK</button>
@@ -851,7 +851,7 @@ button:disabled,
             <div class="pdf-top">
                 <div>
                     <div class="pdf-title">BED HOSPITALITY 2.0</div>
-                    <div class="pdf-sub">team member report</div>
+                    <div class="pdf-sub">peer review report</div>
                     <div class="pdf-date" id="pdfDate">assessment date —</div>
                 </div>
                 <div class="score-box">
@@ -1171,9 +1171,9 @@ if (typeof window.syncToSheet === 'function') {
                     } else if (id === "q2") {
                         subheaderEl.textContent = "STATEMENTS PART TWO";
                     } else if (id === "congrats") {
-                        subheaderEl.textContent = "TEAM MEMBER FORM";
+                        subheaderEl.textContent = "PEER REVIEW FORM";
                     } else {
-                        subheaderEl.textContent = "TEAM MEMBER FORM";
+                        subheaderEl.textContent = "PEER REVIEW FORM";
                     }
                 };
 
@@ -1891,8 +1891,8 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- Custom "Are you sure?" confirmation modal (white, left text, right buttons) v4 (peer) -->
 <div id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmText">
   <div class="modal-box">
-    <div id="confirmTitle" class="title">you want to submit now?</div>
-    <div id="confirmText" class="text">Your assessment scores will be automatically saved.</div>
+    <div id="confirmTitle" class="title">you want to submit your scores?</div>
+    <div id="confirmText" class="text">after you submit your review scores will be automatically saved.</div>
     <div class="actions">
       <button id="cancelConfirm" class="btn-cancel" type="button">No</button>
       <button id="okConfirm" class="btn-ok" type="button">Yes</button>
