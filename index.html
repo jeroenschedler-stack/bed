@@ -7,6 +7,8 @@
 
   <!-- PWA -->
   <link rel="manifest" href="icons/manifest.webmanifest">
+  <link rel="icon" sizes="192x192" href="icons/icon-192.png">
+  <meta name="theme-color" content="#1E90FF">
   <script defer src="install.js"></script>
 
   <style>
@@ -51,6 +53,7 @@
     .icon{width:56px; height:56px; flex:none; border-radius:8px; background:var(--brand-blue); object-fit:cover;}
   </style>
 </head>
+
 <body>
   <main class="wrap">
     <section class="card">
@@ -84,8 +87,10 @@
         </div>
       </button>
 
-      <!-- Hidden Install Button -->
-      <button id="btnInstall" style="display:none; margin-top:20px;">Add to Home Screen</button>
+      <!-- Install App -->
+      <button id="btnInstall" style="display:none; width:200px; margin-top:20px;">
+        Add to Home Screen
+      </button>
     </section>
   </main>
 </body>
