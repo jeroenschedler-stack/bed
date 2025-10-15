@@ -1,1 +1,14 @@
-test
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BED HOSPITALITY 2.0</title>
+  <style>
+    :root{
+      --text-dark:#434343;
+      --brand-blue:#1E90FF;
+      --muted:#999999;
+      --card-bg:#ffffff;
+      --page-bg:#f5f5f5;
+    }
