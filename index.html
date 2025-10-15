@@ -1,109 +1,92 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BED Hospitality 2.0</title>
+  <title>BED HOSPITALITY 2.0</title>
 
-  <!-- ✅ PWA Setup -->
+  <!-- PWA -->
   <link rel="manifest" href="icons/manifest.webmanifest">
-  <meta name="theme-color" content="#1E90FF">
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <script defer src="install.js"></script>
 
-  <!-- ✅ Styling -->
   <style>
-    body {
-      font-family: system-ui, Arial, sans-serif;
-      background: #ffffff;
-      color: #1E90FF;
-      margin: 0;
-      padding: 0;
-      text-align: center;
+    :root{
+      --text-dark:#434343;
+      --brand-blue:#1E90FF;
+      --muted:#999999;
+      --card-bg:#ffffff;
+      --page-bg:#f5f5f5;
     }
-    main {
-      padding: 80px 20px;
-    }
-    h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-      font-weight: 800;
-    }
-    p {
-      color: #444;
-      font-size: 16px;
-      margin-top: 0;
-    }
-    a.button {
-      display: inline-block;
-      margin: 20px 10px;
-      padding: 14px 28px;
-      background: #1E90FF;
-      color: #fff;
-      border-radius: 14px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background 0.3s ease;
-    }
-    a.button:hover {
-      background: #187bdb;
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:var(--page-bg); color:var(--text-dark);
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
     }
 
-    /* ✅ Install message box */
-    #installMsg {
-      display: none;
-      background: #1E90FF;
-      color: #fff;
-      padding: 18px 24px;
-      border-radius: 18px;
-      width: 90%;
-      max-width: 420px;
-      margin: 40px auto 0;
-      text-align: center;
-      font-size: 15px;
-      line-height: 1.5;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      animation: fadeIn 0.5s ease-in-out;
+    .wrap{max-width:720px; margin:40px auto; padding:0 16px}
+    .card{
+      background:var(--card-bg);
+      border-radius:24px;
+      box-shadow:0 8px 24px rgba(0,0,0,.08);
+      padding:28px 24px;
     }
 
-    @keyframes fadeIn {
-      from {opacity: 0; transform: translateY(10px);}
-      to {opacity: 1; transform: translateY(0);}
+    h1{margin:0 0 6px; font-weight:900; font-size:28px; color:#666}
+    .subhead{margin:0 0 16px; font-weight:800; text-transform:uppercase; font-size:18px; color:#666}
+    .intro{margin:18px 0; color:#444; font-size:14px; line-height:1.45;}
+
+    .btn {
+      appearance:none; border:1px solid var(--brand-blue);
+      background:#fff; color:var(--text-dark);
+      width:100%; border-radius:16px; cursor:pointer;
+      display:block; transition:transform .05s, box-shadow .15s;
+      margin:14px 0; padding:16px 18px;
     }
+    .btn:hover { border-color:var(--brand-blue);}
+    .btn:focus-visible {outline:none; box-shadow:0 0 0 4px rgba(30,144,255,.2);}
+    .btn:active {transform:scale(.997);}
+    .btn-grid{display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center;}
+    .title{font-weight:700; font-size:18px; line-height:1.2; text-align:left}
+    .subtitle{font-size:14px; color:#444; margin-top:3px; line-height:1.2; text-align:left}
+    .icon{width:56px; height:56px; flex:none; border-radius:8px; background:var(--brand-blue); object-fit:cover;}
   </style>
 </head>
-
 <body>
-  <main>
-    <h1>BED Hospitality 2.0</h1>
-    <p>Select how you want to begin:</p>
+  <main class="wrap">
+    <section class="card">
+      <h1>BED HOSPITALITY 2.0</h1>
+      <div class="subhead">SELF ASSESSMENT 2025</div>
 
-    <a class="button" href="team/index.html">Team Member Form</a>
-    <a class="button" href="peer/index.html">Peer Review Form</a>
+      <p class="intro">
+        BED 2.0 will change but the foundation of passion, common sense and shared responsibility will always remain.
+        This app reminds us about the things that make BED special. By looking in this mirror we can grow ourselves and help each other.
+      </p>
 
-    <!-- ✅ Install message (shows only when app is installable) -->
-    <div id="installMsg">
-      You can add this app to your home screen.<br>
-      It will save your progress so you can continue anytime.
-    </div>
+      <!-- Team -->
+      <button class="btn" onclick="location.href='./team/';">
+        <div class="btn-grid">
+          <img class="icon" src="./icons/team.png" alt="Team member icon">
+          <div>
+            <div class="title">I am a team member</div>
+            <div class="subtitle">I want to assess myself</div>
+          </div>
+        </div>
+      </button>
+
+      <!-- Peer -->
+      <button class="btn" onclick="location.href='./peer/';">
+        <div class="btn-grid">
+          <img class="icon" src="./icons/peer.png" alt="Peer reviewer icon">
+          <div>
+            <div class="title">I am a peer reviewer</div>
+            <div class="subtitle">I want to review my friend</div>
+          </div>
+        </div>
+      </button>
+
+      <!-- Hidden Install Button -->
+      <button id="btnInstall" style="display:none; margin-top:20px;">Add to Home Screen</button>
+    </section>
   </main>
-
-  <!-- ✅ Register Service Worker -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("/bed/service-worker.js")
-        .then(() => console.log("Service Worker registered successfully."))
-        .catch(err => console.log("Service Worker registration failed:", err));
-    }
-
-    // ✅ Show message only when app can be installed
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      document.getElementById('installMsg').style.display = 'block';
-    });
-  </script>
 </body>
 </html>
