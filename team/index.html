@@ -1277,10 +1277,46 @@ if (typeof window.syncToSheet === 'function') {
                     });
                 }
 
-                document.getElementById("congratsPdf").onclick = () => {
-                    buildPdfReport();
-                    window.print();
-                };
+               <script>
+// Requires html2pdf (see Step 3)
+document.getElementById("congratsPdf").onclick = async (e) => {
+  e.preventDefault();
+
+  // Make sure the PDF DOM is up-to-date
+  buildPdfReport();
+
+  const html = document.getElementById("pdfReport");
+  const opt = {
+    margin: 0,
+    filename: 'BED-report.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+  };
+
+  // Build PDF in memory
+  const worker  = html2pdf().from(html).set(opt);
+  const pdfBlob = await worker.outputPdf('blob');
+  const url     = URL.createObjectURL(pdfBlob);
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                    || navigator.standalone === true;
+
+  if (isStandalone) {
+    // Android PWA: open inside the app
+    location.href = url;
+  } else {
+    // Browser tab: trigger download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'BED-report.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+};
 
                 // Init
                 loadQuestions();
