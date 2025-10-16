@@ -37,12 +37,14 @@
     .subhead{margin:0 0 16px; font-weight:800; text-transform:uppercase; font-size:18px; color:#666}
     .intro{margin:18px 0; color:#444; font-size:14px; line-height:1.45;}
 
+    /* outline button used for Team/Peer links */
     .btn {
       appearance:none; border:1px solid var(--brand-blue);
       background:#fff; color:var(--text-dark);
       width:100%; border-radius:16px; cursor:pointer;
       display:block; transition:transform .05s, box-shadow .15s;
       margin:14px 0; padding:16px 18px;
+      text-decoration:none;
     }
     .btn:hover { border-color:var(--brand-blue);}
     .btn:focus-visible {outline:none; box-shadow:0 0 0 4px rgba(30,144,255,.2);}
@@ -51,6 +53,33 @@
     .title{font-weight:700; font-size:18px; line-height:1.2; text-align:left}
     .subtitle{font-size:14px; color:#444; margin-top:3px; line-height:1.2; text-align:left}
     .icon{width:56px; height:56px; flex:none; border-radius:8px; background:var(--brand-blue); object-fit:cover;}
+
+    /* filled-blue page button for A2HS */
+    .btn-primary{
+      width:100%;
+      padding:16px 18px;
+      border:1px solid var(--brand-blue);
+      border-radius:16px;
+      background:var(--brand-blue);
+      color:#fff;
+      font-weight:700;
+      font-size:18px;
+      line-height:1.2;
+      text-align:center;
+      cursor:pointer;
+      transition:filter .15s;
+    }
+    .btn-primary:hover{ filter:brightness(0.96); }
+    .btn-primary:active{ transform:scale(.997); }
+
+    /* explanatory note under the install button */
+    .install-note{
+      font-size:13px;
+      color:#666;
+      margin-top:8px;
+      line-height:1.4;
+      text-align:left;
+    }
   </style>
 </head>
 
@@ -65,45 +94,39 @@
         This app reminds us about the things that make BED special. By looking in this mirror we can grow ourselves and help each other.
       </p>
 
-     <!-- Team -->
-<a class="btn" href="./team/">
-  <span class="btn-grid">
-    <img class="icon" src="./icons/team.png" alt="Team member icon">
-    <span>
-      <span class="title">I am a team member</span>
-      <span class="subtitle">I want to assess myself</span>
-    </span>
-  </span>
-</a>
+      <!-- Team -->
+      <a class="btn" href="./team/">
+        <span class="btn-grid">
+          <img class="icon" src="./icons/team.png" alt="Team member icon">
+          <span>
+            <span class="title">I am a team member</span>
+            <span class="subtitle">I want to assess myself</span>
+          </span>
+        </span>
+      </a>
 
-<!-- Peer -->
-<a class="btn" href="./peer/">
-  <span class="btn-grid">
-    <img class="icon" src="./icons/peer.png" alt="Peer reviewer icon">
-    <span>
-      <span class="title">I am a peer reviewer</span>
-      <span class="subtitle">I want to review my friend</span>
-    </span>
-  </span>
-</a>
+      <!-- Peer -->
+      <a class="btn" href="./peer/">
+        <span class="btn-grid">
+          <img class="icon" src="./icons/peer.png" alt="Peer reviewer icon">
+          <span>
+            <span class="title">I am a peer reviewer</span>
+            <span class="subtitle">I want to review my friend</span>
+          </span>
+        </span>
+      </a>
 
-  <!-- Team button -->
-<a class="btn" href="./team/">…</a>
+      <!-- Add to Home Screen (filled-blue page button) -->
+      <button id="btnInstall" class="btn-primary" style="display:none;">
+        + Add to Home Screen
+      </button>
 
-<!-- Peer button -->
-<a class="btn" href="./peer/">…</a>
-
-<!-- Install App + Explanatory text -->
-<button id="btnInstall" style="...">
-  + Add to Home Screen
-</button>
-
-<p style="font-size:13px; color:#666; margin-top:8px; line-height:1.4; text-align:center;">
-  When you install the BED 2.0 App, you can return anytime and continue your self-assessment
-  without losing your data.
-</p>
-</section>
-
+      <!-- explanatory line (no italics) -->
+      <p class="install-note">
+        When you install the BED 2.0 App, you can return anytime and continue your self-assessment
+        without losing your data.
+      </p>
+    </section>
   </main>
 </body>
 </html>
