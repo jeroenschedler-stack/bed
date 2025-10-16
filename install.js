@@ -16,11 +16,20 @@ btn?.addEventListener('click', async () => {
   btn.style.display = 'none';
 });
 
-// Hide button if app already installed
+// Detect if running as standalone (already installed)
 const isStandalone =
   window.matchMedia('(display-mode: standalone)').matches ||
   window.navigator.standalone;
-if (isStandalone && btn) btn.style.display = 'none';
+
+if (isStandalone) {
+  if (btn) btn.style.display = 'none';
+
+  const msg = document.createElement('p');
+  msg.textContent = '✅ BED 2.0 is already installed on your device.';
+  msg.style.cssText =
+    'font-size:13px; color:#666; text-align:center; margin-top:12px; line-height:1.4;';
+  document.querySelector('#btnInstall')?.insertAdjacentElement('afterend', msg);
+}
 
 // Register service worker (GitHub Pages path)
 if ('serviceWorker' in navigator) {
