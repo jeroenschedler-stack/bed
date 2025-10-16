@@ -7,21 +7,41 @@
   "background_color": "#ffffff",
   "theme_color": "#1E90FF",
   "icons": [
-    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
   ],
   "shortcuts": [
     {
       "name": "Open Team Form",
       "short_name": "Team",
       "url": "/bed/team/",
-      "icons": [{ "src": "icons/team.png", "sizes": "192x192", "type": "image/png" }]
+      "icons": [
+        {
+          "src": "team.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     },
     {
       "name": "Open Peer Review",
       "short_name": "Peer",
       "url": "/bed/peer/",
-      "icons": [{ "src": "icons/peer.png", "sizes": "192x192", "type": "image/png" }]
+      "icons": [
+        {
+          "src": "peer.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }
