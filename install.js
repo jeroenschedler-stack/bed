@@ -5,7 +5,7 @@ const btn = document.getElementById('btnInstall');
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  btn.style.display = 'inline-block';
+  btn.style.display = 'block'; // full-width button
 });
 
 btn?.addEventListener('click', async () => {
@@ -24,11 +24,12 @@ const isStandalone =
 if (isStandalone) {
   if (btn) btn.style.display = 'none';
 
+  const note = document.querySelector('.install-note');
   const msg = document.createElement('p');
   msg.textContent = '✅ BED 2.0 is already installed on your device.';
   msg.style.cssText =
-    'font-size:13px; color:#666; text-align:center; margin-top:12px; line-height:1.4;';
-  document.querySelector('#btnInstall')?.insertAdjacentElement('afterend', msg);
+    'font-size:13px; color:#2e7d32; text-align:left; margin-top:8px; line-height:1.4;';
+  (note || btn)?.insertAdjacentElement('afterend', msg);
 }
 
 // Register service worker (GitHub Pages path)
@@ -38,5 +39,5 @@ if ('serviceWorker' in navigator) {
 
 // Optional iOS fallback hint
 if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
-  // show small text like “Share → Add to Home Screen”
+  // Optionally show a note like: “Tap Share → Add to Home Screen”
 }
