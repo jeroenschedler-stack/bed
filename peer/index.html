@@ -1276,7 +1276,8 @@ if (typeof window.syncToSheet === 'function') {
                         tb.appendChild(tr);
                     });
                 }
-
+<!-- 1) Add the PDF library (must be before our handler) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
                <script>
 // Requires html2pdf (see Step 3)
 document.getElementById("congratsPdf").onclick = async (e) => {
@@ -2033,7 +2034,53 @@ document.addEventListener("DOMContentLoaded", () => {
   observer.observe(targetNode, { childList: true, subtree: true });
 });
 </script>
-
 <script src="../gsync.js?v=21"></script>
+<!-- 1) Add the PDF library (must be before our handler) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<!-- 2) New Android-safe PDF click handler -->
+<script>
+document.getElementById("congratsPdf").onclick = async (e) => {
+  e.preventDefault();
+
+  // Make sure the PDF DOM is current
+  if (typeof window.buildPdfReport === "function") {
+    window.buildPdfReport();
+  }
+
+  const html = document.getElementById("pdfReport");
+  const opt = {
+    margin: 0,
+    filename: 'BED-report.pdf',
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+  };
+
+  // Build PDF in memory
+  const worker  = html2pdf().from(html).set(opt);
+  const pdfBlob = await worker.outputPdf('blob');
+  const url     = URL.createObjectURL(pdfBlob);
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                    || navigator.standalone === true;
+
+  if (isStandalone) {
+    // Android PWA: open inside the app
+    location.href = url;
+  } else {
+    // Browser tab: trigger download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'BED-report.pdf';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  }
+
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+};
+</script>
+
 </body>
 </html>
