@@ -45,3 +45,6 @@ if ('serviceWorker' in navigator) {
 if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
   // show small text like “Share → Add to Home Screen”
 }
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/bed/sw.js?v=2');
+}
