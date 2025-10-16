@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BED HOSPITALITY 2.0</title>
+  <style>
+    :root{
+      --text-dark:#434343;
+      --brand-blue:#1E90FF;
+      --muted:#999999;
+      --card-bg:#ffffff;
+      --page-bg:#f5f5f5;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; background:var(--page-bg); color:var(--text-dark);
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    }
+
+    .wrap{max-width:720px; margin:40px auto; padding:0 16px}
+    .card{
+      background:var(--card-bg);
+      border-radius:24px; /* round all corners */
+      box-shadow:0 8px 24px rgba(0,0,0,.08);
+      padding:28px 24px;
+    }
+
+    /* Header sizes */
+    h1{
+      margin:0 0 6px 0;
+      font-weight:900;
+      font-size:28px;
+      line-height:1.1;
+      color:#666666;
+      word-break:break-word; /* ensures no overflow */
+    }
+    .subhead{
+      margin:0 0 16px 0;
+      font-weight:800;
+      text-transform:uppercase;
+      font-size:18px;
+      color:#666666;
+    }
+
+    /* Intro text (added) */
+    .intro{
+      margin:18px 0 18px;
+      color:#444;
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    /* Buttons */
+.btn {
+  appearance: none;
+  border: 1px solid var(--brand-blue);   /* always blue border */
+  background: #fff;
+  color: var(--text-dark);
+  width: 100%;
+  border-radius: 16px;
+  cursor: pointer;
+  display: block;
+  transition: 
+    transform .05s ease,
+    box-shadow .15s ease;
+  margin: 14px 0;
+  padding: 16px 18px;
+}
+
+.btn:hover {
+  border-color: var(--brand-blue);         /* keeps blue on hover */
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(30,144,255,.2);
+  border-color: var(--brand-blue);
+}
+
+.btn:active {
+  transform: scale(.997);
+}
+
+    .btn-grid{
+      display:grid; grid-template-columns:auto 1fr; gap:10px; align-items:center;
+    }
+    .title{font-weight:700; font-size:18px; line-height:1.2; text-align:left}
+    .subtitle{font-size:14px;  color:#444; margin-top:3px; line-height:1.2; text-align:left}
+
+    /* Icon switched from inline SVG to PNG */
+    .icon{
+      width:56px; height:56px; flex:none; border-radius:8px;
+      background:var(--brand-blue);
+      display:block; object-fit:cover;
+    }
+    /* legacy rule harmless if no inline SVG present */
+    .icon svg{width:100%; height:100%}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card" role="region" aria-labelledby="title">
+      <h1 id="title">BED HOSPITALITY 2.0</h1>
+      <div class="subhead">SELF ASSESSMENT  2025</div>
+
+      <!-- Intro text (added) -->
+      <p class="intro">
+        BED 2.0 will change but the foundation of passion, common sense and shared responsibility will always remain.
+        This app reminds us about the things that make BED special. By looking in this mirror we can grow ourselves and help each other <br>
+      </p>
+
+      <!-- Button 1: Team (icon changed to PNG) -->
+      <button class="btn" onclick="location.href='./team/';"
+        aria-label="I am a team member. I want to assess myself.">
+        <div class="btn-grid">
+          <img class="icon" src="./icons/team.png" alt="Team member icon" width="50" height="50">
+          <div>
+            <div class="title">I am a team member</div>
+            <div class="subtitle">I want to assess myself</div>
+          </div>
+        </div>
+      </button>
+
+      <!-- Button 2: Peer (icon changed to PNG) -->
+      <button class="btn" onclick="location.href='./peer/';"
+        aria-label="I am a peer reviewer. I want to review my friend.">
+        <div class="btn-grid">
+          <img class="icon" src="./icons/peer.png" alt="Peer reviewer icon" width="50" height="50">
+          <div>
+            <div class="title">I am a peer reviewer</div>
+            <div class="subtitle">I want to review my friend</div>
+          </div>
+        </div>
+      </button>
+    </section>
+  </main>
+</body>
+</html>
