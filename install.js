@@ -1,8 +1,8 @@
 let deferredPrompt;
 const btn = document.getElementById('btnInstall');
 
-// Always show the button
-btn.style.display = 'block';
+// Always show the button (only if it exists on this page)
+if (btn) btn.style.display = 'block';
 
 // Handle installable prompt when available
 window.addEventListener('beforeinstallprompt', (e) => {
@@ -16,10 +16,8 @@ btn?.addEventListener('click', async () => {
     window.matchMedia('(display-mode: standalone)').matches ||
     window.navigator.standalone;
 
-  // If already installed → show message
   if (isStandalone) {
     const note = document.querySelector('.install-note');
-    // Remove any old message first
     document.getElementById('installedMsg')?.remove();
 
     const msg = document.createElement('p');
@@ -32,11 +30,11 @@ btn?.addEventListener('click', async () => {
     return;
   }
 
-  // Otherwise, proceed with install prompt
   if (!deferredPrompt) return;
   await deferredPrompt.prompt();
   await deferredPrompt.userChoice;
   deferredPrompt = null;
+  if (btn) btn.style.display = 'none';
 });
 
 // Register service worker (GitHub Pages path)
@@ -46,5 +44,5 @@ if ('serviceWorker' in navigator) {
 
 // Optional iOS fallback hint
 if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
-  // show small text like “Add app to home screen”
+  // show small text like “Share → Add to Home Screen”
 }
