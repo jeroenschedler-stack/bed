@@ -25,7 +25,6 @@ btn?.addEventListener('click', async () => {
     const msg = document.createElement('p');
     msg.id = 'installedMsg';
     msg.innerHTML =
-      '<span style="color:#1E90FF;">&#10003;</span> ' +
       '<span style="color:#d32f2f;">BED 2.0 is already installed on your device.</span>';
     msg.style.cssText =
       'font-size:13px; text-align:left; margin-top:8px; line-height:1.4;';
@@ -47,5 +46,5 @@ if ('serviceWorker' in navigator) {
 
 // Optional iOS fallback hint
 if (/iphone|ipad|ipod/i.test(navigator.userAgent)) {
-  // show small text like “Share → Add to Home Screen”
+  // show small text like “Add app to home screen”
 }
